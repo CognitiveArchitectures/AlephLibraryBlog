@@ -317,6 +317,11 @@
     .notify-input::placeholder{color:var(--ink-faint)}
     .notify-input:focus{outline:none;border-color:var(--rubric);box-shadow:0 0 0 3px color-mix(in srgb,var(--rubric) 18%,transparent)}
     .notify .btn-primary{flex:0 0 auto}
+    .notify-thanks{margin:34px auto 0;max-width:520px;text-align:center;padding:20px 24px;
+      border:1px solid var(--rubric);border-radius:16px;background:color-mix(in srgb,var(--rubric) 7%,transparent);
+      color:var(--ink-soft);font-size:17px;line-height:1.5;text-wrap:pretty;animation:thanksIn .45s var(--ease) both}
+    .notify-thanks strong{color:var(--rubric);font-weight:700}
+    @keyframes thanksIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
     /* FOOTER */
     footer{border-top:1px solid var(--hair);padding:clamp(52px,7vw,84px) 0 62px;text-align:center;position:relative;z-index:2}
@@ -446,6 +451,34 @@
           s.textContent = pad(diff % 60);
         }
         timer = setInterval(tick, 1000); tick();
+      })();
+
+      // Waitlist: submit in the background, show an inline thank-you (never leave the page)
+      (function(){
+        function thanks(form){
+          var box = document.createElement('div');
+          box.className = 'notify-thanks';
+          box.setAttribute('role', 'status');
+          box.innerHTML = "<strong>You’re on the list.</strong> Thank you — we’ll let you know the moment Aleph launches.";
+          form.replaceWith(box);
+        }
+        document.querySelectorAll('form.notify').forEach(function(form){
+          form.addEventListener('submit', function(e){
+            e.preventDefault();
+            var input = form.querySelector('input[type="email"]');
+            var email = input ? input.value.trim() : '';
+            if(!email){ if(input) input.reportValidity(); return; }
+            var btn = form.querySelector('button[type="submit"]');
+            if(btn){ btn.disabled = true; btn.textContent = 'Joining…'; }
+            var body = 'email=' + encodeURIComponent(email) + '&embed=1';
+            // no-cors: the request reaches Buttondown; the response is opaque, so we optimistically confirm.
+            fetch(form.action, {
+              method: 'POST', mode: 'no-cors',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: body
+            }).then(function(){ thanks(form); }, function(){ thanks(form); });
+          });
+        });
       })();
 
       if(reduce){
