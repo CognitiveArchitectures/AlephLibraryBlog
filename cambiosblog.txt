@@ -1,0 +1,15 @@
+feat(perfil): sección "Tu biblioteca" con stats de lector
+
+Libros · explorados · terminados · autores conectados · conexión más larga
+(cadena más larga del grafo de RelacionLibros, DFS de camino simple acotado
+por presupuesto). Cacheado en @State, recomputado solo al cambiar
+libros/relaciones (.task), no por render. Identidad por amplitud+conexión,
+no por minutos.
+
+perf(arranque): diferir la pestaña Constelación con LazyView
+
+El TabView instancia todas las pestañas al lanzar; envolver Constelación
+(globo SceneKit + grafo Grape) en LazyView difiere su construcción a la
+primera visita, descongestionando el cold-launch. Verificar en device.
+
+content(about): "Aleph refuses to think for you". Beat que contrasta con los tools que te dan el knowledge ya procesado: Aleph te hace procesarlo. "The friction is where understanding is made."
