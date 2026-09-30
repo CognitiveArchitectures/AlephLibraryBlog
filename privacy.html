@@ -6,24 +6,38 @@ permalink: /privacy/
 ---
 <section class="legal"><div class="wrap">
   <h1 class="serif">Privacy Policy</h1>
-  <p class="updated">Last updated: August 19, 2026</p>
+  <p class="updated">Last updated: September 30, 2026</p>
 
-  <p class="lede">Aleph is built privacy-first. Your reading—your library, highlights, notes, and the connections you make—lives on your device and in your own iCloud. We do not run a server that collects it, we do not sell it, we do not show ads, and we do not track you.</p>
+  <p class="lede">Aleph is built privacy-first. Your reading—your library, highlights, notes, and the connections you make—lives on your device and in your own iCloud. We do not run a server that collects it, we do not sell it, we do not show ads, and we do not track you. The only things that become public are the passages you <strong>choose</strong> to share in the community.</p>
 
   <p>This policy explains what Aleph ("the app") does with your information. Aleph is developed by Diego Zárate Rosales ("we", "us", "our"). It applies to the Aleph iOS app and to this website, <a href="https://alephlibrary.com">alephlibrary.com</a>.</p>
 
   <h2 class="serif">Our approach</h2>
-  <p>Aleph is designed to keep your data with <strong>you</strong>. The app works on-device and syncs only through <strong>your own iCloud account</strong> (Apple CloudKit private database). We, the developer, have no access to that data. There is no Aleph analytics server, no third-party advertising SDK, and no cross-app tracking.</p>
+  <p>Aleph is designed to keep your data with <strong>you</strong>. The app works on-device and syncs only through <strong>your own iCloud account</strong> (Apple CloudKit private database). We, the developer, have no access to that data. There is no Aleph analytics server, no third-party advertising SDK, and no cross-app tracking. The one exception is the optional community, described below: what you publish there is stored in Aleph's public CloudKit database so other readers can see it.</p>
 
   <h2 class="serif">What the app handles, and where it lives</h2>
   <ul>
     <li><strong>Your reading data</strong> — the books/PDFs you add, highlights, notes, hand-drawn annotations, tags, reading sessions, and the connections in your graph. Stored on your device and, if you enable iCloud, in your private iCloud (CloudKit). Your document files live in your own iCloud Drive / Files. We never receive them.</li>
+    <li><strong>Text copies for Focus mode</strong> — to read EPUB and TXT books with Apple's native text engine, the app saves a plain-text copy of each such book in the app's own folder in <strong>your</strong> iCloud Drive (iCloud Drive → Aleph → Textos). It is yours, like your other files; we never receive it.</li>
     <li><strong>Sign in with Apple</strong> — if you create an account, we use Apple's Sign in with Apple. Apple gives the app a private identifier; you can choose to hide your email. You can delete your account and its data from within the app.</li>
     <li><strong>Mood / State of Mind (optional)</strong> — if you log how a reading session felt, and you grant permission, the app writes that to Apple <strong>HealthKit</strong> as a State of Mind entry, stored in Apple Health on your device. See the HealthKit section below.</li>
     <li><strong>Location (optional)</strong> — if you enable the reading map, the app may capture an approximate location (about 100 m, "while using the app", one-shot) when you finish a session, to place a pin. It is stored with your session in your own data. It is never continuously tracked and never shared.</li>
     <li><strong>Photos (optional)</strong> — if you attach a photo to a reading session, it is stored with your data. The app only accesses photos you explicitly pick.</li>
     <li><strong>Weather (optional)</strong> — the reading map may show the weather for a session using Apple <strong>WeatherKit</strong>. Weather data is provided by Apple.</li>
   </ul>
+
+  <h2 class="serif">The community (optional): The Great Conversation</h2>
+  <p>You can join Aleph's community to see what other readers are reading and share passages. It is <strong>off until you create a community profile</strong>, and nothing is shared unless you choose to share it.</p>
+  <ul>
+    <li><strong>What becomes public</strong> — your community profile (the @alias and display name you pick, and your profile photo if you choose to use it); the passages you share (the quote, its book and author — never your private notes or your files); reposts and quotes you make, with the text you write when quoting; likes; comments (only possible between friends who follow each other); who you follow; and, if you turn it on, the title and author of the book you are reading. Anyone using Aleph can see these.</li>
+    <li><strong>Where it lives</strong> — in Aleph's public database on Apple's CloudKit. Your community account is identified by an identifier that Apple generates for your iCloud account in this app; it does not reveal your Apple ID or email.</li>
+    <li><strong>Moderation</strong> — to keep the community safe, the app checks what you write before publishing it, lets anyone report posts and comments, hides content that several people report, and lets moderators hide content that breaks the rules. Reports record which item was reported and why. Blocking someone is stored only on your device.</li>
+    <li><strong>Saved posts</strong> — posts you bookmark are stored only on your device.</li>
+    <li><strong>Deleting it</strong> — you can delete your community profile and everything you published (posts, reposts, quotes, comments, likes, follows) at any time from the app: Community → your profile → Delete. Your private library is not affected.</li>
+  </ul>
+
+  <h2 class="serif">Book and audiobook sources</h2>
+  <p>When you use "Get books" or look up an audiobook, the app contacts public services on your behalf: <strong>Project Gutenberg</strong> (search and download of public-domain books), <strong>Open Library</strong> (to look up the printed page count of a book), and <strong>LibriVox</strong> / the <strong>Internet Archive</strong> (to find and play public-domain audiobooks). These requests contain the book title or author you are looking for, not your identity or your library. Their own privacy policies apply to those requests. Websites you open in the in-app browser are governed by their own policies.</p>
 
   <h2 class="serif">On-device intelligence</h2>
   <p>Aleph's suggestions and summaries use Apple Intelligence's on-device models (the Foundation Models framework) and on-device embeddings. This processing happens <strong>on your device</strong>. Your library content is not sent to us or to any third party to power these features.</p>
@@ -43,16 +57,17 @@ permalink: /privacy/
     <li>We do not show advertising.</li>
     <li>We do not track you across other apps or websites, and the app does not use the Advertising Identifier.</li>
     <li>We do not use your reading, health, or location data to build advertising profiles.</li>
+    <li>We do not publish anything to the community that you did not choose to share.</li>
   </ul>
 
   <h2 class="serif">Data retention and deletion</h2>
-  <p>Your app data stays until you delete it. Deleting the app removes local data; data you synced to iCloud is managed in your Apple ID / iCloud settings. If you created an account, you can delete it and its associated data from within the app. To remove your email from the waitlist, use the unsubscribe link in any email or contact us.</p>
+  <p>Your app data stays until you delete it. Deleting the app removes local data; data you synced to iCloud is managed in your Apple ID / iCloud settings. If you created an account, you can delete it and its associated data from within the app. Community content stays public until you delete it (or it is removed by moderation); deleting your community profile removes all of it. To remove your email from the waitlist, use the unsubscribe link in any email or contact us.</p>
 
   <h2 class="serif">Your rights by region</h2>
-  <p>Depending on where you live, you may have specific rights over your personal data. If you are in the <strong>European Economic Area or the United Kingdom</strong>, you may have rights to access, correct, delete, or port your data, and to object to certain processing. If you are in <strong>California</strong>, you have the right to know what personal information is collected and to request its deletion, and the right to know that <strong>we do not sell your personal information</strong>—we don't. Because Aleph keeps your data on your device and in your own iCloud, most of it is never in our possession. To exercise any right, or simply to ask a question, email <a href="mailto:support@alephlibrary.com">support@alephlibrary.com</a> and we'll respond within a reasonable time.</p>
+  <p>Depending on where you live, you may have specific rights over your personal data. If you are in the <strong>European Economic Area or the United Kingdom</strong>, you may have rights to access, correct, delete, or port your data, and to object to certain processing. If you are in <strong>Mexico</strong>, you have the rights of access, rectification, cancellation, and opposition (ARCO) under the Federal Law on the Protection of Personal Data Held by Private Parties. If you are in <strong>California</strong>, you have the right to know what personal information is collected and to request its deletion, and the right to know that <strong>we do not sell your personal information</strong>—we don't. Because Aleph keeps your data on your device and in your own iCloud, most of it is never in our possession. To exercise any right, or simply to ask a question, email <a href="mailto:support@alephlibrary.com">support@alephlibrary.com</a> and we'll respond within a reasonable time.</p>
 
   <h2 class="serif">Children</h2>
-  <p>Aleph is not directed to children under 13, and we do not knowingly collect personal information from them.</p>
+  <p>Aleph is not directed to children under 13, and we do not knowingly collect personal information from them. The community is intended for people 13 and older; if you are a minor, use it only with the permission of a parent or guardian.</p>
 
   <h2 class="serif">Changes to this policy</h2>
   <p>If we make material changes, we will update this page and the "Last updated" date above.</p>
