@@ -7,6 +7,10 @@ noindex: true
 ---
 {%- comment -%}
   404.html — dos trabajos:
+  0. alephlibrary.com/@alias/blog/<uid> = una entrada publicada de su blog (2026-10-09): registro
+     `Entrada` (id blog_<uid>) de la base pública, Markdown pintado aquí con un lector mínimo y
+     seguro (todo con textContent; enlaces solo http(s); imágenes = sus archivos en CloudKit).
+     /@alias/blog lleva al perfil (su bloque «Mi blog» lista las entradas, desde `cuaderno`).
   1. alephlibrary.com/@alias = el perfil público de un lector de Aleph (2026-10-08). GitHub Pages
      no tiene rutas dinámicas: cualquier ruta que no existe cae aquí, y el script lee el @alias de
      la dirección. Con Aleph instalada, iOS abre la app antes de llegar aquí (Universal Links:
@@ -40,6 +44,31 @@ noindex: true
   .lec-spine .q{position:absolute;top:4px;right:6px;color:#fff;font-size:12px;font-family:ui-serif,Georgia,serif;font-weight:700}
   .lec-hint{font-size:12px;color:var(--ink-faint);margin-top:8px}
   .lec-why{margin-top:12px}
+  .lec-cita{padding-left:12px;border-left:2px solid var(--acento,var(--rubric))}
+  .lec-cita + .lec-cita{margin-top:14px}
+  .lec-cita .q{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:17.5px;line-height:1.45;text-wrap:pretty}
+  .lec-cita .f{font-family:ui-monospace,monospace;font-size:11px;color:var(--ink-faint);margin-top:4px}
+  .lec-mas{margin-top:14px;background:none;border:0;padding:0;font:inherit;font-size:14px;font-weight:600;color:var(--acento,var(--rubric));cursor:pointer}
+  #blog{scroll-margin-top:84px}
+  .lec-post{display:block;text-decoration:none}
+  .lec-post .t{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:19px;font-weight:600}
+  .lec-post .f{font-family:ui-monospace,monospace;font-size:11px;color:var(--ink-faint);margin-top:2px}
+  .lec-post .x{font-size:14px;color:var(--ink-soft);margin-top:6px;text-wrap:pretty}
+  .ent-h{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:clamp(28px,5vw,40px);font-weight:700;letter-spacing:-.02em;line-height:1.1;margin:10px 0 12px;text-wrap:balance}
+  .ent-meta{font-family:ui-monospace,monospace;font-size:12px;color:var(--ink-faint)}
+  .ent-autor{display:inline-flex;gap:8px;align-items:center;color:var(--ink-soft);font-size:14px;text-decoration:none;margin-bottom:22px}
+  .md{font-family:ui-serif,"New York","Iowan Old Style",Palatino,Georgia,serif;font-size:18.5px;line-height:1.65;color:var(--ink)}
+  .md p{margin:0 0 16px;text-wrap:pretty}
+  .md h2,.md h3,.md h4{font-weight:700;letter-spacing:-.01em;margin:26px 0 10px;line-height:1.2}
+  .md h2{font-size:26px}.md h3{font-size:21px}.md h4{font-size:18px}
+  .md blockquote{margin:0 0 16px;padding-left:14px;border-left:3px solid var(--rubric);font-style:italic;color:var(--ink-soft)}
+  .md ul,.md ol{margin:0 0 16px;padding-left:22px}.md li{margin-bottom:6px}
+  .md hr{border:none;border-top:1px solid var(--hair);margin:26px 0}
+  .md code{font-family:ui-monospace,monospace;font-size:.85em;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+  .md a{color:var(--rubric);text-underline-offset:2px}
+  .md .md-img{max-width:100%;height:auto;border-radius:10px;margin:6px 0 18px}
+  .md .md-ref{display:inline-block;margin:0 0 16px;font-family:-apple-system,sans-serif;font-size:14px}
+  .lec-card .m{font-size:16px;font-weight:600;margin-top:8px;text-wrap:pretty}
   .lec-block{margin-top:40px}
   .lec-block h2{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:14px}
   .lec-spines{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
@@ -101,12 +130,15 @@ noindex: true
 {% raw %}
 <script>
 (function () {
-  var m = location.pathname.match(/^\/@([A-Za-z0-9_.]{3,20})\/?$/);
+  var m = location.pathname.match(/^\/@([A-Za-z0-9_.]{3,20})(?:\/blog(?:\/([A-Za-z0-9-]{8,64}))?)?\/?$/);
   if (!m) return;
   var alias = m[1].toLowerCase();
+  var uidEntrada = m[2] || null;
   var es = (navigator.language || "en").toLowerCase().indexOf("es") === 0;
   var T = es ? {
-    titulo: "@" + alias + " en Aleph", leyendo: "Leyendo ahora", busco: "Lo que busco: ", tocaLibro: "Toca un libro para ver por qué está aquí.",
+    titulo: "@" + alias + " en Aleph", leyendo: "Leyendo ahora", citas: "Citas que me acompañan",
+    verTodas: function (n) { return "Ver las " + n; }, verMenos: "Ver menos", blog: "Mi blog", otraEntrada: "Otra entrada de este blog",
+    noEntrada: "Esta entrada ya no está.", noEntradaSub: "Su autor la despublicó o cambió de alias.", busco: "Lo que busco: ", tocaLibro: "Toca un libro para ver por qué está aquí.",
     destacados: "Destacados", llevo: "Lo que me llevé", ideas: "Mis ideas", conversacion: "Mi conversación",
     comprobada: "Lectura comprobada", logros: "Logros", enlaces: "Enlaces", estantes: "Mis estantes",
     totalLibros: function (n) { return n.toLocaleString("es") + " libros en mi biblioteca"; },
@@ -119,7 +151,9 @@ noindex: true
     noHay: "No encontramos a @" + alias + ".", noHaySub: "Puede que haya cambiado de alias.",
     soloApp: "Este perfil se ve completo en la app."
   } : {
-    titulo: "@" + alias + " on Aleph", leyendo: "Reading now", busco: "What I'm looking for: ", tocaLibro: "Tap a book to see why it's here.",
+    titulo: "@" + alias + " on Aleph", leyendo: "Reading now", citas: "Quotes that stay with me",
+    verTodas: function (n) { return "See all " + n; }, verMenos: "See less", blog: "My blog", otraEntrada: "Another post from this blog",
+    noEntrada: "This post is no longer available.", noEntradaSub: "Its author unpublished it or changed their alias.", busco: "What I'm looking for: ", tocaLibro: "Tap a book to see why it's here.",
     destacados: "Featured", llevo: "What I took away", ideas: "My ideas", conversacion: "My conversation",
     comprobada: "Verified reading", logros: "Achievements", enlaces: "Links", estantes: "My shelves",
     totalLibros: function (n) { return n.toLocaleString("en") + " books in my library"; },
@@ -183,6 +217,7 @@ noindex: true
     raiz.appendChild(cta());
   }
 
+  var aliasActual = alias;
   var ck = window.ALEPH_CLOUDKIT || {};
   if (!ck.token) { soloAlias(T.soloApp, ""); return; }
 
@@ -197,6 +232,98 @@ noindex: true
       body: JSON.stringify({ zoneID: { zoneName: "_defaultZone" }, records: nombres.map(function (n) { return { recordName: n }; }) })
     }).then(function (r) { if (!r.ok) throw new Error("ck " + r.status); return r.json(); })
       .then(function (j) { return (j.records || []).filter(function (x) { return !x.serverErrorCode; }); });
+  }
+
+  if (uidEntrada) { pintarEntrada(uidEntrada); return; }
+
+  // Una entrada publicada del blog: blog_<uid> (+ mod_blog_<uid> si un moderador la ocultó).
+  function pintarEntrada(uid) {
+    lookup(["blog_" + uid, "mod_blog_" + uid]).then(function (rs) {
+      var r = rs.filter(function (x) { return x.recordType === "Entrada"; })[0];
+      var oculta = rs.some(function (x) { return x.recordType === "Moderacion"; });
+      if (!r || oculta) { soloAlias(T.noEntrada, T.noEntradaSub); return; }
+      raiz.textContent = "";
+      var aliasR = campo(r, "alias") || alias, nombre = campo(r, "nombre") || "";
+      var tituloE = campo(r, "titulo") || "(sin título)";
+      document.title = tituloE + " · @" + aliasR;
+      var fecha = campo(r, "publicadaEn");
+      var meta = [campo(r, "tipo") && campo(r, "tipo") !== "General" ? campo(r, "tipo") : null,
+                  fecha ? new Intl.DateTimeFormat(es ? "es" : "en", { day: "numeric", month: "long", year: "numeric" }).format(new Date(fecha)) : null]
+        .filter(Boolean).join(" · ");
+      if (meta) raiz.appendChild(el("div", "ent-meta", meta));
+      raiz.appendChild(el("h1", "ent-h", tituloE));
+      var au = el("a", "ent-autor", nombre ? nombre + " · @" + aliasR : "@" + aliasR);
+      au.href = "/@" + aliasR;
+      raiz.appendChild(au);
+      if (campo(r, "esLink") === 1) {
+        var u = campo(r, "urlExterna") || "";
+        var a = enlaceSeguro(/^https?:\/\//i.test(u) ? u : "https://" + u, u);
+        if (a) { a.className = "btn btn-primary"; raiz.appendChild(a); }
+      } else {
+        var imgs = (campo(r, "imagenes") || []).map(function (x) { return x && x.downloadURL ? x.downloadURL.replace("${f}", "imagen.jpg") : null; });
+        raiz.appendChild(markdown(campo(r, "cuerpo") || "", imgs, aliasR));
+      }
+      raiz.appendChild(cta());
+    }).catch(function () { soloAlias(T.soloApp, ""); });
+  }
+
+  function enlaceSeguro(href, texto) {
+    try {
+      var u = new URL(href);
+      if (!/^https?:$/.test(u.protocol)) return null;
+      var a = el("a", null, texto); a.href = u.href; a.target = "_blank"; a.rel = "noopener nofollow";
+      return a;
+    } catch (e) { return null; }
+  }
+
+  // Markdown mínimo y seguro: lo mismo que escribe el editor de Aleph (títulos, citas, listas,
+  // separador, [img:N], enlaces, **negritas**, *itálicas*, `código` y aleph://blog/<uid>).
+  function enLinea(s, padre) {
+    var re = /(\*\*([^*]+)\*\*)|(\*([^*]+)\*)|(`([^`]+)`)|(\[([^\]]+)\]\(([^)\s]+)\))|(https?:\/\/[^\s<]*[^\s<.,;:!?)\]"'])/g;
+    var ultimo = 0, mm;
+    while ((mm = re.exec(s))) {
+      if (mm.index > ultimo) padre.appendChild(document.createTextNode(s.slice(ultimo, mm.index)));
+      if (mm[1]) padre.appendChild(el("strong", null, mm[2]));
+      else if (mm[3]) padre.appendChild(el("em", null, mm[4]));
+      else if (mm[5]) padre.appendChild(el("code", null, mm[6]));
+      else if (mm[7]) padre.appendChild(enlaceSeguro(mm[9], mm[8]) || document.createTextNode(mm[8]));
+      else if (mm[10]) padre.appendChild(enlaceSeguro(mm[10], mm[10]) || document.createTextNode(mm[10]));
+      ultimo = re.lastIndex;
+    }
+    if (ultimo < s.length) padre.appendChild(document.createTextNode(s.slice(ultimo)));
+  }
+  function markdown(texto, imgs, aliasR) {
+    var cont = el("div", "md"), lineas = texto.split("\n"), i = 0, parrafo = [];
+    function cerrar() { if (parrafo.length) { var p = el("p"); enLinea(parrafo.join(" "), p); cont.appendChild(p); parrafo = []; } }
+    while (i < lineas.length) {
+      var t = lineas[i].trim(), x;
+      if (!t) { cerrar(); i++; continue; }
+      if ((x = t.match(/^(#{1,3})\s+(.*)$/))) { cerrar(); var h = el("h" + (x[1].length + 1)); enLinea(x[2], h); cont.appendChild(h); i++; continue; }
+      if (/^(-{3,}|\*{3,}|_{3,})$/.test(t)) { cerrar(); cont.appendChild(el("hr")); i++; continue; }
+      if ((x = t.match(/^\[img:(\d+)\]$/))) {
+        cerrar(); var src = imgs[parseInt(x[1], 10) - 1];
+        if (src) { var im = el("img", "md-img"); im.src = src; im.alt = ""; im.loading = "lazy"; cont.appendChild(im); }
+        i++; continue;
+      }
+      if ((x = t.match(/^aleph:\/\/blog\/([A-Za-z0-9-]{8,64})$/))) {
+        cerrar(); var ref = el("a", "md-ref", "→ " + T.otraEntrada); ref.href = "/@" + aliasR + "/blog/" + x[1]; cont.appendChild(ref); i++; continue;
+      }
+      if (/^>\s?/.test(t)) {
+        cerrar(); var q = [];
+        while (i < lineas.length && /^>\s?/.test(lineas[i].trim())) { q.push(lineas[i].trim().replace(/^>\s?/, "")); i++; }
+        var bq = el("blockquote"); enLinea(q.join(" "), bq); cont.appendChild(bq); continue;
+      }
+      if (/^([-*]|\d+\.)\s+/.test(t)) {
+        cerrar(); var lista = el(/^\d+\./.test(t) ? "ol" : "ul");
+        while (i < lineas.length && /^([-*]|\d+\.)\s+/.test(lineas[i].trim())) {
+          var li = el("li"); enLinea(lineas[i].trim().replace(/^([-*]|\d+\.)\s+/, ""), li); lista.appendChild(li); i++;
+        }
+        cont.appendChild(lista); continue;
+      }
+      parrafo.push(t); i++;
+    }
+    cerrar();
+    return cont;
   }
 
   lookup(["alias_" + alias]).then(function (rs) {
@@ -215,6 +342,7 @@ noindex: true
   function pintar(p, leyendo) {
     raiz.textContent = "";
     var aliasReal = campo(p, "alias") || alias;
+    aliasActual = aliasReal;
     document.title = (es ? "@" + aliasReal + " en Aleph" : "@" + aliasReal + " on Aleph");
     var av = campo(p, "avatar");
     var avatarURL = av && av.downloadURL ? av.downloadURL.replace("${f}", "avatar.jpg") : null;
@@ -246,6 +374,9 @@ noindex: true
     }
     raiz.appendChild(cta());
     raiz.appendChild(el("p", "lec-note", T.nota));
+    if (/\/blog\/?$/.test(location.pathname)) {
+      setTimeout(function () { var b = document.getElementById("blog"); if (b) b.scrollIntoView(); }, 60);
+    }
   }
 
   function caja(titulo) { var d = el("div", "lec-block"); d.appendChild(el("h2", null, titulo)); return d; }
@@ -263,7 +394,7 @@ noindex: true
         var por = el("div", "lec-why");
         var algunoConPorque = false;
         c.destacados.forEach(function (l) {
-          var tiene = !!(l.frase || l.opinion);
+          var tiene = !!(l.motivo || l.frase || l.opinion);
           if (tiene) algunoConPorque = true;
           var s = el("button", "lec-spine"); s.type = "button"; s.style.background = PALETA[l.color] || PALETA[5];
           s.title = l.titulo + (l.autor ? " — " + l.autor : "");
@@ -277,6 +408,7 @@ noindex: true
             s.classList.add("sel");
             var k = el("div", "lec-card");
             k.appendChild(el("div", "k", l.titulo + (l.autor ? " · " + l.autor : "")));
+            if (l.motivo) k.appendChild(el("div", "m", l.motivo));
             if (l.frase) k.appendChild(el("div", "q", "“" + l.frase + "”"));
             if (l.opinion) k.appendChild(el("div", "o", l.opinion));
             por.appendChild(k);
@@ -351,6 +483,40 @@ noindex: true
           ks.appendChild(row);
         });
         d.appendChild(ks); return d;
+      case "citas":
+        if (!c.citas || !c.citas.length) return null;
+        d = caja(T.citas);
+        var kc = el("div", "lec-card");
+        var abiertas = false;
+        function pintarCitas() {
+          kc.textContent = "";
+          (abiertas ? c.citas : c.citas.slice(0, 4)).forEach(function (x) {
+            var q = el("div", "lec-cita");
+            q.appendChild(el("div", "q", "“" + x.texto + "”"));
+            q.appendChild(el("div", "f", ["— " + (x.titulo || ""), x.autor || "", x.pagina ? (es ? "pág. " : "p. ") + x.pagina : ""]
+              .filter(function (t) { return t && t !== "— "; }).join(" · ")));
+            kc.appendChild(q);
+          });
+          if (c.citas.length > 4) {
+            var b = el("button", "lec-mas", abiertas ? T.verMenos : T.verTodas(c.citas.length)); b.type = "button";
+            b.addEventListener("click", function () { abiertas = !abiertas; pintarCitas(); });
+            kc.appendChild(b);
+          }
+        }
+        pintarCitas();
+        d.appendChild(kc); return d;
+      case "blog":
+        if (!c.blog || !c.blog.length) return null;
+        d = caja(T.blog); d.id = "blog";
+        c.blog.forEach(function (e) {
+          var a = el("a", "lec-card lec-post"); a.href = "/@" + aliasActual + "/blog/" + e.uid;
+          a.appendChild(el("div", "t", e.titulo));
+          var f = fechaSwift(e.fecha);
+          if (f) a.appendChild(el("div", "f", new Intl.DateTimeFormat(es ? "es" : "en", { day: "numeric", month: "short", year: "numeric" }).format(f)));
+          if (e.extracto) a.appendChild(el("div", "x", e.extracto));
+          d.appendChild(a);
+        });
+        return d;
       case "logros":
         if (!c.logros || !c.logros.length) return null;
         d = caja(T.logros);
