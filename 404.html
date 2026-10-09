@@ -33,6 +33,13 @@ noindex: true
   .lec-now{margin-top:24px;padding:16px 18px;background:var(--surface);border:1px solid var(--hair);border-radius:16px}
   .lec-now .t{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:20px;font-weight:600;margin-top:4px}
   .lec-now .a{font-size:14px;color:var(--rubric)}
+  .lec-now .b{font-size:14px;color:var(--ink-soft);font-style:italic;margin-top:8px;text-wrap:pretty}
+  button.lec-spine{border:0;padding:0;cursor:pointer;font:inherit;text-align:left;width:100%}
+  button.lec-spine[disabled]{cursor:default}
+  .lec-spine.sel{outline:2px solid var(--ink);outline-offset:2px}
+  .lec-spine .q{position:absolute;top:4px;right:6px;color:#fff;font-size:12px;font-family:ui-serif,Georgia,serif;font-weight:700}
+  .lec-hint{font-size:12px;color:var(--ink-faint);margin-top:8px}
+  .lec-why{margin-top:12px}
   .lec-block{margin-top:40px}
   .lec-block h2{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:14px}
   .lec-spines{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
@@ -57,6 +64,11 @@ noindex: true
   .lec-awards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
   .lec-award{text-align:center;font-size:14px;font-weight:600}
   .lec-award::before{content:"✦";display:block;font-size:22px;color:var(--acento,var(--rubric));margin-bottom:4px}
+  .lec-shelf{display:grid;grid-template-columns:minmax(0,9rem) minmax(0,1fr) 2.6rem;align-items:center;gap:10px;margin-top:8px}
+  .lec-shelf .nm{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lec-shelf .bar{height:6px;border-radius:999px;background:var(--hair);overflow:hidden}
+  .lec-shelf .bar i{display:block;height:100%;border-radius:999px;background:var(--acento,var(--rubric))}
+  .lec-shelf .n{font-family:ui-monospace,monospace;font-size:12px;color:var(--ink-soft);text-align:right}
   .lec-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .lec-link{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--hair);
     border-radius:12px;text-decoration:none;min-width:0}
@@ -94,9 +106,10 @@ noindex: true
   var alias = m[1].toLowerCase();
   var es = (navigator.language || "en").toLowerCase().indexOf("es") === 0;
   var T = es ? {
-    titulo: "@" + alias + " en Aleph", leyendo: "Leyendo ahora",
+    titulo: "@" + alias + " en Aleph", leyendo: "Leyendo ahora", busco: "Lo que busco: ", tocaLibro: "Toca un libro para ver por qué está aquí.",
     destacados: "Destacados", llevo: "Lo que me llevé", ideas: "Mis ideas", conversacion: "Mi conversación",
-    comprobada: "Lectura comprobada", logros: "Logros", enlaces: "Enlaces",
+    comprobada: "Lectura comprobada", logros: "Logros", enlaces: "Enlaces", estantes: "Mis estantes",
+    totalLibros: function (n) { return n.toLocaleString("es") + " libros en mi biblioteca"; },
     conv: function (a, b) { return "Converso con autores de " + anio(a) + " a " + anio(b); },
     convSub: function (n) { return n + " años de obras, de la más antigua a la más nueva que he leído."; },
     horas: "de lectura comprobada", libros: function (n) { return n === 1 ? "libro terminado este año" : "libros terminados este año"; },
@@ -106,9 +119,10 @@ noindex: true
     noHay: "No encontramos a @" + alias + ".", noHaySub: "Puede que haya cambiado de alias.",
     soloApp: "Este perfil se ve completo en la app."
   } : {
-    titulo: "@" + alias + " on Aleph", leyendo: "Reading now",
+    titulo: "@" + alias + " on Aleph", leyendo: "Reading now", busco: "What I'm looking for: ", tocaLibro: "Tap a book to see why it's here.",
     destacados: "Featured", llevo: "What I took away", ideas: "My ideas", conversacion: "My conversation",
-    comprobada: "Verified reading", logros: "Achievements", enlaces: "Links",
+    comprobada: "Verified reading", logros: "Achievements", enlaces: "Links", estantes: "My shelves",
+    totalLibros: function (n) { return n.toLocaleString("en") + " books in my library"; },
     conv: function (a, b) { return "In conversation with authors from " + anio(a) + " to " + anio(b); },
     convSub: function (n) { return n + " years of works, from the oldest to the newest I've read."; },
     horas: "of verified reading", libros: function (n) { return n === 1 ? "book finished this year" : "books finished this year"; },
@@ -208,6 +222,8 @@ noindex: true
     var linea = raiz.querySelector(".lec-alias") || raiz.querySelector(".lec-name");
     linea.textContent = "@" + aliasReal;
 
+    var c = null;
+    try { c = JSON.parse(campo(p, "cuaderno") || "null"); } catch (e) { c = null; }
     var leyendoPublico = campo(p, "leyendoPublico");
     var titulo = campo(leyendo, "tituloLibro");
     var cuando = campo(leyendo, "actualizadoEn");
@@ -218,11 +234,12 @@ noindex: true
       now.appendChild(el("div", "t", titulo));
       var autor = campo(leyendo, "autorLibro");
       if (autor) now.appendChild(el("div", "a", autor));
+      var claveL = campo(leyendo, "claveLibro");
+      var nota = c && c.busco && claveL ? c.busco[claveL] : null;
+      if (nota) now.appendChild(el("div", "b", T.busco + nota));
       raiz.appendChild(now);
     }
 
-    var c = null;
-    try { c = JSON.parse(campo(p, "cuaderno") || "null"); } catch (e) { c = null; }
     if (c && Array.isArray(c.bloques)) {
       if (typeof c.acento === "number" && c.acento >= 0 && PALETA[c.acento]) seccion.style.setProperty("--acento", PALETA[c.acento]);
       c.bloques.forEach(function (b) { var n = bloque(b, c); if (n) raiz.appendChild(n); });
@@ -243,12 +260,33 @@ noindex: true
         if (!c.destacados || !c.destacados.length) return null;
         d = caja(T.destacados);
         var g = el("div", "lec-spines");
+        var por = el("div", "lec-why");
+        var algunoConPorque = false;
         c.destacados.forEach(function (l) {
-          var s = el("div", "lec-spine"); s.style.background = PALETA[l.color] || PALETA[5];
+          var tiene = !!(l.frase || l.opinion);
+          if (tiene) algunoConPorque = true;
+          var s = el("button", "lec-spine"); s.type = "button"; s.style.background = PALETA[l.color] || PALETA[5];
           s.title = l.titulo + (l.autor ? " — " + l.autor : "");
-          s.appendChild(el("span", null, l.titulo)); g.appendChild(s);
+          s.appendChild(el("span", null, l.titulo));
+          if (tiene) { s.appendChild(el("i", "q", "“")); } else { s.disabled = true; }
+          s.addEventListener("click", function () {
+            var yaSel = s.classList.contains("sel");
+            g.querySelectorAll(".lec-spine").forEach(function (x) { x.classList.remove("sel"); });
+            por.textContent = "";
+            if (yaSel) return;
+            s.classList.add("sel");
+            var k = el("div", "lec-card");
+            k.appendChild(el("div", "k", l.titulo + (l.autor ? " · " + l.autor : "")));
+            if (l.frase) k.appendChild(el("div", "q", "“" + l.frase + "”"));
+            if (l.opinion) k.appendChild(el("div", "o", l.opinion));
+            por.appendChild(k);
+          });
+          g.appendChild(s);
         });
-        d.appendChild(g); return d;
+        d.appendChild(g);
+        if (algunoConPorque) d.appendChild(el("div", "lec-hint", T.tocaLibro));
+        d.appendChild(por);
+        return d;
       case "llevo":
         if (!c.frases || !c.frases.length) return null;
         d = caja(T.llevo);
@@ -295,6 +333,24 @@ noindex: true
           var k = el("div", "lec-card lec-stat"); k.appendChild(el("div", "n", p[0])); k.appendChild(el("div", "l", p[1])); st.appendChild(k);
         });
         d.appendChild(st); return d;
+      case "estantes":
+        if (!c.estantes || !c.estantes.length) return null;
+        d = caja(T.estantes);
+        var ks = el("div", "lec-card");
+        if (typeof c.totalLibros === "number" && c.totalLibros > 0) {
+          var tq = el("div", "q", T.totalLibros(c.totalLibros)); tq.style.marginTop = "0"; ks.appendChild(tq);
+        }
+        var mx = Math.max.apply(null, c.estantes.map(function (e) { return e.libros; }).concat([1]));
+        c.estantes.forEach(function (e) {
+          var row = el("div", "lec-shelf");
+          row.appendChild(el("span", "nm", e.nombre));
+          var bar = el("span", "bar"), fill = el("i");
+          fill.style.width = Math.max(3, 100 * e.libros / mx) + "%";
+          bar.appendChild(fill); row.appendChild(bar);
+          row.appendChild(el("span", "n", String(e.libros)));
+          ks.appendChild(row);
+        });
+        d.appendChild(ks); return d;
       case "logros":
         if (!c.logros || !c.logros.length) return null;
         d = caja(T.logros);
