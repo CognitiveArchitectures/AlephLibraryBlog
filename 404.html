@@ -19,6 +19,8 @@ noindex: true
   Datos: CloudKit Web Services sobre la base PÚBLICA (lo mismo que ve cualquiera en la app):
   alias_<alias> → usuario → perfil_<uid> + leyendo_<uid>. Solo se muestra lo que el lector
   prendió (campo `cuaderno`, JSON de CuadernoLector en la app). Token en _config.yml › cloudkit.
+  Racha (2026-10-09): si el lector la prendió, el fuego con sus días junto al nombre, solo si el
+  último día que contó (`cuaderno.rachaDia`) es hoy o ayer (`rachaVigente`, igual que la app).
   Reglas: todo el texto del lector entra con textContent (nunca innerHTML); los enlaces solo
   http(s) o mailto; noindex (no se indexan perfiles).
 {%- endcomment -%}
@@ -32,6 +34,12 @@ noindex: true
   .lec-name{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:clamp(28px,5vw,38px);font-weight:700;
     letter-spacing:-.02em;line-height:1.08;text-wrap:balance}
   .lec-alias{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:14px;color:var(--ink-soft);margin-top:4px}
+  .lec-id{flex:1;min-width:0}
+  .lec-racha{margin-left:auto;flex:none;display:flex;flex-direction:column;align-items:center;gap:1px;
+    padding:8px 12px;background:var(--surface);border:1px solid var(--hair);border-radius:14px}
+  .lec-racha svg{width:22px;height:22px;fill:var(--gold)}
+  .lec-racha .n{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+  .lec-racha .d{font-size:11px;color:var(--ink-soft)}
   .lec-bio{margin-top:20px;font-size:17px;color:var(--ink);text-wrap:pretty}
   .lec-place{margin-top:6px;font-size:14px;color:var(--ink-faint)}
   .lec-now{margin-top:24px;padding:16px 18px;background:var(--surface);border:1px solid var(--hair);border-radius:16px}
@@ -148,6 +156,8 @@ noindex: true
     cta: "Aleph es una app para leer en iPhone y iPad: tus libros, lo que subrayas y lo que aprendes, conectado. Las horas de lectura se comprueban mientras lees.",
     conoce: "Conoce Aleph", abrir: "Ya tengo Aleph: abrir",
     nota: "Este perfil muestra solo lo que su lector decidió compartir.",
+    dias: function (n) { return n === 1 ? "día" : "días"; },
+    rachaLabel: function (n) { return "Racha de lectura: " + n + (n === 1 ? " día seguido" : " días seguidos"); },
     noHay: "No encontramos a @" + alias + ".", noHaySub: "Puede que haya cambiado de alias.",
     soloApp: "Este perfil se ve completo en la app."
   } : {
@@ -163,6 +173,8 @@ noindex: true
     cta: "Aleph is a reading app for iPhone and iPad: your books, what you highlight and what you learn, connected. Reading hours are verified as you read.",
     conoce: "Discover Aleph", abrir: "I have Aleph: open",
     nota: "This profile shows only what its reader chose to share.",
+    dias: function (n) { return n === 1 ? "day" : "days"; },
+    rachaLabel: function (n) { return "Reading streak: " + n + (n === 1 ? " day" : " days") + " in a row"; },
     noHay: "We couldn't find @" + alias + ".", noHaySub: "They may have changed their alias.",
     soloApp: "The full profile is in the app."
   };
@@ -202,13 +214,38 @@ noindex: true
       var ini = (nombre || alias).split(/\s+/).slice(0, 2).map(function (p) { return p.charAt(0); }).join("").toUpperCase();
       h.appendChild(el("div", "lec-avatar", ini || "ℵ"));
     }
-    var t = el("div");
+    var t = el("div", "lec-id");
     t.appendChild(el("h1", "lec-name", nombre || "@" + alias));
     if (nombre) t.appendChild(el("div", "lec-alias", "@" + alias));
     h.appendChild(t);
     raiz.appendChild(h);
     if (bio) raiz.appendChild(el("p", "lec-bio", bio));
     if (lugar) raiz.appendChild(el("p", "lec-place", lugar));
+  }
+
+  // Su racha 🔥 (si la prendió en la app): solo si el último día que contó es hoy o ayer; si no,
+  // ya se rompió y no se muestra (CuadernoLector.rachaVigente en la app).
+  function rachaVigente(c) {
+    if (!c || typeof c.racha !== "number" || c.racha < 1 || typeof c.rachaDia !== "string") return 0;
+    var m = c.rachaDia.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return 0;
+    var dia = new Date(+m[1], +m[2] - 1, +m[3]);
+    var hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    var dias = Math.round((hoy - dia) / 86400000);
+    return dias <= 1 ? c.racha : 0;
+  }
+  function fuego(n) {
+    var f = el("div", "lec-racha");
+    f.setAttribute("role", "img");
+    f.setAttribute("aria-label", T.rachaLabel(n));
+    var ns = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(ns, "svg"); svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true");
+    var path = document.createElementNS(ns, "path");
+    path.setAttribute("d", "M12 2c.6 3.2-1.2 5-2.8 6.9C7.6 10.8 6 12.7 6 15.4 6 19 8.7 22 12 22s6-3 6-6.6c0-2.3-1-4.1-2.3-5.6-.3 1.4-1 2.4-2.1 2.9.4-3.6-.7-7.6-1.6-10.7z");
+    svg.appendChild(path); f.appendChild(svg);
+    f.appendChild(el("div", "n", String(n)));
+    f.appendChild(el("div", "d", T.dias(n)));
+    return f;
   }
 
   function soloAlias(titulo, sub) {
@@ -352,6 +389,8 @@ noindex: true
 
     var c = null;
     try { c = JSON.parse(campo(p, "cuaderno") || "null"); } catch (e) { c = null; }
+    var racha = rachaVigente(c);
+    if (racha) raiz.querySelector(".lec-head").appendChild(fuego(racha));
     var leyendoPublico = campo(p, "leyendoPublico");
     var titulo = campo(leyendo, "tituloLibro");
     var cuando = campo(leyendo, "actualizadoEn");
