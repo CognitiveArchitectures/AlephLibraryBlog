@@ -154,6 +154,18 @@ El Worker+D1 (si se hace) **solo guarda** correos; **enviar** el aviso a todos n
 - **Script + plantilla HTML** = sí funciona, pero envía a través de una **API de correo** (NO desde Gmail personal → spam). Sweet-spot: **Resend** (free ~100/día, plantillas, integra con Workers). Alternativas: Amazon SES (barato a escala), Postmark.
 - **Decisión pendiente:** Buttondown (simple) **vs** Worker+D1 (guardar, tuyo) + Resend + script (soberano).
 
+### 3.8 — Perfil de lector en la web: alephlibrary.com/@alias (2026-10-08, sin pushear)
+Cada lector con perfil de la comunidad tiene enlace + QR en la app. Con Aleph instalada el enlace abre
+la app (Universal Links); sin ella, cae en **`404.html`**, que lee el @alias de la dirección y pinta el
+perfil público con **CloudKit Web Services** (base pública: alias → perfil + lo que lee + bloques del
+«cuaderno» que el lector prendió). Spec en el repo de la app: `docs/spec-enlace-perfil.md`.
+- **`/.well-known/apple-app-site-association`** (sin extensión): appID `UU72XA88RN.ThinkBigApps.Aleph-Personal-Library`, ruta `/@*`.
+- **Falta (Diego):** token de API en CloudKit Console (Production) → `_config.yml › cloudkit.token`;
+  publicar; verificar `https://alephlibrary.com/.well-known/apple-app-site-association` (200, sin
+  redirección) y el CDN de Apple `https://app-site-association.cdn-apple.com/a/v1/alephlibrary.com`.
+- Legales actualizados: `/terms` sección «Copyright» completa (aviso y retirada, contranotificación,
+  reincidentes) y licencia que incluye la página del perfil; `/privacy` «Your profile link» + opiniones.
+
 ## 4. 💡 Ideas / Mejoras futuras
 
 - **Blog de verdad** (Jekyll ya lo soporta): ensayos sobre lectura, la Gran Conversación, el método — refuerza el moat de marca y el SEO. Carpeta `_posts/`.

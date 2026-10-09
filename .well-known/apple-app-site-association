@@ -1,0 +1,12 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["UU72XA88RN.ThinkBigApps.Aleph-Personal-Library"],
+        "components": [
+          { "/": "/@*", "comment": "El perfil de un lector: alephlibrary.com/@alias abre su perfil en Aleph" }
+        ]
+      }
+    ]
+  }
+}

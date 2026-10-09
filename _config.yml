@@ -14,6 +14,14 @@ plugins:
   - jekyll-sitemap
 include:
   - .well-known
+# Perfil de un lector en la web: alephlibrary.com/@alias (lo sirve 404.html). Lee el perfil
+# público de la app con CloudKit Web Services. El token es de API (CloudKit Console › Tokens &
+# Keys › API Tokens, entorno Production): está hecho para ir en páginas web y solo lee la base
+# pública. Mientras esté vacío, la página muestra el alias y la invitación a Aleph.
+cloudkit:
+  container: "iCloud.ThinkBigApps.Aleph-Personal-Library"
+  environment: "production"
+  token: "2e56256f7bfb04a4cdc8e5f7b50c87bb3625240101e33d96cd0b066af8e5a171"
 exclude:
   - README.md
   - .gitignore
