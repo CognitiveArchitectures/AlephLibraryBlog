@@ -1,1 +1,0 @@
-git commit -am 'copy(seo): título de la home → "Own the knowledge you read" (concreto, alinea con el subtítulo del App Store); "Join the Great Conversation" se conserva como línea de héroe'

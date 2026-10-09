@@ -1,8 +1,8 @@
 title: Aleph Personal Library
 description: "The goal is not to read books. It is to interconnect them. A living graph of ideas for iOS."
-author: Diego Zárate Rosales
+author: Cognitive Architectures S.A.S.
 lang: en
-# Lista de espera: crea la cuenta GRATIS en buttondown.com y pon aquí tu usuario real.
+# Lista de espera (Buttondown).
 buttondown_username: "alephlibrary"
 url: "https://alephlibrary.com"
 baseurl: ""  # Debe quedar absolutamente vacío si usas un dominio TLD.
@@ -25,4 +25,3 @@ cloudkit:
 exclude:
   - README.md
   - .gitignore
-  - STATUS.md

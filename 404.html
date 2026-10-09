@@ -21,6 +21,16 @@ noindex: true
   prendió (campo `cuaderno`, JSON de CuadernoLector en la app). Token en _config.yml › cloudkit.
   Racha (2026-10-09): si el lector la prendió, el fuego con sus días junto al nombre, solo si el
   último día que contó (`cuaderno.rachaDia`) es hoy o ayer (`rachaVigente`, igual que la app).
+  Notas del script (aquí y no en el JS: este bloque no se publica):
+  - PALETA = StudyPalette de la app (índices 0–6): lomos, ideas y color de acento.
+  - rachaVigente(): igual que CuadernoLector.rachaVigente en la app (último día hoy o ayer).
+  - Entrada del blog: registro blog_<uid>; mod_blog_<uid> si un moderador la ocultó. Perfil
+    oculto por un moderador: mod_<uid> (Moderación › «Ocultar para todos»).
+  - Markdown: solo lo que escribe el editor de Aleph (títulos, citas, listas, separador, [img:N],
+    enlaces, negritas, itálicas, código y aleph://blog/<uid>).
+  - Fechas del cuaderno: JSONEncoder de Swift = segundos desde 2001-01-01.
+  - Enlaces de redes: mismas reglas que PlataformaSocial.url / EnlacesPerfilView en la app.
+  En el JS que se publica no van comentarios internos (revisión 2026-10-09).
   Reglas: todo el texto del lector entra con textContent (nunca innerHTML); los enlaces solo
   http(s) o mailto; noindex (no se indexan perfiles).
 {%- endcomment -%}
@@ -179,7 +189,6 @@ noindex: true
     soloApp: "The full profile is in the app."
   };
   function anio(n) { return n < 0 ? (-n) + (es ? " a. C." : " BC") : String(n); }
-  // StudyPalette de la app (índices 0–6), para lomos, ideas y el color de acento.
   var PALETA = ["#7FA88B", "#6E8CB0", "#6FB0AE", "#9182B0", "#C08BA0", "#9A968F", "#CF9A6A"];
 
   document.getElementById("no-encontrada").hidden = true;
@@ -223,8 +232,6 @@ noindex: true
     if (lugar) raiz.appendChild(el("p", "lec-place", lugar));
   }
 
-  // Su racha 🔥 (si la prendió en la app): solo si el último día que contó es hoy o ayer; si no,
-  // ya se rompió y no se muestra (CuadernoLector.rachaVigente en la app).
   function rachaVigente(c) {
     if (!c || typeof c.racha !== "number" || c.racha < 1 || typeof c.rachaDia !== "string") return 0;
     var m = c.rachaDia.match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -273,7 +280,6 @@ noindex: true
 
   if (uidEntrada) { pintarEntrada(uidEntrada); return; }
 
-  // Una entrada publicada del blog: blog_<uid> (+ mod_blog_<uid> si un moderador la ocultó).
   function pintarEntrada(uid) {
     lookup(["blog_" + uid, "mod_blog_" + uid]).then(function (rs) {
       var r = rs.filter(function (x) { return x.recordType === "Entrada"; })[0];
@@ -313,8 +319,6 @@ noindex: true
     } catch (e) { return null; }
   }
 
-  // Markdown mínimo y seguro: lo mismo que escribe el editor de Aleph (títulos, citas, listas,
-  // separador, [img:N], enlaces, **negritas**, *itálicas*, `código` y aleph://blog/<uid>).
   function enLinea(s, padre) {
     var re = /(\*\*([^*]+)\*\*)|(\*([^*]+)\*)|(`([^`]+)`)|(\[([^\]]+)\]\(([^)\s]+)\))|(https?:\/\/[^\s<]*[^\s<.,;:!?)\]"'])/g;
     var ultimo = 0, mm;
@@ -366,7 +370,6 @@ noindex: true
   lookup(["alias_" + alias]).then(function (rs) {
     var uid = campo(rs[0], "usuario");
     if (!uid) { soloAlias(T.noHay, T.noHaySub); return; }
-    // mod_<uid> = un moderador ocultó este perfil (Moderación › «Ocultar para todos»).
     return lookup(["perfil_" + uid, "leyendo_" + uid, "mod_" + uid]).then(function (rs2) {
       var perfil = rs2.filter(function (x) { return x.recordType === "Perfil"; })[0];
       var leyendo = rs2.filter(function (x) { return x.recordType === "Leyendo"; })[0];
@@ -420,7 +423,6 @@ noindex: true
 
   function caja(titulo) { var d = el("div", "lec-block"); d.appendChild(el("h2", null, titulo)); return d; }
 
-  // Las fechas de la app (JSONEncoder de Swift) vienen en segundos desde 2001-01-01.
   function fechaSwift(s) { return typeof s === "number" ? new Date((s + 978307200) * 1000) : null; }
 
   function bloque(b, c) {
@@ -578,7 +580,6 @@ noindex: true
     return null;
   }
 
-  // Mismas reglas que PlataformaSocial.url / EnlacesPerfilView en la app.
   var MONO = { "X": "X", "Instagram": "IG", "GitHub": "GH", "LinkedIn": "in", "YouTube": "YT",
                "Mastodon": "M", "Bluesky": "BS", "Sitio web": "www", "Email": "@" };
   function handle(v) { return v.replace(/@/g, "").replace(/ /g, ""); }
