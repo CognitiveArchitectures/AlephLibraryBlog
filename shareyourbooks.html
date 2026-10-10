@@ -14,8 +14,12 @@ permalink: /shareyourbooks/
   las dos con CORS abierto, así el lienzo no queda «manchado» y se puede descargar); título; tu foto
   (de la compu o del iPhone, recortada a cuadrado y reducida a 320 px en el navegador) y tu usuario
   de una red (Instagram, X, TikTok o Facebook), cada una con su ícono monocromo dibujado en el
-  lienzo (uso nominativo: indicar dónde encontrarte). La imagen es de 1080×1350 (retrato de
-  Instagram; sirve en X) en el papel de Aleph (marca fija, no sigue el tema). Descargar = PNG;
+  lienzo (uso nominativo: indicar dónde encontrarte); una línea de bio; «La frase que se te quedó»
+  (de uno de tus libros: la tarjeta con cita es la que más se comparte, según Shelfies; y es lo
+  propio de Aleph). Formato: Publicación 1080×1350 (retrato de Instagram; sirve en X) o Historia
+  1080×1920 (respeta los márgenes de la interfaz de Instagram y TikTok). Estilo: Papel, Noche o
+  Rúbrica (StoryGraph: los lectores piden diseños más bonitos y variados). Pie: «Join the Great
+  Conversation» con la dirección de la página. Descargar = PNG;
   Copiar = el PNG al portapapeles; Compartir = hoja del sistema con el archivo (si el navegador puede). Lo elegido, incluida la foto,
   se recuerda solo en este navegador (localStorage, con try/catch): nada sale a un servidor nuestro.
   Idioma: inglés por defecto y español si el navegador está en español (como el perfil, 404.html).
@@ -66,7 +70,20 @@ permalink: /shareyourbooks/
     font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
   .cl-ctl button:disabled{opacity:.35;cursor:default}
   .cl-hint{font-size:13px;color:var(--ink-faint);margin-top:12px}
-  .cl-preview canvas{width:100%;height:auto;border-radius:14px;box-shadow:var(--shadow-lg);display:block;background:#F4F0E7}
+  .cl-preview canvas{width:auto;max-width:100%;max-height:78vh;height:auto;border-radius:14px;box-shadow:var(--shadow-lg);display:block;margin:0 auto;background:#F4F0E7}
+  @media(min-width:900px){.cl-preview{position:sticky;top:84px}}
+  .cl-sec{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--rubric);font-weight:600;margin:26px 0 10px}
+  .cl-sec:first-child{margin-top:0}
+  .cl-seg{display:inline-flex;padding:3px;border-radius:999px;border:1px solid var(--hair-strong);background:var(--surface)}
+  .cl-seg button{font:inherit;font-size:13px;font-weight:600;border:0;background:none;color:var(--ink-soft);padding:7px 14px;border-radius:999px;cursor:pointer}
+  .cl-seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  .cl-temas{display:flex;gap:10px}
+  .cl-tema{display:flex;align-items:center;gap:8px;font:inherit;font-size:13px;font-weight:600;padding:6px 12px 6px 6px;border-radius:999px;
+    border:1px solid var(--hair-strong);background:var(--surface);color:var(--ink-soft);cursor:pointer}
+  .cl-tema i{width:22px;height:22px;border-radius:50%;display:block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+  .cl-tema[aria-pressed="true"]{border-color:var(--ink);color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+  .cl-diseno{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  textarea.cl-input{resize:vertical;min-height:72px;line-height:1.4}
   .cl-acciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
   .cl-cta{margin-top:16px;font-size:15px;color:var(--ink-soft)}
   .cl-cta a{color:var(--rubric);font-weight:600}
@@ -95,6 +112,7 @@ permalink: /shareyourbooks/
 
     <div class="cl-layout">
       <div>
+        <div class="cl-sec" data-t="secTu">You</div>
         <div class="cl-campos">
           <div class="cl-yo">
             <button type="button" class="cl-foto" id="cl-foto" aria-label="Choose your photo">+</button>
@@ -104,15 +122,29 @@ permalink: /shareyourbooks/
             </div>
             <input type="file" id="cl-foto-input" accept="image/*" class="cl-oculto" tabindex="-1">
           </div>
-          <label><span data-t="lTitulo">Title</span><input class="cl-input" id="cl-titulo" maxlength="60" autocomplete="off"></label>
           <div class="cl-etq">
             <span data-t="lRed">Your handle (optional)</span>
             <div class="cl-redes" id="cl-redes" role="group"></div>
             <div class="cl-usuario"><span>@</span><input class="cl-input" id="cl-usuario" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Username"></div>
           </div>
+          <label><span data-t="lBio">A line about you (optional)</span><input class="cl-input" id="cl-bio" maxlength="80" autocomplete="off"></label>
+        </div>
+        <div class="cl-sec" data-t="secLista">Your list</div>
+        <div class="cl-campos">
+          <label><span data-t="lTitulo">Title</span><input class="cl-input" id="cl-titulo" maxlength="60" autocomplete="off"></label>
         </div>
         <div class="cl-grid" id="cl-grid"></div>
         <p class="cl-hint" data-t="hint">Tap an empty square to add a book (up to 9). Use the arrows to reorder.</p>
+        <div class="cl-sec" data-t="secFrase">The line that stayed with you</div>
+        <div class="cl-campos">
+          <label><span data-t="lFrase">A sentence from one of your books (optional)</span><textarea class="cl-input" id="cl-frase" maxlength="220" rows="3"></textarea></label>
+          <label><span data-t="lFraseLibro">From</span><select class="cl-input" id="cl-frase-libro"></select></label>
+        </div>
+        <div class="cl-sec" data-t="secDiseno">Design</div>
+        <div class="cl-diseno">
+          <div class="cl-seg" id="cl-formato" role="group" aria-label="Format"></div>
+          <div class="cl-temas" id="cl-temas" role="group" aria-label="Style"></div>
+        </div>
       </div>
       <div class="cl-preview">
         <canvas id="cl-canvas" width="1080" height="1350" role="img" aria-label="Preview of your image"></canvas>
@@ -148,6 +180,11 @@ permalink: /shareyourbooks/
     lead: "Elige tus favoritos, agrega tu foto y tu usuario, y comparte la imagen. Gratis, sin cuenta, y nada de lo que eliges sale de tu navegador.",
     fotoElegir: "Agrega tu foto", fotoCambiar: "Cambiar foto", fotoQuitar: "Quitar", fotoNota: "De tu compu o de tu teléfono. Se queda en tu dispositivo.",
     lTitulo: "Título", lRed: "Tu usuario (opcional)", ninguna: "Ninguna",
+    secTu: "Tú", secLista: "Tu lista", secFrase: "La frase que se te quedó", secDiseno: "Diseño",
+    lBio: "Una línea sobre ti (opcional)", lFrase: "Una frase de uno de tus libros (opcional)", lFraseLibro: "De",
+    otroLibro: "Otro libro", post: "Publicación", historia: "Historia", papel: "Papel", noche: "Noche", rubrica: "Rúbrica",
+    guardarFotos: "Guardar en Fotos", notaFotos: "En el menú, toca «Guardar imagen»: va a tu carrete.",
+    lema: "Únete a la Gran Conversación",
     hint: "Toca un cuadro vacío para agregar un libro (hasta 9). Usa las flechas para ordenarlos.",
     descargar: "Descargar imagen", compartir: "Compartir", limpiar: "Empezar de nuevo", copiar: "Copiar imagen", copiada: "Copiada ✓", noCopio: "No se pudo copiar",
     cta: "En Aleph, tus libros favoritos llevan la frase que se te quedó y las horas que de verdad los leíste.",
@@ -157,12 +194,17 @@ permalink: /shareyourbooks/
     nada: "No lo encontramos.", sinRed: "No pudimos buscar. Revisa tu conexión.",
     sinPortada: function (q) { return "Agregar «" + q + "» sin portada"; },
     agregar: "Agregar libro", mover: "Mover", quitar: "Quitar",
-    pie: "Haz la tuya en alephlibrary.com/shareyourbooks", archivo: "mis-libros-favoritos-aleph.png", vacio: "Agrega tus libros"
+    pie: "alephlibrary.com/shareyourbooks", archivo: "mis-libros-favoritos-aleph.png", vacio: "Agrega tus libros"
   } : {
     eyebrow: "Share your books", h1: "Share your favorite books",
     lead: "Pick your favorites, add your photo and your handle, and share the image. Free, no sign-up, and nothing you choose leaves your browser.",
     fotoElegir: "Add your photo", fotoCambiar: "Change photo", fotoQuitar: "Remove", fotoNota: "From your computer or your phone. It stays on your device.",
     lTitulo: "Title", lRed: "Your handle (optional)", ninguna: "None",
+    secTu: "You", secLista: "Your list", secFrase: "The line that stayed with you", secDiseno: "Design",
+    lBio: "A line about you (optional)", lFrase: "A sentence from one of your books (optional)", lFraseLibro: "From",
+    otroLibro: "Another book", post: "Post", historia: "Story", papel: "Paper", noche: "Night", rubrica: "Rubric",
+    guardarFotos: "Save to Photos", notaFotos: "In the menu, tap “Save Image”: it goes to your camera roll.",
+    lema: "Join the Great Conversation",
     hint: "Tap an empty square to add a book (up to 9). Use the arrows to reorder.",
     descargar: "Download image", compartir: "Share", limpiar: "Start over", copiar: "Copy image", copiada: "Copied ✓", noCopio: "Couldn't copy",
     cta: "In Aleph, your favorite books carry the line that stayed with you and the hours you actually spent reading them.",
@@ -172,7 +214,7 @@ permalink: /shareyourbooks/
     nada: "We couldn't find it.", sinRed: "We couldn't search. Check your connection.",
     sinPortada: function (q) { return "Add “" + q + "” without a cover"; },
     agregar: "Add a book", mover: "Move", quitar: "Remove",
-    pie: "Make yours at alephlibrary.com/shareyourbooks", archivo: "my-favorite-books-aleph.png", vacio: "Add your books"
+    pie: "alephlibrary.com/shareyourbooks", archivo: "my-favorite-books-aleph.png", vacio: "Add your books"
   };
   document.querySelectorAll("[data-t]").forEach(function (n) {
     var v = T[n.getAttribute("data-t")]; if (typeof v === "string") n.textContent = v;
@@ -210,7 +252,7 @@ permalink: /shareyourbooks/
   var PALETA = ["#7FA88B", "#6E8CB0", "#6FB0AE", "#9182B0", "#C08BA0", "#9A968F", "#CF9A6A"];
   var CLAVE = "aleph.compartirLibros";
   var vacios = function () { return [null, null, null, null, null, null, null, null, null]; };
-  var st = { libros: vacios(), titulo: "", red: "instagram", usuario: "", foto: "" };
+  var st = { libros: vacios(), titulo: "", red: "instagram", usuario: "", foto: "", bio: "", frase: "", fraseLibro: -1, formato: "post", tema: "papel" };
   try {
     var g = JSON.parse(localStorage.getItem(CLAVE) || "null");
     if (g && Array.isArray(g.libros) && g.libros.length === 9) st = Object.assign(st, g);
@@ -244,6 +286,49 @@ permalink: /shareyourbooks/
     if ($usuario.value !== st.usuario) $usuario.value = st.usuario;
     guardar(); dibujar();
   });
+
+  // --- Bio, la frase y el diseño ---
+  var $bio = document.getElementById("cl-bio"), $frase = document.getElementById("cl-frase");
+  var $fraseLibro = document.getElementById("cl-frase-libro");
+  $bio.value = st.bio || ""; $frase.value = st.frase || "";
+  $bio.addEventListener("input", function () { st.bio = $bio.value; guardar(); dibujar(); });
+  $frase.addEventListener("input", function () { st.frase = $frase.value; guardar(); dibujar(); });
+  $fraseLibro.addEventListener("change", function () { st.fraseLibro = Number($fraseLibro.value); guardar(); dibujar(); });
+  /// Las opciones de «De»: tus libros elegidos (por su casilla) o «Otro libro».
+  function pintarFraseLibro() {
+    $fraseLibro.textContent = "";
+    var hay = false;
+    st.libros.forEach(function (l, i) {
+      if (!l) return;
+      hay = true;
+      var o = el("option", null, l.title + (l.author ? " — " + l.author : "")); o.value = String(i); $fraseLibro.appendChild(o);
+    });
+    var otro = el("option", null, T.otroLibro); otro.value = "-1"; $fraseLibro.appendChild(otro);
+    if (st.fraseLibro >= 0 && !st.libros[st.fraseLibro]) st.fraseLibro = -1;
+    if (st.fraseLibro < 0 && hay && !st.frase) st.fraseLibro = st.libros.findIndex(Boolean);
+    $fraseLibro.value = String(st.fraseLibro);
+  }
+  var TEMAS = {
+    papel:   { fondo: "#F4F0E7", tinta: "#201D18", suave: "#5C5445", acento: "#9E2B25", linea: "#D0C7B2", muestra: "#F4F0E7" },
+    noche:   { fondo: "#141218", tinta: "#EDE6D6", suave: "#ABA5B4", acento: "#E9614F", linea: "#3A3542", muestra: "#141218" },
+    rubrica: { fondo: "#7C2019", tinta: "#F7EFE3", suave: "#EBCFC2", acento: "#F2C46D", linea: "#A2463B", muestra: "#7C2019" }
+  };
+  var $formato = document.getElementById("cl-formato"), $temas = document.getElementById("cl-temas");
+  function pintarDiseno() {
+    $formato.textContent = "";
+    [["post", T.post], ["historia", T.historia]].forEach(function (f) {
+      var b = el("button", null, f[1]); b.type = "button"; b.setAttribute("aria-pressed", String(st.formato === f[0]));
+      b.addEventListener("click", function () { st.formato = f[0]; guardar(); pintarDiseno(); dibujar(); });
+      $formato.appendChild(b);
+    });
+    $temas.textContent = "";
+    ["papel", "noche", "rubrica"].forEach(function (k) {
+      var b = el("button", "cl-tema"); b.type = "button"; b.setAttribute("aria-pressed", String(st.tema === k));
+      var m = el("i"); m.style.background = TEMAS[k].muestra; b.appendChild(m); b.appendChild(el("span", null, T[k]));
+      b.addEventListener("click", function () { st.tema = k; guardar(); pintarDiseno(); dibujar(); });
+      $temas.appendChild(b);
+    });
+  }
 
   // --- Tu foto (recortada a cuadrado y reducida a 320 px, solo en el navegador) ---
   var $foto = document.getElementById("cl-foto"), $fotoInput = document.getElementById("cl-foto-input");
@@ -322,7 +407,7 @@ permalink: /shareyourbooks/
     });
   }
   function mover(a, b) { if (b < 0 || b > 8) return; var t = st.libros[a]; st.libros[a] = st.libros[b]; st.libros[b] = t; cambio(); }
-  function cambio() { guardar(); pintarCasillas(); dibujar(); }
+  function cambio() { guardar(); pintarCasillas(); pintarFraseLibro(); dibujar(); }
 
   // --- Búsqueda (Open Library) ---
   var $dlg = document.getElementById("cl-dlg"), $q = document.getElementById("cl-q");
@@ -371,16 +456,24 @@ permalink: /shareyourbooks/
       .catch(function () { if (mio === turno) $estado.textContent = T.sinRed; });
   }
 
-  // --- La imagen (1080×1350, papel de Aleph) ---
+  // --- La imagen: Publicación 1080×1350 o Historia 1080×1920, en Papel, Noche o Rúbrica ---
   var $canvas = document.getElementById("cl-canvas"), ctx = $canvas.getContext("2d");
-  var W = 1080, H = 1350, M = 90;
-  var TINTA = "#201D18", SUAVE = "#5C5445", RUBRICA = "#9E2B25", PAPEL = "#F4F0E7";
+  var W = 1080, M = 90;
   var SERIF = 'ui-serif, "New York", "Iowan Old Style", Palatino, Georgia, serif';
   var SANS = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif';
   var logo = new Image(); logo.onload = dibujar; logo.src = "/aleph_logo_tinta_transparente.png";
+  var logos = {};
+  /// El ℵ del logo pintado del color del estilo (la imagen original es tinta oscura).
+  function logoDe(color) {
+    if (!logo.complete || !logo.naturalWidth) return null;
+    if (logos[color]) return logos[color];
+    var c = document.createElement("canvas"); c.width = logo.naturalWidth; c.height = logo.naturalHeight;
+    var g = c.getContext("2d"); g.drawImage(logo, 0, 0); g.globalCompositeOperation = "source-in"; g.fillStyle = color; g.fillRect(0, 0, c.width, c.height);
+    logos[color] = c; return c;
+  }
 
   function lineas(texto, ancho, maxLineas) {
-    var palabras = texto.split(/\s+/), out = [], linea = "";
+    var palabras = texto.split(/\s+/).filter(Boolean), out = [], linea = "";
     palabras.forEach(function (p) {
       var prueba = linea ? linea + " " + p : p;
       if (ctx.measureText(prueba).width > ancho && linea) { out.push(linea); linea = p; } else linea = prueba;
@@ -394,8 +487,8 @@ permalink: /shareyourbooks/
     ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
   }
   /// El ícono de la red, de `t` px, con su esquina superior izquierda en (x, y).
-  function iconoRed(id, x, y, t) {
-    ctx.save(); ctx.translate(x, y); ctx.scale(t / 24, t / 24); ctx.fillStyle = TINTA; ctx.strokeStyle = TINTA;
+  function iconoRed(id, x, y, t, color, fondo) {
+    ctx.save(); ctx.translate(x, y); ctx.scale(t / 24, t / 24); ctx.fillStyle = color; ctx.strokeStyle = color;
     if (TRAZO[id] && window.Path2D) { ctx.fill(new Path2D(TRAZO[id])); }
     else if (id === "instagram") {
       ctx.lineWidth = 2.2; redondo(2.5, 2.5, 19, 19, 5.5); ctx.stroke();
@@ -410,52 +503,94 @@ permalink: /shareyourbooks/
   }
 
   function dibujar() {
+    var historia = st.formato === "historia";
+    var H = historia ? 1920 : 1350;
+    if ($canvas.height !== H) $canvas.height = H;
+    var t = TEMAS[st.tema] || TEMAS.papel;
+    // Márgenes: en una historia, Instagram y TikTok tapan arriba (perfil) y abajo (responder).
+    var arriba = historia ? 230 : 64, abajo = historia ? 250 : 0;
     ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
-    ctx.fillStyle = PAPEL; ctx.fillRect(0, 0, W, H);
-    // Marca
-    if (logo.complete && logo.naturalWidth) { var lh = 40, lw = logo.naturalWidth * lh / logo.naturalHeight; ctx.drawImage(logo, M, 64, lw, lh); }
+    ctx.fillStyle = t.fondo; ctx.fillRect(0, 0, W, H);
 
-    // Encabezado: tu foto (si la hay) + título + tu usuario
-    var y = 150, xTexto = M, conFoto = !!fotoImg, F = 132;
+    var lg = logoDe(t.tinta);
+    if (lg) { var lh = 40, lw = lg.width * lh / lg.height; ctx.drawImage(lg, M, arriba, lw, lh); }
+
+    // Encabezado: tu foto + título + tu usuario + tu línea
+    var y = arriba + 84, xTexto = M, F = historia ? 156 : 140;
+    var conFoto = !!fotoImg;
+    if (conFoto) xTexto = M + F + 34;
+    var anchoTexto = W - M - xTexto;
+    ctx.font = "700 " + (historia ? 64 : 58) + "px " + SERIF;
+    var lsTitulo = lineas((st.titulo || "").trim() || T.tituloDefault, anchoTexto, 2);
+    var altoTitulo = lsTitulo.length * (historia ? 72 : 66);
+    ctx.font = "italic 400 28px " + SERIF;
+    var lsBio = (st.bio || "").trim() ? lineas(st.bio.trim(), anchoTexto, 2) : [];
+    var altoTexto = altoTitulo + (st.usuario ? 48 : 0) + lsBio.length * 38 + (lsBio.length ? 8 : 0);
+    var altoEnc = Math.max(conFoto ? F : 0, altoTexto);
     if (conFoto) {
-      ctx.save(); ctx.beginPath(); ctx.arc(M + F / 2, y + F / 2, F / 2, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
-      ctx.drawImage(fotoImg, M, y, F, F); ctx.restore();
-      ctx.beginPath(); ctx.arc(M + F / 2, y + F / 2, F / 2 + 3, 0, Math.PI * 2); ctx.strokeStyle = "#D0C7B2"; ctx.lineWidth = 3; ctx.stroke();
-      xTexto = M + F + 34;
+      var fy = y + (altoEnc - F) / 2;
+      ctx.save(); ctx.beginPath(); ctx.arc(M + F / 2, fy + F / 2, F / 2, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
+      ctx.drawImage(fotoImg, M, fy, F, F); ctx.restore();
+      ctx.beginPath(); ctx.arc(M + F / 2, fy + F / 2, F / 2 + 4, 0, Math.PI * 2); ctx.strokeStyle = t.acento; ctx.lineWidth = 3; ctx.stroke();
     }
-    ctx.fillStyle = TINTA; ctx.font = "700 58px " + SERIF;
-    var ls = lineas((st.titulo || "").trim() || T.tituloDefault, W - M - xTexto, 2);
-    var bloque = ls.length * 66 + (st.usuario ? 50 : 0);
-    var yt = conFoto ? y + Math.max(0, (F - bloque) / 2) + 52 : y + 46;
-    ls.forEach(function (l) { ctx.fillText(l, xTexto, yt); yt += 66; });
+    var ty = y + (altoEnc - altoTexto) / 2;
+    ctx.fillStyle = t.tinta; ctx.font = "700 " + (historia ? 64 : 58) + "px " + SERIF;
+    lsTitulo.forEach(function (l) { ty += historia ? 64 : 58; ctx.fillText(l, xTexto, ty); ty += historia ? 8 : 8; });
     if (st.usuario) {
-      var tIcono = 32;
-      iconoRed(st.red, xTexto, yt - 22 - 4, tIcono);
-      ctx.fillStyle = SUAVE; ctx.font = "600 30px " + SANS;
-      ctx.fillText("@" + st.usuario, xTexto + tIcono + 12, yt);
-      yt += 20;
+      ty += 40;
+      iconoRed(st.red, xTexto, ty - 27, 32, t.tinta, t.fondo);
+      ctx.fillStyle = t.suave; ctx.font = "600 30px " + SANS;
+      ctx.fillText("@" + st.usuario, xTexto + 44, ty);
     }
-    var top = Math.max(conFoto ? y + F + 44 : yt + 26, 300);
+    if (lsBio.length) {
+      ty += 8; ctx.fillStyle = t.suave; ctx.font = "italic 400 28px " + SERIF;
+      lsBio.forEach(function (l) { ty += 38; ctx.fillText(l, xTexto, ty); });
+    }
+    var top = y + altoEnc + (historia ? 70 : 46);
 
-    // Cuadrícula (hasta 9; 3 por fila, centrada)
+    // Pie
+    var pieY = H - abajo - 52, lineaPie = H - abajo - 96;
+
+    // La frase (arriba del pie)
+    var frase = (st.frase || "").trim(), fuente = "";
+    if (frase) {
+      var lb = st.fraseLibro >= 0 ? st.libros[st.fraseLibro] : null;
+      if (lb) fuente = "— " + lb.title + (lb.author ? ", " + lb.author : "");
+    }
+    var fondoFrase = lineaPie - 30;
+    if (frase) {
+      ctx.font = "italic 400 " + (historia ? 40 : 34) + "px " + SERIF;
+      var lsFrase = lineas("“" + frase + "”", W - 2 * M - 40, historia ? 5 : 3);
+      var paso = historia ? 54 : 46;
+      var altoFrase = lsFrase.length * paso + (fuente ? 46 : 0);
+      var fy0 = fondoFrase - altoFrase;
+      ctx.fillStyle = t.acento; ctx.fillRect(M, fy0 + 8, 4, altoFrase - (fuente ? 30 : 4));
+      ctx.fillStyle = t.tinta;
+      var yy = fy0;
+      lsFrase.forEach(function (l) { yy += paso; ctx.fillText(l, M + 32, yy - 10); });
+      if (fuente) { ctx.font = "500 24px " + SANS; ctx.fillStyle = t.suave; ctx.fillText(lineas(fuente, W - 2 * M - 40, 1)[0], M + 32, yy + 34); }
+      fondoFrase = fy0 - (historia ? 60 : 40);
+    }
+
+    // Cuadrícula (hasta 9; 3 por fila; la última fila centrada)
     var elegidos = st.libros.filter(Boolean);
-    var pie = H - 110;
-    var cw = 236, ch = 354, gx = 36, gy = 30;
+    var cw = historia ? 262 : 236, ch = cw * 1.5, gx = 34, gy = 30;
     var filas = Math.max(1, Math.ceil(elegidos.length / 3));
     var alto = filas * ch + (filas - 1) * gy;
-    if (top + alto > pie) { var esc = (pie - top) / alto; cw *= esc; ch *= esc; gx *= esc; gy *= esc; alto = pie - top; }
-    var porFila = Math.min(3, Math.max(1, elegidos.length));
-    var y0 = top + Math.max(0, (pie - top - alto) / 2);
+    var disponible = fondoFrase - top;
+    if (alto > disponible) { var esc = disponible / alto; cw *= esc; ch *= esc; gx *= esc; gy *= esc; alto = disponible; }
+    var y0 = top + Math.max(0, (disponible - alto) / 2);
     if (!elegidos.length) {
-      ctx.font = "italic 400 34px " + SERIF; ctx.fillStyle = "#8B8171"; ctx.textAlign = "center";
-      ctx.fillText(T.vacio, W / 2, (top + pie) / 2); ctx.textAlign = "left";
+      ctx.font = "italic 400 34px " + SERIF; ctx.fillStyle = t.suave; ctx.textAlign = "center";
+      ctx.fillText(T.vacio, W / 2, top + disponible / 2); ctx.textAlign = "left";
     }
+    var sombra = st.tema === "papel" ? "rgba(32,29,24,.22)" : "rgba(0,0,0,.45)";
     elegidos.forEach(function (l, i) {
       var f = Math.floor(i / 3), enFila = Math.min(3, elegidos.length - f * 3), c = i % 3;
       var x0 = (W - (enFila * cw + (enFila - 1) * gx)) / 2;
       var x = x0 + c * (cw + gx), yy = y0 + f * (ch + gy);
       ctx.save();
-      ctx.shadowColor = "rgba(32,29,24,.22)"; ctx.shadowBlur = 18; ctx.shadowOffsetY = 8;
+      ctx.shadowColor = sombra; ctx.shadowBlur = 18; ctx.shadowOffsetY = 8;
       redondo(x, yy, cw, ch, 8); ctx.fillStyle = colorDe(l.title); ctx.fill();
       ctx.restore();
       var im = imagen(l.cover);
@@ -473,19 +608,41 @@ permalink: /shareyourbooks/
       ctx.restore();
     });
 
-    // Pie
-    ctx.fillStyle = "#D0C7B2"; ctx.fillRect(M, H - 96, W - 2 * M, 1);
-    ctx.font = "600 24px " + SANS; ctx.fillStyle = RUBRICA; ctx.textAlign = "right";
-    ctx.fillText(T.pie, W - M, H - 52);
-    ctx.textAlign = "left"; ctx.font = "italic 400 26px " + SERIF; ctx.fillStyle = SUAVE;
-    ctx.fillText("Aleph", M, H - 52);
+    // Pie: ℵ Aleph · Join the Great Conversation  ·····  alephlibrary.com/shareyourbooks
+    ctx.fillStyle = t.linea; ctx.fillRect(M, lineaPie, W - 2 * M, 1);
+    ctx.font = "italic 400 25px " + SERIF; ctx.fillStyle = t.suave;
+    ctx.fillText("Aleph · " + T.lema, M, pieY);
+    ctx.font = "600 22px " + SANS; ctx.fillStyle = t.acento; ctx.textAlign = "right";
+    ctx.fillText(T.pie, W - M, pieY);
+    ctx.textAlign = "left";
   }
 
-  // --- Descargar y compartir ---
+  // --- Guardar, copiar y compartir ---
+  // En iPhone/iPad, «Descargar» manda a Archivos, no a Fotos, y ninguna página puede guardar
+  // directo en Fotos: la hoja de compartir del sistema sí («Guardar imagen» → carrete). Así que
+  // ahí el botón principal es «Guardar en Fotos» y abre esa hoja.
   function archivo(cb) { $canvas.toBlob(function (b) { cb(b); }, "image/png"); }
-  document.getElementById("cl-descargar").addEventListener("click", function () {
+  var puedeArchivos = false;
+  try {
+    var prueba = new File([new Blob(["x"], { type: "image/png" })], "x.png", { type: "image/png" });
+    puedeArchivos = !!(navigator.canShare && navigator.canShare({ files: [prueba] }));
+  } catch (e) {}
+  var esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var $descargar = document.getElementById("cl-descargar"), $comp = document.getElementById("cl-compartir");
+  var aFotos = esIOS && puedeArchivos;
+  if (aFotos) {
+    $descargar.textContent = T.guardarFotos;
+    var nota = el("p", "cl-hint", T.notaFotos); $descargar.parentNode.parentNode.insertBefore(nota, $descargar.parentNode.nextSibling);
+  } else if (puedeArchivos) {
+    $comp.hidden = false;
+  }
+  $descargar.addEventListener("click", function () {
     archivo(function (b) {
       if (!b) return;
+      if (aFotos) {
+        navigator.share({ files: [new File([b], T.archivo, { type: "image/png" })] }).catch(function () {});
+        return;
+      }
       var u = URL.createObjectURL(b), a = document.createElement("a");
       a.href = u; a.download = T.archivo; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(u); }, 2000);
@@ -502,11 +659,6 @@ permalink: /shareyourbooks/
       .catch(function () { $copiar.textContent = T.noCopio; })
       .then(function () { setTimeout(function () { $copiar.textContent = T.copiar; }, 1800); });
   });
-  var $comp = document.getElementById("cl-compartir");
-  try {
-    var prueba = new File([new Blob(["x"], { type: "image/png" })], "x.png", { type: "image/png" });
-    if (navigator.canShare && navigator.canShare({ files: [prueba] })) $comp.hidden = false;
-  } catch (e) {}
   $comp.addEventListener("click", function () {
     archivo(function (b) {
       if (!b) return;
@@ -515,12 +667,14 @@ permalink: /shareyourbooks/
     });
   });
   document.getElementById("cl-limpiar").addEventListener("click", function () {
-    st = { libros: vacios(), titulo: "", red: st.red, usuario: "", foto: "" };
-    $titulo.value = ""; $usuario.value = ""; cargarFoto(); cambio();
+    st = { libros: vacios(), titulo: "", red: st.red, usuario: "", foto: "", bio: "", frase: "", fraseLibro: -1, formato: st.formato, tema: st.tema };
+    $titulo.value = ""; $usuario.value = ""; $bio.value = ""; $frase.value = ""; cargarFoto(); cambio();
   });
 
   pintarRedes();
+  pintarDiseno();
   pintarCasillas();
+  pintarFraseLibro();
   cargarFoto();
   dibujar();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(dibujar);
