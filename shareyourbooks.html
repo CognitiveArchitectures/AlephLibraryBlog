@@ -1,0 +1,529 @@
+---
+layout: default
+title: Share your favorite books — Aleph
+description: "Pick your favorite books, add your photo and your handle, and share them as an image. Free, no sign-up, nothing is saved."
+permalink: /shareyourbooks/
+---
+{%- comment -%}
+  shareyourbooks.html — alephlibrary.com/shareyourbooks: «Share your favorite books» (2026-10-09).
+  Diego vio en X las cuadrículas de libros favoritos y pidió algo FUNCIONAL en el sitio para que
+  cualquiera, sin la app, arme la suya y la comparte; sin el «9» en el nombre para no sonar a copia.
+  Cada imagen publicada lleva «alephlibrary.com/shareyourbooks» (y la página invita a la lista de
+  espera).
+  Qué tiene: hasta 9 libros buscados en Open Library (search.json; portadas en covers.openlibrary.org,
+  las dos con CORS abierto, así el lienzo no queda «manchado» y se puede descargar); título; tu foto
+  (de la compu o del iPhone, recortada a cuadrado y reducida a 320 px en el navegador) y tu usuario
+  de una red (Instagram, X, TikTok o Facebook), cada una con su ícono monocromo dibujado en el
+  lienzo (uso nominativo: indicar dónde encontrarte). La imagen es de 1080×1350 (retrato de
+  Instagram; sirve en X) en el papel de Aleph (marca fija, no sigue el tema). Descargar = PNG;
+  Copiar = el PNG al portapapeles; Compartir = hoja del sistema con el archivo (si el navegador puede). Lo elegido, incluida la foto,
+  se recuerda solo en este navegador (localStorage, con try/catch): nada sale a un servidor nuestro.
+  Idioma: inglés por defecto y español si el navegador está en español (como el perfil, 404.html).
+  Reglas: todo texto de Open Library o del usuario entra con textContent; sin innerHTML con datos.
+  Íconos de X y TikTok: trazos de Simple Icons (CC0); Instagram y Facebook, dibujados con figuras
+  (monocromos, sin alterar la forma reconocible).
+{%- endcomment -%}
+<style>
+  .compartir{padding:clamp(40px,7vw,80px) 0;position:relative;z-index:2}
+  .compartir .wrap{max-width:1080px}
+  .cl-h1{font-size:clamp(34px,6vw,56px);font-weight:700;letter-spacing:-.02em;line-height:1.05;margin:14px 0 12px;text-wrap:balance}
+  .cl-lead{color:var(--ink-soft);max-width:620px;font-size:17px}
+  .cl-layout{display:grid;grid-template-columns:1fr;gap:36px;margin-top:34px;align-items:start}
+  @media(min-width:900px){.cl-layout{grid-template-columns:1fr 1fr}}
+  .cl-campos{display:grid;gap:14px;margin-bottom:18px}
+  .cl-campos label,.cl-etq{display:grid;gap:6px;font-size:13px;color:var(--ink-soft);font-weight:600}
+  .cl-input{font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1px solid var(--hair-strong);
+    border-radius:12px;padding:11px 14px;width:100%}
+  .cl-input:focus{outline:none;border-color:var(--rubric);box-shadow:0 0 0 3px color-mix(in srgb,var(--rubric) 18%,transparent)}
+  .cl-yo{display:flex;align-items:center;gap:14px}
+  .cl-foto{width:64px;height:64px;border-radius:50%;flex:none;border:1.5px dashed var(--hair-strong);background:var(--surface);
+    display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--ink-faint);font-size:22px;cursor:pointer;padding:0}
+  .cl-foto img{width:100%;height:100%;object-fit:cover}
+  .cl-foto-txt{display:grid;gap:4px;font-size:14px}
+  .cl-foto-txt button{font:inherit;font-size:14px;border:0;background:none;color:var(--rubric);font-weight:600;cursor:pointer;padding:0;text-align:left}
+  .cl-foto-txt span{font-size:12px;color:var(--ink-faint)}
+  .cl-redes{display:flex;gap:6px;flex-wrap:wrap}
+  .cl-red{display:flex;align-items:center;gap:6px;font:inherit;font-size:13px;font-weight:600;padding:8px 12px;border-radius:999px;
+    border:1px solid var(--hair-strong);background:var(--surface);color:var(--ink-soft);cursor:pointer}
+  .cl-red svg{width:16px;height:16px}
+  .cl-red[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .cl-usuario{display:flex;align-items:center;gap:0;margin-top:8px}
+  .cl-usuario span{padding:11px 0 11px 14px;border:1px solid var(--hair-strong);border-right:0;border-radius:12px 0 0 12px;
+    background:var(--surface);color:var(--ink-faint);font-size:16px}
+  .cl-usuario input{border-radius:0 12px 12px 0;border-left:0;padding-left:4px}
+  .cl-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .cl-slot{position:relative;aspect-ratio:2/3;border-radius:10px;border:1.5px dashed var(--hair-strong);background:var(--surface);
+    display:flex;align-items:center;justify-content:center;color:var(--ink-faint);font-size:28px;cursor:pointer;overflow:hidden;
+    font-family:inherit;padding:0;width:100%}
+  .cl-slot:hover{border-color:var(--rubric);color:var(--rubric)}
+  .cl-slot.lleno{border-style:solid;border-color:var(--hair);cursor:default;background:var(--paper-2)}
+  .cl-slot img{width:100%;height:100%;object-fit:cover;display:block}
+  .cl-slot .sin{padding:10px 10px 48px;font-family:ui-serif,Georgia,serif;font-size:13px;line-height:1.2;color:#F7F2E8;text-align:left;
+    width:100%;height:100%;display:flex;align-items:flex-end}
+  .cl-ctl{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;padding:6px;
+    background:linear-gradient(transparent,rgba(0,0,0,.55))}
+  .cl-ctl button{width:32px;height:32px;border-radius:16px;border:0;background:rgba(255,255,255,.92);color:#201D18;
+    font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .cl-ctl button:disabled{opacity:.35;cursor:default}
+  .cl-hint{font-size:13px;color:var(--ink-faint);margin-top:12px}
+  .cl-preview canvas{width:100%;height:auto;border-radius:14px;box-shadow:var(--shadow-lg);display:block;background:#F4F0E7}
+  .cl-acciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .cl-cta{margin-top:16px;font-size:15px;color:var(--ink-soft)}
+  .cl-cta a{color:var(--rubric);font-weight:600}
+  dialog.cl-dlg{border:1px solid var(--hair-strong);border-radius:18px;background:var(--surface);color:var(--ink);
+    width:min(560px,calc(100vw - 32px));max-height:min(640px,calc(100vh - 64px));padding:0;box-shadow:var(--shadow-lg)}
+  dialog.cl-dlg::backdrop{background:rgba(0,0,0,.45)}
+  .cl-dlg-cab{display:flex;gap:8px;padding:14px;border-bottom:1px solid var(--hair);position:sticky;top:0;background:var(--surface)}
+  .cl-dlg-cab input{flex:1;min-width:0}
+  .cl-dlg-cab button{flex:none}
+  .cl-res{list-style:none;padding:6px}
+  .cl-res li button{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:0;background:none;color:inherit;
+    font:inherit;padding:8px;border-radius:12px;cursor:pointer}
+  .cl-res li button:hover,.cl-res li button:focus{background:var(--paper-2);outline:none}
+  .cl-res img,.cl-res .ph{width:40px;height:60px;border-radius:4px;object-fit:cover;flex:none;background:var(--hair)}
+  .cl-res .t{font-weight:600;font-size:15px;line-height:1.25}
+  .cl-res .a{font-size:13px;color:var(--ink-soft)}
+  .cl-estado{padding:14px 18px;font-size:14px;color:var(--ink-faint)}
+  .cl-oculto{position:absolute;left:-9999px}
+</style>
+
+<section class="compartir">
+  <div class="wrap">
+    <div class="eyebrow" data-t="eyebrow">Share your books</div>
+    <h1 class="cl-h1 serif" data-t="h1">Share your favorite books</h1>
+    <p class="cl-lead" data-t="lead">Pick your favorites, add your photo and your handle, and share the image. Free, no sign-up, and nothing you choose leaves your browser.</p>
+
+    <div class="cl-layout">
+      <div>
+        <div class="cl-campos">
+          <div class="cl-yo">
+            <button type="button" class="cl-foto" id="cl-foto" aria-label="Choose your photo">+</button>
+            <div class="cl-foto-txt">
+              <button type="button" id="cl-foto-elegir" data-t="fotoElegir">Add your photo</button>
+              <span data-t="fotoNota">From your computer or your phone. It stays on your device.</span>
+            </div>
+            <input type="file" id="cl-foto-input" accept="image/*" class="cl-oculto" tabindex="-1">
+          </div>
+          <label><span data-t="lTitulo">Title</span><input class="cl-input" id="cl-titulo" maxlength="60" autocomplete="off"></label>
+          <div class="cl-etq">
+            <span data-t="lRed">Your handle (optional)</span>
+            <div class="cl-redes" id="cl-redes" role="group"></div>
+            <div class="cl-usuario"><span>@</span><input class="cl-input" id="cl-usuario" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Username"></div>
+          </div>
+        </div>
+        <div class="cl-grid" id="cl-grid"></div>
+        <p class="cl-hint" data-t="hint">Tap an empty square to add a book (up to 9). Use the arrows to reorder.</p>
+      </div>
+      <div class="cl-preview">
+        <canvas id="cl-canvas" width="1080" height="1350" role="img" aria-label="Preview of your image"></canvas>
+        <div class="cl-acciones">
+          <button type="button" class="btn btn-primary" id="cl-descargar" data-t="descargar">Download image</button>
+          <button type="button" class="btn btn-ghost" id="cl-copiar" hidden data-t="copiar">Copy image</button>
+          <button type="button" class="btn btn-ghost" id="cl-compartir" hidden data-t="compartir">Share</button>
+          <button type="button" class="btn btn-ghost" id="cl-limpiar" data-t="limpiar">Start over</button>
+        </div>
+        <p class="cl-cta"><span data-t="cta">In Aleph, your favorite books carry the line that stayed with you and the hours you actually spent reading them.</span>
+          <a href="/#notify" data-t="ctaLink">The first 100 get a year free.</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<dialog class="cl-dlg" id="cl-dlg" aria-labelledby="cl-q-label">
+  <form class="cl-dlg-cab" id="cl-form" method="dialog">
+    <label id="cl-q-label" for="cl-q" class="cl-oculto" data-t="buscar">Search a book</label>
+    <input class="cl-input" id="cl-q" type="search" autocomplete="off" enterkeyhint="search">
+    <button type="button" class="btn btn-ghost" id="cl-cerrar" data-t="cerrar">Close</button>
+  </form>
+  <ul class="cl-res" id="cl-res"></ul>
+  <div class="cl-estado" id="cl-estado"></div>
+</dialog>
+
+{% raw %}
+<script>
+(function () {
+  var es = (navigator.language || "en").toLowerCase().indexOf("es") === 0;
+  var T = es ? {
+    eyebrow: "Comparte tus libros", h1: "Comparte tus libros favoritos",
+    lead: "Elige tus favoritos, agrega tu foto y tu usuario, y comparte la imagen. Gratis, sin cuenta, y nada de lo que eliges sale de tu navegador.",
+    fotoElegir: "Agrega tu foto", fotoCambiar: "Cambiar foto", fotoQuitar: "Quitar", fotoNota: "De tu compu o de tu teléfono. Se queda en tu dispositivo.",
+    lTitulo: "Título", lRed: "Tu usuario (opcional)", ninguna: "Ninguna",
+    hint: "Toca un cuadro vacío para agregar un libro (hasta 9). Usa las flechas para ordenarlos.",
+    descargar: "Descargar imagen", compartir: "Compartir", limpiar: "Empezar de nuevo", copiar: "Copiar imagen", copiada: "Copiada ✓", noCopio: "No se pudo copiar",
+    cta: "En Aleph, tus libros favoritos llevan la frase que se te quedó y las horas que de verdad los leíste.",
+    ctaLink: "Los primeros 100 tienen un año gratis.",
+    buscar: "Busca un libro", placeholder: "Título o autor", cerrar: "Cerrar",
+    tituloDefault: "Mis libros favoritos", buscando: "Buscando…",
+    nada: "No lo encontramos.", sinRed: "No pudimos buscar. Revisa tu conexión.",
+    sinPortada: function (q) { return "Agregar «" + q + "» sin portada"; },
+    agregar: "Agregar libro", mover: "Mover", quitar: "Quitar",
+    pie: "Haz la tuya en alephlibrary.com/shareyourbooks", archivo: "mis-libros-favoritos-aleph.png", vacio: "Agrega tus libros"
+  } : {
+    eyebrow: "Share your books", h1: "Share your favorite books",
+    lead: "Pick your favorites, add your photo and your handle, and share the image. Free, no sign-up, and nothing you choose leaves your browser.",
+    fotoElegir: "Add your photo", fotoCambiar: "Change photo", fotoQuitar: "Remove", fotoNota: "From your computer or your phone. It stays on your device.",
+    lTitulo: "Title", lRed: "Your handle (optional)", ninguna: "None",
+    hint: "Tap an empty square to add a book (up to 9). Use the arrows to reorder.",
+    descargar: "Download image", compartir: "Share", limpiar: "Start over", copiar: "Copy image", copiada: "Copied ✓", noCopio: "Couldn't copy",
+    cta: "In Aleph, your favorite books carry the line that stayed with you and the hours you actually spent reading them.",
+    ctaLink: "The first 100 get a year free.",
+    buscar: "Search a book", placeholder: "Title or author", cerrar: "Close",
+    tituloDefault: "My favorite books", buscando: "Searching…",
+    nada: "We couldn't find it.", sinRed: "We couldn't search. Check your connection.",
+    sinPortada: function (q) { return "Add “" + q + "” without a cover"; },
+    agregar: "Add a book", mover: "Move", quitar: "Remove",
+    pie: "Make yours at alephlibrary.com/shareyourbooks", archivo: "my-favorite-books-aleph.png", vacio: "Add your books"
+  };
+  document.querySelectorAll("[data-t]").forEach(function (n) {
+    var v = T[n.getAttribute("data-t")]; if (typeof v === "string") n.textContent = v;
+  });
+  if (es) { document.documentElement.lang = "es"; document.title = "Comparte tus libros favoritos — Aleph"; }
+
+  // Íconos de las redes: X y TikTok con trazos de Simple Icons (CC0, viewBox 24); Instagram y
+  // Facebook con figuras. Se usan en los botones (SVG) y en el lienzo (Path2D / figuras).
+  var TRAZO = {
+    x: "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z",
+    tiktok: "M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"
+  };
+  var REDES = [
+    { id: "instagram", nombre: "Instagram" }, { id: "x", nombre: "X" },
+    { id: "tiktok", nombre: "TikTok" }, { id: "facebook", nombre: "Facebook" }
+  ];
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function svgRed(id) {
+    var s = document.createElementNS(SVGNS, "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true");
+    function hijo(tag, attrs) { var e = document.createElementNS(SVGNS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); s.appendChild(e); return e; }
+    if (TRAZO[id]) hijo("path", { d: TRAZO[id], fill: "currentColor" });
+    else if (id === "instagram") {
+      hijo("rect", { x: 2.5, y: 2.5, width: 19, height: 19, rx: 5.5, fill: "none", stroke: "currentColor", "stroke-width": 2.2 });
+      hijo("circle", { cx: 12, cy: 12, r: 4.4, fill: "none", stroke: "currentColor", "stroke-width": 2.2 });
+      hijo("circle", { cx: 17.4, cy: 6.6, r: 1.3, fill: "currentColor" });
+    } else if (id === "facebook") {
+      hijo("rect", { x: 2.5, y: 2.5, width: 19, height: 19, rx: 5, fill: "none", stroke: "currentColor", "stroke-width": 2.2 });
+      var t = hijo("text", { x: 13.4, y: 19.2, "text-anchor": "middle", "font-size": 16, "font-weight": 800, "font-family": "Helvetica, Arial, sans-serif", fill: "currentColor" });
+      t.textContent = "f";
+    }
+    return s;
+  }
+
+  // Paleta de lomos de Aleph (StudyPalette) para los libros sin portada.
+  var PALETA = ["#7FA88B", "#6E8CB0", "#6FB0AE", "#9182B0", "#C08BA0", "#9A968F", "#CF9A6A"];
+  var CLAVE = "aleph.compartirLibros";
+  var vacios = function () { return [null, null, null, null, null, null, null, null, null]; };
+  var st = { libros: vacios(), titulo: "", red: "instagram", usuario: "", foto: "" };
+  try {
+    var g = JSON.parse(localStorage.getItem(CLAVE) || "null");
+    if (g && Array.isArray(g.libros) && g.libros.length === 9) st = Object.assign(st, g);
+  } catch (e) {}
+  function guardar() { try { localStorage.setItem(CLAVE, JSON.stringify(st)); } catch (e) {} }
+
+  function el(tag, cls, texto) { var e = document.createElement(tag); if (cls) e.className = cls; if (texto != null) e.textContent = texto; return e; }
+  function portadaURL(id, tam) { return "https://covers.openlibrary.org/b/id/" + encodeURIComponent(id) + "-" + tam + ".jpg"; }
+  function colorDe(t) { var h = 0; for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0; return PALETA[h % PALETA.length]; }
+
+  // --- Título ---
+  var $titulo = document.getElementById("cl-titulo");
+  $titulo.placeholder = T.tituloDefault; $titulo.value = st.titulo;
+  $titulo.addEventListener("input", function () { st.titulo = $titulo.value; guardar(); dibujar(); });
+
+  // --- Red y usuario ---
+  var $redes = document.getElementById("cl-redes"), $usuario = document.getElementById("cl-usuario");
+  $usuario.value = st.usuario;
+  function pintarRedes() {
+    $redes.textContent = "";
+    REDES.forEach(function (r) {
+      var b = el("button", "cl-red"); b.type = "button";
+      b.setAttribute("aria-pressed", String(st.red === r.id));
+      b.appendChild(svgRed(r.id)); b.appendChild(el("span", null, r.nombre));
+      b.addEventListener("click", function () { st.red = r.id; guardar(); pintarRedes(); dibujar(); });
+      $redes.appendChild(b);
+    });
+  }
+  $usuario.addEventListener("input", function () {
+    st.usuario = $usuario.value.replace(/^@+/, "").replace(/\s+/g, "");
+    if ($usuario.value !== st.usuario) $usuario.value = st.usuario;
+    guardar(); dibujar();
+  });
+
+  // --- Tu foto (recortada a cuadrado y reducida a 320 px, solo en el navegador) ---
+  var $foto = document.getElementById("cl-foto"), $fotoInput = document.getElementById("cl-foto-input");
+  var $fotoBtn = document.getElementById("cl-foto-elegir");
+  var fotoImg = null;
+  function cargarFoto() {
+    fotoImg = null;
+    $foto.textContent = "";
+    if (!st.foto) { $foto.textContent = "+"; $fotoBtn.textContent = T.fotoElegir; quitarBtn.hidden = true; dibujar(); return; }
+    var im = el("img"); im.alt = ""; im.src = st.foto; $foto.appendChild(im);
+    var c = new Image(); c.onload = function () { fotoImg = c; dibujar(); }; c.src = st.foto;
+    $fotoBtn.textContent = T.fotoCambiar; quitarBtn.hidden = false;
+  }
+  var quitarBtn = el("button", null, T.fotoQuitar); quitarBtn.type = "button";
+  quitarBtn.style.color = "var(--ink-faint)"; quitarBtn.style.fontWeight = "500";
+  $fotoBtn.parentNode.insertBefore(quitarBtn, $fotoBtn.nextSibling);
+  quitarBtn.addEventListener("click", function () { st.foto = ""; guardar(); cargarFoto(); });
+  function elegirFoto() { $fotoInput.click(); }
+  $foto.addEventListener("click", elegirFoto); $fotoBtn.addEventListener("click", elegirFoto);
+  $fotoInput.addEventListener("change", function () {
+    var f = $fotoInput.files && $fotoInput.files[0];
+    if (!f) return;
+    var u = URL.createObjectURL(f), im = new Image();
+    im.onload = function () {
+      var lado = Math.min(im.naturalWidth, im.naturalHeight), L = 320;
+      var c = document.createElement("canvas"); c.width = L; c.height = L;
+      c.getContext("2d").drawImage(im, (im.naturalWidth - lado) / 2, (im.naturalHeight - lado) / 2, lado, lado, 0, 0, L, L);
+      st.foto = c.toDataURL("image/jpeg", 0.86);
+      URL.revokeObjectURL(u); $fotoInput.value = "";
+      guardar(); cargarFoto();
+    };
+    im.onerror = function () { URL.revokeObjectURL(u); };
+    im.src = u;
+  });
+
+  // Imágenes de portada (para el lienzo), con CORS.
+  var imgs = {};
+  function imagen(id) {
+    if (!id) return null;
+    if (imgs[id]) return imgs[id];
+    var im = new Image(); im.crossOrigin = "anonymous";
+    im.onload = dibujar; im.onerror = function () { im.fallo = true; dibujar(); };
+    im.src = portadaURL(id, "L");
+    imgs[id] = im;
+    return im;
+  }
+
+  // --- Las casillas ---
+  var $grid = document.getElementById("cl-grid");
+  var destino = 0;
+  function pintarCasillas() {
+    $grid.textContent = "";
+    st.libros.forEach(function (l, i) {
+      if (!l) {
+        var b = el("button", "cl-slot", "+"); b.type = "button";
+        b.setAttribute("aria-label", T.agregar + " " + (i + 1));
+        b.addEventListener("click", function () { abrirBusqueda(i); });
+        $grid.appendChild(b); return;
+      }
+      var d = el("div", "cl-slot lleno");
+      if (l.cover) {
+        var im = el("img"); im.src = portadaURL(l.cover, "M"); im.alt = l.title; im.loading = "lazy"; d.appendChild(im);
+      } else {
+        var s = el("div", "sin", l.title); s.style.background = colorDe(l.title); d.appendChild(s);
+      }
+      var c = el("div", "cl-ctl");
+      var izq = el("button", null, "←"); izq.type = "button"; izq.setAttribute("aria-label", T.mover + " ←"); izq.disabled = i === 0;
+      var x = el("button", null, "✕"); x.type = "button"; x.setAttribute("aria-label", T.quitar + ": " + l.title);
+      var der = el("button", null, "→"); der.type = "button"; der.setAttribute("aria-label", T.mover + " →"); der.disabled = i === 8;
+      izq.addEventListener("click", function () { mover(i, i - 1); });
+      der.addEventListener("click", function () { mover(i, i + 1); });
+      x.addEventListener("click", function () { st.libros[i] = null; cambio(); });
+      c.appendChild(izq); c.appendChild(x); c.appendChild(der); d.appendChild(c);
+      d.title = l.title + (l.author ? " — " + l.author : "");
+      $grid.appendChild(d);
+    });
+  }
+  function mover(a, b) { if (b < 0 || b > 8) return; var t = st.libros[a]; st.libros[a] = st.libros[b]; st.libros[b] = t; cambio(); }
+  function cambio() { guardar(); pintarCasillas(); dibujar(); }
+
+  // --- Búsqueda (Open Library) ---
+  var $dlg = document.getElementById("cl-dlg"), $q = document.getElementById("cl-q");
+  var $res = document.getElementById("cl-res"), $estado = document.getElementById("cl-estado");
+  $q.placeholder = T.placeholder;
+  document.getElementById("cl-cerrar").addEventListener("click", function () { $dlg.close(); });
+  document.getElementById("cl-form").addEventListener("submit", function (e) { e.preventDefault(); buscar(); });
+  function abrirBusqueda(i) {
+    destino = i; $q.value = ""; $res.textContent = ""; $estado.textContent = "";
+    if ($dlg.showModal) $dlg.showModal(); else $dlg.setAttribute("open", "");
+    setTimeout(function () { $q.focus(); }, 30);
+  }
+  var espera = null, turno = 0;
+  $q.addEventListener("input", function () { clearTimeout(espera); espera = setTimeout(buscar, 350); });
+  function elegir(libro) { st.libros[destino] = libro; $dlg.close(); cambio(); }
+  function buscar() {
+    var q = $q.value.trim();
+    $res.textContent = "";
+    if (q.length < 2) { $estado.textContent = ""; return; }
+    var mio = ++turno;
+    $estado.textContent = T.buscando;
+    var url = "https://openlibrary.org/search.json?limit=12&fields=key,title,author_name,cover_i,first_publish_year&q=" + encodeURIComponent(q);
+    var ctl = new AbortController(); setTimeout(function () { ctl.abort(); }, 9000);
+    fetch(url, { signal: ctl.signal }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (j) {
+        if (mio !== turno) return;
+        $estado.textContent = "";
+        var docs = (j.docs || []).filter(function (d) { return d.title; });
+        docs.forEach(function (d) {
+          var li = el("li"), b = el("button"); b.type = "button";
+          if (d.cover_i) { var im = el("img"); im.src = portadaURL(d.cover_i, "S"); im.alt = ""; im.loading = "lazy"; b.appendChild(im); }
+          else b.appendChild(el("div", "ph"));
+          var t = el("div"); t.appendChild(el("div", "t", d.title));
+          var autor = (d.author_name || [])[0] || "";
+          t.appendChild(el("div", "a", [autor, d.first_publish_year].filter(Boolean).join(" · ")));
+          b.appendChild(t);
+          b.addEventListener("click", function () { elegir({ title: d.title, author: autor, cover: d.cover_i || null }); });
+          li.appendChild(b); $res.appendChild(li);
+        });
+        if (!docs.length) $estado.textContent = T.nada;
+        var li2 = el("li"), b2 = el("button"); b2.type = "button";
+        b2.appendChild(el("div", "ph")); b2.appendChild(el("div", "t", T.sinPortada(q)));
+        b2.addEventListener("click", function () { elegir({ title: q, author: "", cover: null }); });
+        li2.appendChild(b2); $res.appendChild(li2);
+      })
+      .catch(function () { if (mio === turno) $estado.textContent = T.sinRed; });
+  }
+
+  // --- La imagen (1080×1350, papel de Aleph) ---
+  var $canvas = document.getElementById("cl-canvas"), ctx = $canvas.getContext("2d");
+  var W = 1080, H = 1350, M = 90;
+  var TINTA = "#201D18", SUAVE = "#5C5445", RUBRICA = "#9E2B25", PAPEL = "#F4F0E7";
+  var SERIF = 'ui-serif, "New York", "Iowan Old Style", Palatino, Georgia, serif';
+  var SANS = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif';
+  var logo = new Image(); logo.onload = dibujar; logo.src = "/aleph_logo_tinta_transparente.png";
+
+  function lineas(texto, ancho, maxLineas) {
+    var palabras = texto.split(/\s+/), out = [], linea = "";
+    palabras.forEach(function (p) {
+      var prueba = linea ? linea + " " + p : p;
+      if (ctx.measureText(prueba).width > ancho && linea) { out.push(linea); linea = p; } else linea = prueba;
+    });
+    if (linea) out.push(linea);
+    if (out.length > maxLineas) { out = out.slice(0, maxLineas); out[maxLineas - 1] = out[maxLineas - 1].replace(/\s*\S*$/, "") + "…"; }
+    return out;
+  }
+  function redondo(x, y, w, h, r) {
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+  /// El ícono de la red, de `t` px, con su esquina superior izquierda en (x, y).
+  function iconoRed(id, x, y, t) {
+    ctx.save(); ctx.translate(x, y); ctx.scale(t / 24, t / 24); ctx.fillStyle = TINTA; ctx.strokeStyle = TINTA;
+    if (TRAZO[id] && window.Path2D) { ctx.fill(new Path2D(TRAZO[id])); }
+    else if (id === "instagram") {
+      ctx.lineWidth = 2.2; redondo(2.5, 2.5, 19, 19, 5.5); ctx.stroke();
+      ctx.beginPath(); ctx.arc(12, 12, 4.4, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(17.4, 6.6, 1.3, 0, Math.PI * 2); ctx.fill();
+    } else if (id === "facebook") {
+      ctx.lineWidth = 2.2; redondo(2.5, 2.5, 19, 19, 5); ctx.stroke();
+      ctx.font = "800 16px Helvetica, Arial, sans-serif"; ctx.textAlign = "center";
+      ctx.fillText("f", 13.4, 19.2);
+    }
+    ctx.restore();
+  }
+
+  function dibujar() {
+    ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = PAPEL; ctx.fillRect(0, 0, W, H);
+    // Marca
+    if (logo.complete && logo.naturalWidth) { var lh = 40, lw = logo.naturalWidth * lh / logo.naturalHeight; ctx.drawImage(logo, M, 64, lw, lh); }
+
+    // Encabezado: tu foto (si la hay) + título + tu usuario
+    var y = 150, xTexto = M, conFoto = !!fotoImg, F = 132;
+    if (conFoto) {
+      ctx.save(); ctx.beginPath(); ctx.arc(M + F / 2, y + F / 2, F / 2, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
+      ctx.drawImage(fotoImg, M, y, F, F); ctx.restore();
+      ctx.beginPath(); ctx.arc(M + F / 2, y + F / 2, F / 2 + 3, 0, Math.PI * 2); ctx.strokeStyle = "#D0C7B2"; ctx.lineWidth = 3; ctx.stroke();
+      xTexto = M + F + 34;
+    }
+    ctx.fillStyle = TINTA; ctx.font = "700 58px " + SERIF;
+    var ls = lineas((st.titulo || "").trim() || T.tituloDefault, W - M - xTexto, 2);
+    var bloque = ls.length * 66 + (st.usuario ? 50 : 0);
+    var yt = conFoto ? y + Math.max(0, (F - bloque) / 2) + 52 : y + 46;
+    ls.forEach(function (l) { ctx.fillText(l, xTexto, yt); yt += 66; });
+    if (st.usuario) {
+      var tIcono = 32;
+      iconoRed(st.red, xTexto, yt - 22 - 4, tIcono);
+      ctx.fillStyle = SUAVE; ctx.font = "600 30px " + SANS;
+      ctx.fillText("@" + st.usuario, xTexto + tIcono + 12, yt);
+      yt += 20;
+    }
+    var top = Math.max(conFoto ? y + F + 44 : yt + 26, 300);
+
+    // Cuadrícula (hasta 9; 3 por fila, centrada)
+    var elegidos = st.libros.filter(Boolean);
+    var pie = H - 110;
+    var cw = 236, ch = 354, gx = 36, gy = 30;
+    var filas = Math.max(1, Math.ceil(elegidos.length / 3));
+    var alto = filas * ch + (filas - 1) * gy;
+    if (top + alto > pie) { var esc = (pie - top) / alto; cw *= esc; ch *= esc; gx *= esc; gy *= esc; alto = pie - top; }
+    var porFila = Math.min(3, Math.max(1, elegidos.length));
+    var y0 = top + Math.max(0, (pie - top - alto) / 2);
+    if (!elegidos.length) {
+      ctx.font = "italic 400 34px " + SERIF; ctx.fillStyle = "#8B8171"; ctx.textAlign = "center";
+      ctx.fillText(T.vacio, W / 2, (top + pie) / 2); ctx.textAlign = "left";
+    }
+    elegidos.forEach(function (l, i) {
+      var f = Math.floor(i / 3), enFila = Math.min(3, elegidos.length - f * 3), c = i % 3;
+      var x0 = (W - (enFila * cw + (enFila - 1) * gx)) / 2;
+      var x = x0 + c * (cw + gx), yy = y0 + f * (ch + gy);
+      ctx.save();
+      ctx.shadowColor = "rgba(32,29,24,.22)"; ctx.shadowBlur = 18; ctx.shadowOffsetY = 8;
+      redondo(x, yy, cw, ch, 8); ctx.fillStyle = colorDe(l.title); ctx.fill();
+      ctx.restore();
+      var im = imagen(l.cover);
+      ctx.save(); redondo(x, yy, cw, ch, 8); ctx.clip();
+      if (im && im.complete && im.naturalWidth && !im.fallo) {
+        var r = Math.max(cw / im.naturalWidth, ch / im.naturalHeight);
+        var iw = im.naturalWidth * r, ih = im.naturalHeight * r;
+        ctx.drawImage(im, x + (cw - iw) / 2, yy + (ch - ih) / 2, iw, ih);
+      } else {
+        ctx.fillStyle = "#F7F2E8"; ctx.font = "600 " + Math.round(cw * 0.105) + "px " + SERIF;
+        var lt = lineas(l.title, cw - 32, 5), ly = yy + ch - 22 - (lt.length - 1) * cw * 0.125;
+        lt.forEach(function (s) { ctx.fillText(s, x + 16, ly); ly += cw * 0.125; });
+        if (l.author) { ctx.font = "400 " + Math.round(cw * 0.07) + "px " + SANS; ctx.fillText(l.author, x + 16, yy + 34); }
+      }
+      ctx.restore();
+    });
+
+    // Pie
+    ctx.fillStyle = "#D0C7B2"; ctx.fillRect(M, H - 96, W - 2 * M, 1);
+    ctx.font = "600 24px " + SANS; ctx.fillStyle = RUBRICA; ctx.textAlign = "right";
+    ctx.fillText(T.pie, W - M, H - 52);
+    ctx.textAlign = "left"; ctx.font = "italic 400 26px " + SERIF; ctx.fillStyle = SUAVE;
+    ctx.fillText("Aleph", M, H - 52);
+  }
+
+  // --- Descargar y compartir ---
+  function archivo(cb) { $canvas.toBlob(function (b) { cb(b); }, "image/png"); }
+  document.getElementById("cl-descargar").addEventListener("click", function () {
+    archivo(function (b) {
+      if (!b) return;
+      var u = URL.createObjectURL(b), a = document.createElement("a");
+      a.href = u; a.download = T.archivo; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(u); }, 2000);
+    });
+  });
+  // Copiar al portapapeles: la promesa del PNG va DENTRO del ClipboardItem, creado en el mismo toque
+  // (Safari lo exige así).
+  var $copiar = document.getElementById("cl-copiar");
+  if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) $copiar.hidden = false;
+  $copiar.addEventListener("click", function () {
+    var png = new Promise(function (ok, mal) { $canvas.toBlob(function (b) { b ? ok(b) : mal(); }, "image/png"); });
+    navigator.clipboard.write([new ClipboardItem({ "image/png": png })])
+      .then(function () { $copiar.textContent = T.copiada; })
+      .catch(function () { $copiar.textContent = T.noCopio; })
+      .then(function () { setTimeout(function () { $copiar.textContent = T.copiar; }, 1800); });
+  });
+  var $comp = document.getElementById("cl-compartir");
+  try {
+    var prueba = new File([new Blob(["x"], { type: "image/png" })], "x.png", { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [prueba] })) $comp.hidden = false;
+  } catch (e) {}
+  $comp.addEventListener("click", function () {
+    archivo(function (b) {
+      if (!b) return;
+      var f = new File([b], T.archivo, { type: "image/png" });
+      navigator.share({ files: [f], title: (st.titulo || T.tituloDefault), text: T.pie }).catch(function () {});
+    });
+  });
+  document.getElementById("cl-limpiar").addEventListener("click", function () {
+    st = { libros: vacios(), titulo: "", red: st.red, usuario: "", foto: "" };
+    $titulo.value = ""; $usuario.value = ""; cargarFoto(); cambio();
+  });
+
+  pintarRedes();
+  pintarCasillas();
+  cargarFoto();
+  dibujar();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(dibujar);
+})();
+</script>
+{% endraw %}
