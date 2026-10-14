@@ -19,8 +19,16 @@ noindex: true
   Datos: CloudKit Web Services sobre la base PÚBLICA (lo mismo que ve cualquiera en la app):
   alias_<alias> → usuario → perfil_<uid> + leyendo_<uid>. Solo se muestra lo que el lector
   prendió (campo `cuaderno`, JSON de CuadernoLector en la app). Token en _config.yml › cloudkit.
-  Racha (2026-10-09): si el lector la prendió, el fuego con sus días junto al nombre, solo si el
-  último día que contó (`cuaderno.rachaDia`) es hoy o ayer (`rachaVigente`, igual que la app).
+  Racha (2026-10-09): si el lector la prendió, el fuego con sus días, solo si el último día que
+  contó (`cuaderno.rachaDia`) es hoy o ayer (`rachaVigente`, igual que la app).
+  Perfil único (2026-10-14, docs/spec-social-perfil-2026-10.md §10 en el repo de la app): mismo
+  orden que la app. Cabecera · redes y blog en una línea bajo la bio (el blog abre una ventana con
+  sus entradas) · cifras (racha · libros leídos · horas del año; tocar = su año completo) · Leyendo
+  ahora + «También leyendo» (`cuaderno.leyendo`; perfiles viejos: el registro leyendo_<uid>) · Mi
+  año de lectura (`cuaderno.anio`: semana, autores | libros, contexto, «Ver su año completo») ·
+  los bloques en su orden (sin enlaces, blog, conversación ni comprobada, que ya van arriba).
+  Tocar un Destacado abre una ventana con su porqué, sus horas y sus citas con ⭐. Las ventanas
+  son <dialog>. Los logros traen el nombre de su SF Symbol: se pintan con un emoji equivalente.
   Notas del script (aquí y no en el JS: este bloque no se publica):
   - PALETA = StudyPalette de la app (índices 0–6): lomos, ideas y color de acento.
   - rachaVigente(): igual que CuadernoLector.rachaVigente en la app (último día hoy o ayer).
@@ -122,6 +130,78 @@ noindex: true
   .lec-link b{flex:none;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;
     align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:10.5px}
   .lec-link span{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .lec-linea{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px}
+  .lec-linea a,.lec-linea button{display:inline-flex;align-items:center;gap:5px;font:inherit;font-size:14px;color:var(--ink-soft);
+    text-decoration:none;background:none;border:0;padding:0;cursor:pointer}
+  .lec-linea b{font-family:ui-monospace,monospace;font-size:11px;color:var(--ink)}
+  .lec-linea .blog{color:var(--rubric);font-weight:600}
+  .lec-cifras{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));margin-top:22px;padding:12px 0;
+    border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);width:100%;background:none;border-left:0;border-right:0;
+    font:inherit;color:inherit;cursor:pointer}
+  .lec-cifras div{text-align:center;min-width:0}
+  .lec-cifras .n{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums}
+  .lec-cifras .l{font-size:11.5px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lec-cifras svg{width:15px;height:15px;fill:var(--gold);vertical-align:-1px;margin-left:2px}
+  .lec-now .r{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.14em;color:var(--acento,var(--rubric));margin-top:6px}
+  .lec-now .p{display:flex;align-items:center;gap:8px;margin-top:10px;font-family:ui-monospace,monospace;font-size:11px;color:var(--ink-faint)}
+  .lec-now .p span{flex:1;height:5px;border-radius:999px;background:var(--hair);overflow:hidden}
+  .lec-now .p i{display:block;height:100%;background:var(--acento,var(--rubric))}
+  .lec-also{margin-top:10px;background:none;border:0;padding:0;font:inherit;font-size:14px;font-weight:600;color:var(--acento,var(--rubric));cursor:pointer}
+  .lec-also-list{margin-top:8px}
+  .lec-also-list .row{padding:10px 0;border-top:1px solid var(--hair)}
+  .lec-also-list .row:first-child{border-top:0}
+  .lec-also-list .t{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:16px;font-weight:600}
+  .lec-also-list .a{font-size:13px;color:var(--ink-soft)}
+  .lec-anio .fr{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:21px;line-height:1.3;text-wrap:balance}
+  .lec-anio .ok{font-size:13px;color:var(--ink-soft);margin-top:4px}
+  .lec-semana{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));margin-top:16px;text-align:center}
+  .lec-semana .c{width:32px;height:32px;margin:0 auto;border-radius:50%;border:3px solid var(--hair);display:flex;align-items:center;
+    justify-content:center;font-family:ui-monospace,monospace;font-size:10px;color:var(--ink-soft);box-sizing:border-box}
+  .lec-semana .c.si{border-color:var(--rubric);color:var(--rubric);font-size:13px}
+  .lec-semana .c.al{border-color:var(--gold)}
+  .lec-semana .c svg{width:14px;height:14px;fill:var(--rubric)}
+  .lec-semana .d{font-size:12px;color:var(--ink-soft);margin-top:4px}
+  .lec-semana .d.hoy{color:var(--acento,var(--rubric));font-weight:700}
+  .lec-minis{display:flex;gap:16px;margin-top:14px}
+  .lec-minis div{flex:1}.lec-minis .n{font-size:18px;font-weight:700}.lec-minis .l{font-size:12px;color:var(--ink-soft)}
+  .lec-tabs{display:flex;gap:16px;margin-top:18px}
+  .lec-tabs button{background:none;border:0;padding:0 0 3px;font:inherit;font-size:15px;color:var(--ink-faint);cursor:pointer}
+  .lec-tabs button.on{color:var(--ink);font-weight:700;border-bottom:2px solid var(--acento,var(--rubric))}
+  .lec-top{display:flex;align-items:center;gap:10px;margin-top:10px}
+  .lec-top .av{flex:none;width:30px;height:30px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;
+    font-family:ui-serif,Georgia,serif;font-size:12px;font-weight:700}
+  .lec-top .lo{flex:none;width:22px;height:31px;border-radius:3px}
+  .lec-top .x{flex:1;min-width:0}
+  .lec-top .h{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+  .lec-top .h span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lec-top .h span:last-child{font-family:ui-monospace,monospace;font-size:12px;color:var(--ink-soft)}
+  .lec-top .bar{height:4px;border-radius:999px;background:var(--hair);margin-top:5px;overflow:hidden}
+  .lec-top .bar i{display:block;height:100%;background:var(--gold)}
+  .lec-top:first-of-type .bar i{background:var(--acento,var(--rubric))}
+  .lec-ctx{font-size:14px;color:var(--ink-soft);margin-top:14px;text-wrap:pretty}
+  dialog.lec-modal{margin:auto;inset:0;width:min(560px,calc(100vw - 32px));max-height:min(80vh,760px);border:1px solid var(--hair);border-radius:20px;
+    padding:0;background:var(--paper);color:var(--ink);box-shadow:0 24px 60px -20px rgba(0,0,0,.45)}
+  dialog.lec-modal::backdrop{background:rgba(20,16,12,.45)}
+  .lec-modal-h{position:sticky;top:0;display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--paper);border-bottom:1px solid var(--hair)}
+  .lec-modal-h .t{flex:1;font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:18px;font-weight:700;min-width:0}
+  .lec-x{background:var(--surface);border:1px solid var(--hair);border-radius:999px;width:32px;height:32px;font-size:18px;line-height:1;cursor:pointer;color:var(--ink)}
+  .lec-modal-b{padding:18px}
+  .lec-modal-b > * + *{margin-top:16px}
+  .lec-modal-b .k{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+  .lec-modal-b .m{font-size:17px;font-weight:600;text-wrap:pretty}
+  .lec-modal-b .q{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:19px;line-height:1.42;text-wrap:pretty}
+  .lec-modal-b .o{font-size:15px;color:var(--ink-soft);text-wrap:pretty}
+  .lec-meses{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:5px;align-items:end;height:110px}
+  .lec-meses div{display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;height:100%}
+  .lec-meses i{display:block;width:100%;border-radius:3px;background:var(--gold);min-height:3px}
+  .lec-meses i.cero{background:var(--hair)}.lec-meses i.ahora{background:var(--acento,var(--rubric))}
+  .lec-meses span{font-family:ui-monospace,monospace;font-size:10px;color:var(--ink-soft)}
+  .lec-fila{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--hair);font-size:14px}
+  .lec-fila:first-of-type{border-top:0}
+  .lec-fila .s{font-family:ui-monospace,monospace;font-size:12px;color:var(--ink-soft);white-space:nowrap}
+  .lec-fila .f{color:var(--ink-faint)}
+  .lec-award .ic{display:block;font-size:24px;margin-bottom:4px}
+  .lec-award.con::before{content:none}
   .lec-cta{margin-top:52px;padding:26px;border-radius:20px;background:var(--surface);border:1px solid var(--hair);text-align:center}
   .lec-cta p{color:var(--ink-soft);font-size:16px;max-width:46ch;margin:0 auto 18px;text-wrap:pretty}
   .lec-cta .row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
@@ -154,11 +234,11 @@ noindex: true
   var uidEntrada = m[2] || null;
   var es = (navigator.language || "en").toLowerCase().indexOf("es") === 0;
   var T = es ? {
-    titulo: "@" + alias + " en Aleph", leyendo: "Leyendo ahora", citas: "Citas que me acompañan",
+    titulo: "@" + alias + " en Aleph", leyendo: "Leyendo ahora", citas: "Lo que destaco de cada obra",
     verTodas: function (n) { return "Ver las " + n; }, verMenos: "Ver menos", blog: "Mi blog", otraEntrada: "Otra entrada de este blog",
     noEntrada: "Esta entrada ya no está.", noEntradaSub: "Su autor la despublicó o cambió de alias.", busco: "Lo que busco: ", tocaLibro: "Toca un libro para ver por qué está aquí.",
-    destacados: "Destacados", llevo: "Lo que me llevé", ideas: "Mis ideas", conversacion: "Mi conversación",
-    comprobada: "Lectura comprobada", logros: "Logros", enlaces: "Enlaces", estantes: "Mis estantes",
+    destacados: "Destacados", llevo: "Lo que me llevo de mis obras leídas", ideas: "Mis ideas", conversacion: "Mi conversación",
+    comprobada: "Mi año de lectura", logros: "Logros", enlaces: "Enlaces", estantes: "Mis estantes",
     totalLibros: function (n) { return n.toLocaleString("es") + " libros en mi biblioteca"; },
     conv: function (a, b) { return "Converso con autores de " + anio(a) + " a " + anio(b); },
     convSub: function (n) { return n + " años de obras, de la más antigua a la más nueva que he leído."; },
@@ -168,14 +248,27 @@ noindex: true
     nota: "Este perfil muestra solo lo que su lector decidió compartir.",
     dias: function (n) { return n === 1 ? "día" : "días"; },
     rachaLabel: function (n) { return "Racha de lectura: " + n + (n === 1 ? " día seguido" : " días seguidos"); },
+    tambien: function (n) { return "También leyendo · " + n; }, releyendo: "RELEYENDO",
+    anioT: "Mi año de lectura", fraseAnio: function (h, n) { return "Este año leí " + h + (n ? " y terminé " + n + (n === 1 ? " libro." : " libros.") : "."); },
+    sinAnio: "Este año aún no hay lecturas registradas.", comprobadasA: function (h) { return "✓ " + h + " de lectura comprobada"; },
+    estaSemana: "esta semana", rachaLarga: "racha más larga", misAutores: "Mis autores", misLibros: "Mis libros",
+    obras: function (a, b) { return "Obras de " + anio(a) + " a " + anio(b); }, paises: function (n) { return "autores de " + n + " países"; },
+    momento: function (m) { return "leo " + m; }, verAnio: "Ver su año completo", mesAMes: "Mes a mes",
+    mejorMes: function (m, h) { return "Mi mejor mes: " + m + ", con " + h + "."; }, terminadosA: function (n) { return "Terminados este año · " + n; },
+    sesiones: "Últimas sesiones", otroLibro: "Otro libro", horasLeyendo: function (h) { return h + " h leyéndolo"; },
+    fraseLleva: "La frase que me llevo", opinion: "Mi opinión", destacoEste: "Lo que destaco de este libro", cerrar: "Cerrar",
+    diasSeguidos: function (n) { return n === 1 ? "día seguido" : "días seguidos"; }, leidos: function (n) { return n === 1 ? "libro leído" : "libros leídos"; },
+    esteAnio: "este año", leyendoAnio: function (y) { return "leyendo en " + y; }, blogN: function (n) { return "Mi blog · " + n; },
+    diasIni: ["D", "L", "M", "M", "J", "V", "S"], mesesIni: ["E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
+    meses: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
     noHay: "No encontramos a @" + alias + ".", noHaySub: "Puede que haya cambiado de alias.",
     soloApp: "Este perfil se ve completo en la app."
   } : {
-    titulo: "@" + alias + " on Aleph", leyendo: "Reading now", citas: "Quotes that stay with me",
+    titulo: "@" + alias + " on Aleph", leyendo: "Reading now", citas: "What I highlight from each work",
     verTodas: function (n) { return "See all " + n; }, verMenos: "See less", blog: "My blog", otraEntrada: "Another post from this blog",
     noEntrada: "This post is no longer available.", noEntradaSub: "Its author unpublished it or changed their alias.", busco: "What I'm looking for: ", tocaLibro: "Tap a book to see why it's here.",
-    destacados: "Featured", llevo: "What I took away", ideas: "My ideas", conversacion: "My conversation",
-    comprobada: "Verified reading", logros: "Achievements", enlaces: "Links", estantes: "My shelves",
+    destacados: "Featured", llevo: "What I take from the works I've read", ideas: "My ideas", conversacion: "My conversation",
+    comprobada: "My year in reading", logros: "Achievements", enlaces: "Links", estantes: "My shelves",
     totalLibros: function (n) { return n.toLocaleString("en") + " books in my library"; },
     conv: function (a, b) { return "In conversation with authors from " + anio(a) + " to " + anio(b); },
     convSub: function (n) { return n + " years of works, from the oldest to the newest I've read."; },
@@ -185,6 +278,20 @@ noindex: true
     nota: "This profile shows only what its reader chose to share.",
     dias: function (n) { return n === 1 ? "day" : "days"; },
     rachaLabel: function (n) { return "Reading streak: " + n + (n === 1 ? " day" : " days") + " in a row"; },
+    tambien: function (n) { return "Also reading · " + n; }, releyendo: "REREADING",
+    anioT: "My year in reading", fraseAnio: function (h, n) { return "This year I read " + h + (n ? " and finished " + n + (n === 1 ? " book." : " books.") : "."); },
+    sinAnio: "No reading logged yet this year.", comprobadasA: function (h) { return "✓ " + h + " of verified reading"; },
+    estaSemana: "this week", rachaLarga: "longest streak", misAutores: "My authors", misLibros: "My books",
+    obras: function (a, b) { return "Works from " + anio(a) + " to " + anio(b); }, paises: function (n) { return "authors from " + n + " countries"; },
+    momento: function (m) { return ({ "de madrugada": "I read in the small hours", "por la mañana": "I read in the morning", "por la tarde": "I read in the afternoon", "de noche": "I read at night" })[m] || ""; },
+    verAnio: "See their full year", mesAMes: "Month by month",
+    mejorMes: function (m, h) { return "My best month: " + m + ", with " + h + "."; }, terminadosA: function (n) { return "Finished this year · " + n; },
+    sesiones: "Latest sessions", otroLibro: "Another book", horasLeyendo: function (h) { return h + " h reading it"; },
+    fraseLleva: "The line I take with me", opinion: "My take", destacoEste: "What I highlight from this book", cerrar: "Close",
+    diasSeguidos: function (n) { return n === 1 ? "day in a row" : "days in a row"; }, leidos: function (n) { return n === 1 ? "book read" : "books read"; },
+    esteAnio: "this year", leyendoAnio: function (y) { return "reading in " + y; }, blogN: function (n) { return "My blog · " + n; },
+    diasIni: ["S", "M", "T", "W", "T", "F", "S"], mesesIni: ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
+    meses: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     noHay: "We couldn't find @" + alias + ".", noHaySub: "They may have changed their alias.",
     soloApp: "The full profile is in the app."
   };
@@ -392,34 +499,287 @@ noindex: true
 
     var c = null;
     try { c = JSON.parse(campo(p, "cuaderno") || "null"); } catch (e) { c = null; }
-    var racha = rachaVigente(c);
-    if (racha) raiz.querySelector(".lec-head").appendChild(fuego(racha));
-    var leyendoPublico = campo(p, "leyendoPublico");
-    var titulo = campo(leyendo, "tituloLibro");
-    var cuando = campo(leyendo, "actualizadoEn");
-    var reciente = !cuando || (Date.now() - cuando) < 1000 * 60 * 60 * 24 * 90;
-    if (leyendoPublico !== 0 && titulo && reciente) {
-      var now = el("div", "lec-now");
-      now.appendChild(el("div", "eyebrow", T.leyendo));
-      now.appendChild(el("div", "t", titulo));
-      var autor = campo(leyendo, "autorLibro");
-      if (autor) now.appendChild(el("div", "a", autor));
-      var claveL = campo(leyendo, "claveLibro");
-      var nota = c && c.busco && claveL ? c.busco[claveL] : null;
-      if (nota) now.appendChild(el("div", "b", T.busco + nota));
-      raiz.appendChild(now);
+    if (c && typeof c.acento === "number" && c.acento >= 0 && PALETA[c.acento]) seccion.style.setProperty("--acento", PALETA[c.acento]);
+    if (c) lineaEnlaces(c);
+    var cif = cifras(c); if (cif) raiz.appendChild(cif);
+    if (c && Array.isArray(c.leyendo) && c.leyendo.length) {
+      raiz.appendChild(leyendoLista(c.leyendo));
+    } else {
+      var leyendoPublico = campo(p, "leyendoPublico");
+      var titulo = campo(leyendo, "tituloLibro");
+      var cuando = campo(leyendo, "actualizadoEn");
+      var reciente = !cuando || (Date.now() - cuando) < 1000 * 60 * 60 * 24 * 90;
+      if (leyendoPublico !== 0 && titulo && reciente) {
+        var now = el("div", "lec-now");
+        now.appendChild(el("div", "eyebrow", T.leyendo));
+        now.appendChild(el("div", "t", titulo));
+        var autor = campo(leyendo, "autorLibro");
+        if (autor) now.appendChild(el("div", "a", autor));
+        var claveL = campo(leyendo, "claveLibro");
+        var nota = c && c.busco && claveL ? c.busco[claveL] : null;
+        if (nota) now.appendChild(el("div", "b", T.busco + nota));
+        raiz.appendChild(now);
+      }
     }
 
     if (c && Array.isArray(c.bloques)) {
-      if (typeof c.acento === "number" && c.acento >= 0 && PALETA[c.acento]) seccion.style.setProperty("--acento", PALETA[c.acento]);
-      c.bloques.forEach(function (b) { var n = bloque(b, c); if (n) raiz.appendChild(n); });
+      if (c.bloques.indexOf("comprobada") >= 0) { var an = miAnio(c); if (an) raiz.appendChild(an); }
+      c.bloques.forEach(function (b) {
+        if (["enlaces", "blog", "conversacion", "comprobada"].indexOf(b) >= 0) return;
+        var n = bloque(b, c); if (n) raiz.appendChild(n);
+      });
     }
     raiz.appendChild(cta());
     raiz.appendChild(el("p", "lec-note", T.nota));
-    if (/\/blog\/?$/.test(location.pathname)) {
-      setTimeout(function () { var b = document.getElementById("blog"); if (b) b.scrollIntoView(); }, 60);
+    if (/\/blog\/?$/.test(location.pathname) && c && c.blog && c.blog.length) abrirBlog(c);
+  }
+
+  function horas(min) {
+    min = Math.round(min || 0);
+    if (min >= 600) return Math.round(min / 60) + " h";
+    if (min >= 60) return min % 60 === 0 ? (min / 60) + " h" : Math.floor(min / 60) + " h " + (min % 60) + " min";
+    return min + " min";
+  }
+  function flama() {
+    var ns = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(ns, "svg"); svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true");
+    var path = document.createElementNS(ns, "path");
+    path.setAttribute("d", "M12 2c.6 3.2-1.2 5-2.8 6.9C7.6 10.8 6 12.7 6 15.4 6 19 8.7 22 12 22s6-3 6-6.6c0-2.3-1-4.1-2.3-5.6-.3 1.4-1 2.4-2.1 2.9.4-3.6-.7-7.6-1.6-10.7z");
+    svg.appendChild(path); return svg;
+  }
+  function parseDia(t) {
+    var m = typeof t === "string" ? t.match(/^(\d{4})-(\d{2})-(\d{2})$/) : null;
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+  }
+  function modal(titulo, cuerpo) {
+    var d = document.createElement("dialog"); d.className = "lec-modal";
+    var h = el("div", "lec-modal-h"); h.appendChild(el("div", "t", titulo));
+    var x = el("button", "lec-x", "×"); x.type = "button"; x.setAttribute("aria-label", T.cerrar);
+    x.addEventListener("click", function () { d.close(); });
+    h.appendChild(x); d.appendChild(h); d.appendChild(cuerpo);
+    d.addEventListener("close", function () { d.remove(); });
+    d.addEventListener("click", function (e) { if (e.target === d) d.close(); });
+    var est = seccion.style.getPropertyValue("--acento");
+    if (est) d.style.setProperty("--acento", est);
+    document.body.appendChild(d);
+    if (typeof d.showModal === "function") d.showModal(); else d.setAttribute("open", "");
+  }
+  function lineaEnlaces(c) {
+    var enl = (c.enlaces || []).filter(function (e) { return urlRed(e.plataforma, e.valor); });
+    var hayBlog = c.blog && c.blog.length;
+    if (!enl.length && !hayBlog) return;
+    var ln = el("div", "lec-linea");
+    enl.forEach(function (e) {
+      var a = el("a"); a.href = urlRed(e.plataforma, e.valor); a.rel = "me noopener nofollow"; a.target = "_blank";
+      a.appendChild(el("b", null, MONO[e.plataforma] || "·"));
+      a.appendChild(el("span", null, visible(e.plataforma, e.valor)));
+      ln.appendChild(a);
+    });
+    if (hayBlog) {
+      var b = el("button", "blog", "✎ " + T.blogN(c.blog.length)); b.type = "button";
+      b.addEventListener("click", function () { abrirBlog(c); });
+      ln.appendChild(b);
+    }
+    raiz.appendChild(ln);
+  }
+  function abrirBlog(c) {
+    var cuerpo = el("div", "lec-modal-b");
+    c.blog.forEach(function (e) {
+      var a = el("a", "lec-card lec-post"); a.href = "/@" + aliasActual + "/blog/" + e.uid;
+      a.appendChild(el("div", "t", e.titulo));
+      var f = fechaSwift(e.fecha);
+      if (f) a.appendChild(el("div", "f", new Intl.DateTimeFormat(es ? "es" : "en", { day: "numeric", month: "short", year: "numeric" }).format(f)));
+      if (e.extracto) a.appendChild(el("div", "x", e.extracto));
+      cuerpo.appendChild(a);
+    });
+    modal(T.blog, cuerpo);
+  }
+  function cifras(c) {
+    if (!c) return null;
+    var items = [], r = rachaVigente(c), a = c.anio;
+    if (r) items.push([String(r), T.diasSeguidos(r), true]);
+    if (a) {
+      items.push([String(a.terminadosTotal || 0), T.leidos(a.terminadosTotal || 0)]);
+      items.push([horas(a.minutos), T.leyendoAnio(a.anio)]);
+    }
+    if (!items.length) return null;
+    var b = el("button", "lec-cifras"); b.type = "button";
+    b.style.gridTemplateColumns = "repeat(" + items.length + ",minmax(0,1fr))";
+    items.forEach(function (it) {
+      var d = el("div"), n = el("div", "n", it[0]);
+      if (it[2]) n.appendChild(flama());
+      d.appendChild(n); d.appendChild(el("div", "l", it[1])); b.appendChild(d);
+    });
+    if (a) b.addEventListener("click", function () { abrirAnio(c); }); else b.style.cursor = "default";
+    return b;
+  }
+  function pintaLibro(padre, l, grande) {
+    if (l.releyendo) padre.appendChild(el("div", "r", T.releyendo));
+    padre.appendChild(el("div", "t", l.titulo));
+    if (l.autor) padre.appendChild(el("div", "a", l.autor));
+    if (grande && l.busco) padre.appendChild(el("div", "b", T.busco + l.busco));
+    if (l.progreso > 0 && !l.releyendo) {
+      var pr = el("div", "p"), sp = el("span"), i = el("i");
+      i.style.width = Math.min(100, l.progreso) + "%"; sp.appendChild(i); pr.appendChild(sp);
+      pr.appendChild(document.createTextNode(l.progreso + " %")); padre.appendChild(pr);
     }
   }
+  function leyendoLista(lista) {
+    var now = el("div", "lec-now");
+    now.appendChild(el("div", "eyebrow", T.leyendo));
+    pintaLibro(now, lista[0], true);
+    if (lista.length > 1) {
+      var bt = el("button", "lec-also", T.tambien(lista.length - 1)); bt.type = "button";
+      bt.setAttribute("aria-expanded", "false");
+      var box = el("div", "lec-also-list"); box.hidden = true;
+      lista.slice(1).forEach(function (l) { var row = el("div", "row"); pintaLibro(row, l, false); box.appendChild(row); });
+      bt.addEventListener("click", function () { box.hidden = !box.hidden; bt.setAttribute("aria-expanded", String(!box.hidden)); });
+      now.appendChild(bt); now.appendChild(box);
+    }
+    return now;
+  }
+  function iniciales(n) {
+    var p = (n || "").split(/\s+/).filter(function (x) { return x.length > 2 || /^[A-ZÁÉÍÓÚÑ]/.test(x); });
+    var t = [p[0], p.length > 1 ? p[p.length - 1] : null].filter(Boolean).map(function (x) { return x.charAt(0); }).join("");
+    return (t || "?").toUpperCase();
+  }
+  function miAnio(c) {
+    var a = c.anio, d, k;
+    if (!a) {
+      if (!(c.horasComprobadas > 0 || c.terminadosAnio > 0)) return null;
+      d = caja(T.comprobada);
+      var st = el("div", "lec-stats");
+      [[c.horasComprobadas + " h", T.horas], [String(c.terminadosAnio || 0), T.libros(c.terminadosAnio || 0)]].forEach(function (p) {
+        var x = el("div", "lec-card lec-stat"); x.appendChild(el("div", "n", p[0])); x.appendChild(el("div", "l", p[1])); st.appendChild(x);
+      });
+      d.appendChild(st); return d;
+    }
+    if (!((a.minutos || 0) > 0 || (a.terminadosTotal || 0) > 0)) return null;
+    d = caja(T.anioT);
+    k = el("div", "lec-card lec-anio");
+    var nt = (a.terminados || []).length;
+    k.appendChild(el("div", "fr", (a.minutos > 0 || nt) ? T.fraseAnio(horas(a.minutos), nt) : T.sinAnio));
+    if (a.minutosComprobados > 0) k.appendChild(el("div", "ok", T.comprobadasA(horas(a.minutosComprobados))));
+    var sem = el("div", "lec-semana"), hoy = parseDia(a.hoy) || new Date();
+    (a.semana || []).forEach(function (m, i) {
+      var dia = new Date(hoy); dia.setDate(hoy.getDate() - ((a.semana.length - 1) - i));
+      var cum = a.semanaCumplidos && a.semanaCumplidos[i];
+      var cell = el("div"), circ = el("div", "c" + (cum ? " si" : m > 0 ? " al" : ""));
+      if (cum) circ.appendChild(flama()); else if (m > 0) circ.textContent = String(m);
+      cell.appendChild(circ);
+      cell.appendChild(el("div", "d" + (i === a.semana.length - 1 ? " hoy" : ""), T.diasIni[dia.getDay()]));
+      sem.appendChild(cell);
+    });
+    k.appendChild(sem);
+    var mn = el("div", "lec-minis");
+    [[horas((a.semana || []).reduce(function (x, y) { return x + y; }, 0)), T.estaSemana]]
+      .concat(a.rachaMasLarga > 0 ? [[a.rachaMasLarga + " " + T.dias(a.rachaMasLarga), T.rachaLarga]] : [])
+      .forEach(function (p) { var x = el("div"); x.appendChild(el("div", "n", p[0])); x.appendChild(el("div", "l", p[1])); mn.appendChild(x); });
+    k.appendChild(mn);
+    var aut = a.autores || [], lib = a.libros || [];
+    if (aut.length || lib.length) {
+      var tabs = el("div", "lec-tabs"), lista = el("div");
+      var bA = el("button", null, T.misAutores), bL = el("button", null, T.misLibros);
+      bA.type = "button"; bL.type = "button";
+      var ver = function (libros) {
+        bA.className = libros ? "" : "on"; bL.className = libros ? "on" : "";
+        lista.textContent = "";
+        var xs = (libros ? lib : aut).slice(0, 3), tope = Math.max(1, xs.length ? xs[0].minutos : 1);
+        xs.forEach(function (t, n) {
+          var row = el("div", "lec-top");
+          if (libros) { var lo = el("span", "lo"); lo.style.background = PALETA[t.color] || PALETA[5]; row.appendChild(lo); }
+          else { var av = el("span", "av", iniciales(t.nombre)); av.style.background = PALETA[t.color] || PALETA[5]; row.appendChild(av); }
+          var x = el("div", "x"), h = el("div", "h");
+          h.appendChild(el("span", null, t.nombre)); h.appendChild(el("span", null, horas(t.minutos))); x.appendChild(h);
+          var bar = el("div", "bar"), f = el("i"); f.style.width = Math.max(3, 100 * t.minutos / tope) + "%";
+          if (n === 0) f.style.background = "var(--acento,var(--rubric))";
+          bar.appendChild(f); x.appendChild(bar);
+          row.appendChild(x); lista.appendChild(row);
+        });
+      };
+      bA.addEventListener("click", function () { ver(false); });
+      bL.addEventListener("click", function () { ver(true); });
+      if (!aut.length) bA.disabled = true;
+      if (!lib.length) bL.disabled = true;
+      tabs.appendChild(bA); tabs.appendChild(bL); k.appendChild(tabs); k.appendChild(lista);
+      ver(!aut.length);
+    }
+    var ctx = [];
+    if (typeof c.conversacionDesde === "number" && typeof c.conversacionHasta === "number" && c.conversacionHasta > c.conversacionDesde) ctx.push(T.obras(c.conversacionDesde, c.conversacionHasta));
+    if (a.paises) ctx.push(T.paises(a.paises));
+    if (a.momento && T.momento(a.momento)) ctx.push(T.momento(a.momento));
+    if (ctx.length) { var t = ctx.join(" · "); k.appendChild(el("div", "lec-ctx", t.charAt(0).toUpperCase() + t.slice(1))); }
+    var mas = el("button", "lec-mas", T.verAnio + " →"); mas.type = "button";
+    mas.addEventListener("click", function () { abrirAnio(c); });
+    k.appendChild(mas);
+    d.appendChild(k);
+    return d;
+  }
+  function abrirAnio(c) {
+    var a = c.anio; if (!a) return;
+    var b = el("div", "lec-modal-b"), mn = el("div", "lec-minis"), r = rachaVigente(c);
+    (r ? [[String(r), T.diasSeguidos(r)]] : [])
+      .concat([[a.rachaMasLarga + " " + T.dias(a.rachaMasLarga), T.rachaLarga], [horas(a.minutos), T.esteAnio]])
+      .forEach(function (p) { var x = el("div"); x.appendChild(el("div", "n", p[0])); x.appendChild(el("div", "l", p[1])); mn.appendChild(x); });
+    b.appendChild(mn);
+    if (a.minutosComprobados > 0) b.appendChild(el("div", "o", T.comprobadasA(horas(a.minutosComprobados))));
+    var meses = a.meses || [];
+    if (meses.length === 12) {
+      b.appendChild(el("div", "k", T.mesAMes));
+      var g = el("div", "lec-meses"), tope = Math.max.apply(null, meses.concat([1])), ahora = new Date().getMonth();
+      meses.forEach(function (m, i) {
+        var col = el("div"), bar = el("i", m > 0 ? (i === ahora ? "ahora" : "") : "cero");
+        bar.style.height = Math.max(3, 90 * m / tope) + "px"; bar.title = T.meses[i] + ": " + horas(m);
+        col.appendChild(bar); col.appendChild(el("span", null, T.mesesIni[i])); g.appendChild(col);
+      });
+      b.appendChild(g);
+      var mejor = meses.indexOf(Math.max.apply(null, meses));
+      if (meses[mejor] > 0) b.appendChild(el("div", "o", T.mejorMes(T.meses[mejor], horas(meses[mejor]))));
+    }
+    if (a.terminados && a.terminados.length) {
+      b.appendChild(el("div", "k", T.terminadosA(a.terminados.length)));
+      var lt = el("div");
+      a.terminados.forEach(function (t) {
+        var f = el("div", "lec-fila"), izq = el("div"), fecha = fechaSwift(t.fecha);
+        izq.appendChild(el("div", null, t.titulo)); if (t.autor) izq.appendChild(el("div", "f", t.autor));
+        f.appendChild(izq);
+        f.appendChild(el("div", "s", [fecha ? T.meses[fecha.getMonth()] : "", t.horas ? t.horas + " h" : ""].filter(Boolean).join(" · ")));
+        lt.appendChild(f);
+      });
+      b.appendChild(lt);
+    }
+    if (a.sesiones && a.sesiones.length) {
+      b.appendChild(el("div", "k", T.sesiones));
+      var ls = el("div");
+      a.sesiones.forEach(function (s) {
+        var f = el("div", "lec-fila"), fecha = fechaSwift(s.fecha);
+        var txt = (fecha ? new Intl.DateTimeFormat(es ? "es" : "en", { day: "numeric", month: "short" }).format(fecha) + " · " : "") + (s.titulo || T.otroLibro);
+        f.appendChild(el("div", s.titulo ? null : "f", txt));
+        f.appendChild(el("div", "s", s.minutos + " min" + (s.comprobada ? " ✓" : "")));
+        ls.appendChild(f);
+      });
+      b.appendChild(ls);
+    }
+    modal(T.anioT + " " + a.anio, b);
+  }
+  function abrirDestacado(l) {
+    var b = el("div", "lec-modal-b");
+    if (l.autor) b.appendChild(el("div", "o", l.autor));
+    if (l.horas >= 0.1) b.appendChild(el("div", "o", T.horasLeyendo(Math.round(l.horas * 10) / 10)));
+    if (l.motivo) b.appendChild(el("div", "m", l.motivo));
+    if (l.frase) { b.appendChild(el("div", "k", T.fraseLleva)); b.appendChild(el("div", "q", "“" + l.frase + "”")); }
+    if (l.opinion) { b.appendChild(el("div", "k", T.opinion)); b.appendChild(el("div", "o", l.opinion)); }
+    if (l.citas && l.citas.length) {
+      b.appendChild(el("div", "k", T.destacoEste));
+      l.citas.forEach(function (x) { var q = el("div", "lec-cita"); q.appendChild(el("div", "q", "“" + x + "”")); b.appendChild(q); });
+    }
+    modal(l.titulo, b);
+  }
+  var ICONOS = { "book.closed.fill": "📕", "books.vertical.fill": "📚", "building.columns.fill": "🏛️", "character.book.closed.fill": "📖",
+    "checkmark.seal.fill": "✅", "eye.fill": "👁️", "globe.americas.fill": "🌎", "lightbulb.fill": "💡", "link": "🔗", "moon.stars.fill": "🌙",
+    "person.crop.circle.badge.checkmark": "🤝", "person.text.rectangle.fill": "🪪", "questionmark.diamond.fill": "❓", "signpost.right.fill": "🪧",
+    "square.and.pencil": "✍️", "sun.max.fill": "☀️", "text.book.closed.fill": "📘", "network": "🕸️", "hourglass": "⏳", "highlighter": "🖍️",
+    "brain.head.profile": "🧠", "atom": "⚛️" };
 
   function caja(titulo) { var d = el("div", "lec-block"); d.appendChild(el("h2", null, titulo)); return d; }
 
@@ -432,33 +792,19 @@ noindex: true
         if (!c.destacados || !c.destacados.length) return null;
         d = caja(T.destacados);
         var g = el("div", "lec-spines");
-        var por = el("div", "lec-why");
         var algunoConPorque = false;
         c.destacados.forEach(function (l) {
-          var tiene = !!(l.motivo || l.frase || l.opinion);
+          var tiene = !!(l.motivo || l.frase || l.opinion || l.horas >= 0.1 || (l.citas && l.citas.length));
           if (tiene) algunoConPorque = true;
           var s = el("button", "lec-spine"); s.type = "button"; s.style.background = PALETA[l.color] || PALETA[5];
           s.title = l.titulo + (l.autor ? " — " + l.autor : "");
           s.appendChild(el("span", null, l.titulo));
           if (tiene) { s.appendChild(el("i", "q", "“")); } else { s.disabled = true; }
-          s.addEventListener("click", function () {
-            var yaSel = s.classList.contains("sel");
-            g.querySelectorAll(".lec-spine").forEach(function (x) { x.classList.remove("sel"); });
-            por.textContent = "";
-            if (yaSel) return;
-            s.classList.add("sel");
-            var k = el("div", "lec-card");
-            k.appendChild(el("div", "k", l.titulo + (l.autor ? " · " + l.autor : "")));
-            if (l.motivo) k.appendChild(el("div", "m", l.motivo));
-            if (l.frase) k.appendChild(el("div", "q", "“" + l.frase + "”"));
-            if (l.opinion) k.appendChild(el("div", "o", l.opinion));
-            por.appendChild(k);
-          });
+          s.addEventListener("click", function () { abrirDestacado(l); });
           g.appendChild(s);
         });
         d.appendChild(g);
         if (algunoConPorque) d.appendChild(el("div", "lec-hint", T.tocaLibro));
-        d.appendChild(por);
         return d;
       case "llevo":
         if (!c.frases || !c.frases.length) return null;
@@ -562,7 +908,11 @@ noindex: true
         if (!c.logros || !c.logros.length) return null;
         d = caja(T.logros);
         var lg = el("div", "lec-awards");
-        c.logros.forEach(function (l) { lg.appendChild(el("div", "lec-card lec-award", l.nombre)); });
+        c.logros.forEach(function (l) {
+          var ic = ICONOS[l.icono], x = el("div", "lec-card lec-award" + (ic ? " con" : ""));
+          if (ic) x.appendChild(el("span", "ic", ic));
+          x.appendChild(document.createTextNode(l.nombre)); lg.appendChild(x);
+        });
         d.appendChild(lg); return d;
       case "enlaces":
         if (!c.enlaces || !c.enlaces.length) return null;
