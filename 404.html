@@ -93,6 +93,16 @@ noindex: true
   .md code{font-family:ui-monospace,monospace;font-size:.85em;background:var(--surface-2);padding:1px 5px;border-radius:4px}
   .md a{color:var(--rubric);text-underline-offset:2px}
   .md .md-img{max-width:100%;height:auto;border-radius:10px;margin:6px 0 18px}
+  .md .md-code{margin:0 0 16px;padding:12px 14px;background:var(--surface-2);border-radius:10px;overflow-x:auto}
+  .md .md-code code{background:none;padding:0;font-size:13px;white-space:pre}
+  .md .md-card{display:block;margin:6px 0 18px;padding:12px 14px;border:1px solid var(--hair);border-radius:12px;text-decoration:none;color:var(--ink)}
+  .md .md-card-t{font-weight:600;font-size:15px}
+  .md .md-card-s{font-size:13px;color:var(--ink-soft);margin-top:2px;overflow-wrap:anywhere}
+  .md .md-video{padding:0;overflow:hidden}
+  .md .md-video .md-card-t{padding:10px 14px}
+  .md .md-thumb{position:relative;aspect-ratio:16/9;max-width:100%;background:var(--surface-2)}
+  .md .md-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .md .md-play{position:absolute;inset:0;margin:auto;width:56px;height:56px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px}
   .md .md-ref{display:inline-block;margin:0 0 16px;font-family:-apple-system,sans-serif;font-size:14px}
   .lec-card .m{font-size:16px;font-weight:600;margin-top:8px;text-wrap:pretty}
   .lec-block{margin-top:40px}
@@ -456,6 +466,37 @@ noindex: true
     }
     if (ultimo < s.length) padre.appendChild(document.createTextNode(s.slice(ultimo)));
   }
+  // Un enlace solo en su línea = tarjeta (como LinkPreviewCard en la app). YouTube con su
+  // miniatura y ▶; lo demás, con su dominio. Sin iframes ni scripts de terceros.
+  function idYouTube(u) {
+    var h = u.hostname.replace(/^www\.|^m\./, "");
+    if (h === "youtu.be") return u.pathname.slice(1).split("/")[0];
+    if (h === "youtube.com" || h === "youtube-nocookie.com") {
+      if (u.searchParams.get("v")) return u.searchParams.get("v");
+      var m = u.pathname.match(/^\/(shorts|embed|live)\/([A-Za-z0-9_-]{6,})/);
+      if (m) return m[2];
+    }
+    return null;
+  }
+  function tarjetaEnlace(href) {
+    var u; try { u = new URL(href); } catch (e) { return null; }
+    if (!/^https?:$/.test(u.protocol)) return null;
+    var a = el("a", "md-card"); a.href = u.href; a.target = "_blank"; a.rel = "noopener nofollow";
+    var yt = idYouTube(u);
+    if (yt && /^[A-Za-z0-9_-]{6,20}$/.test(yt)) {
+      a.classList.add("md-video");
+      var mini = el("div", "md-thumb");
+      var im = el("img"); im.src = "https://i.ytimg.com/vi/" + yt + "/hqdefault.jpg"; im.alt = ""; im.loading = "lazy";
+      mini.appendChild(im); mini.appendChild(el("span", "md-play", "▶"));
+      a.appendChild(mini);
+      a.appendChild(el("div", "md-card-t", "YouTube"));
+    } else {
+      a.appendChild(el("div", "md-card-t", u.hostname.replace(/^www\./, "")));
+      var ruta = (u.pathname + u.search).replace(/\/$/, "");
+      if (ruta) a.appendChild(el("div", "md-card-s", decodeURIComponent(ruta).slice(0, 80)));
+    }
+    return a;
+  }
   function markdown(texto, imgs, aliasR) {
     var cont = el("div", "md"), lineas = texto.split("\n"), i = 0, parrafo = [];
     function cerrar() { if (parrafo.length) { var p = el("p"); enLinea(parrafo.join(" "), p); cont.appendChild(p); parrafo = []; } }
@@ -469,6 +510,12 @@ noindex: true
         if (src) { var im = el("img", "md-img"); im.src = src; im.alt = ""; im.loading = "lazy"; cont.appendChild(im); }
         i++; continue;
       }
+      if (/^```/.test(t)) {
+        cerrar(); var codigo = []; i++;
+        while (i < lineas.length && !/^```/.test(lineas[i].trim())) { codigo.push(lineas[i]); i++; }
+        var pre = el("pre", "md-code"); pre.appendChild(el("code", null, codigo.join("\n"))); cont.appendChild(pre); i++; continue;
+      }
+      if (/^https?:\/\/\S+$/.test(t)) { cerrar(); var tarjeta = tarjetaEnlace(t); if (tarjeta) cont.appendChild(tarjeta); i++; continue; }
       if ((x = t.match(/^aleph:\/\/blog\/([A-Za-z0-9-]{8,64})$/))) {
         cerrar(); var ref = el("a", "md-ref", "→ " + T.otraEntrada); ref.href = "/@" + aliasR + "/blog/" + x[1]; cont.appendChild(ref); i++; continue;
       }
