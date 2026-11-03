@@ -31,6 +31,9 @@ noindex: true
   son <dialog>. Los logros traen el nombre de su SF Symbol: se pintan con un emoji equivalente.
   Notas del script (aquí y no en el JS: este bloque no se publica):
   - PALETA = StudyPalette de la app (índices 0–6): lomos, ideas y color de acento.
+  - «Me interesa» (2026-11-02): `cuaderno.intereses` = InteresBreve de la app (emoji, nombre,
+    porQue, libros, horas, subrayados, temas); la app ya quita los ocultos y su id. Mismo dibujo
+    que filaInteres en la app: nombre, cifras y el porqué.
   - rachaVigente(): igual que CuadernoLector.rachaVigente en la app (último día hoy o ayer).
   - Entrada del blog: registro blog_<uid>; mod_blog_<uid> si un moderador la ocultó. Perfil
     oculto por un moderador: mod_<uid> (Moderación › «Ocultar para todos»).
@@ -120,6 +123,8 @@ noindex: true
   .lec-card .k{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
   .lec-card .q{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:19px;line-height:1.42;margin-top:8px;text-wrap:pretty}
   .lec-card .o{font-size:15px;color:var(--ink-soft);margin-top:10px;padding-left:12px;border-left:2px solid var(--acento,var(--rubric))}
+  .lec-interes .m{margin-top:0}
+  .lec-interes .k{margin-top:6px;letter-spacing:.04em;text-transform:none}
   .lec-sub{font-size:14px;color:var(--ink-soft);margin-top:6px}
   .lec-tags{display:flex;flex-wrap:wrap;gap:8px}
   .lec-tag{border-radius:999px;font-weight:600;border:1px solid}
@@ -261,6 +266,7 @@ noindex: true
     noEntrada: "Esta entrada ya no está.", noEntradaSub: "Su autor la despublicó o cambió de alias.", busco: "Lo que busco: ", tocaLibro: "Toca un libro para ver por qué está aquí.",
     destacados: "Destacados", llevo: "Lo que me llevo de mis obras leídas", ideas: "Mis ideas", conversacion: "Mi conversación",
     comprobada: "Mi año de lectura", logros: "Logros", enlaces: "Enlaces", estantes: "Mis estantes",
+    intereses: "Me interesa", intLibro: ["libro", "libros"], intSub: ["subrayado", "subrayados"], intTema: ["tema", "temas"],
     totalLibros: function (n) { return n.toLocaleString("es") + " libros en mi biblioteca"; },
     conv: function (a, b) { return "Converso con autores de " + anio(a) + " a " + anio(b); },
     convSub: function (n) { return n + " años de obras, de la más antigua a la más nueva que he leído."; },
@@ -293,6 +299,7 @@ noindex: true
     noEntrada: "This post is no longer available.", noEntradaSub: "Its author unpublished it or changed their alias.", busco: "What I'm looking for: ", tocaLibro: "Tap a book to see why it's here.",
     destacados: "Featured", llevo: "What I take from the works I've read", ideas: "My ideas", conversacion: "My conversation",
     comprobada: "My year in reading", logros: "Achievements", enlaces: "Links", estantes: "My shelves",
+    intereses: "What interests me", intLibro: ["book", "books"], intSub: ["highlight", "highlights"], intTema: ["topic", "topics"],
     totalLibros: function (n) { return n.toLocaleString("en") + " books in my library"; },
     conv: function (a, b) { return "In conversation with authors from " + anio(a) + " to " + anio(b); },
     convSub: function (n) { return n + " years of works, from the oldest to the newest I've read."; },
@@ -867,6 +874,14 @@ noindex: true
     return d;
   }
   function caja(titulo) { var d = el("div", "lec-block"); d.appendChild(el("h2", null, titulo)); return d; }
+  // «12 libros · 30 h · 140 subrayados · 2 temas», sin las cifras en cero (Interes.textoCifras en la app).
+  function cifrasInteres(i) {
+    var loc = es ? "es" : "en";
+    return [[i.libros, T.intLibro], [i.horas, ["h", "h"]], [i.subrayados, T.intSub], [i.temas, T.intTema]]
+      .filter(function (p) { return p[0] > 0; })
+      .map(function (p) { return p[0].toLocaleString(loc) + " " + p[1][p[0] === 1 ? 0 : 1]; })
+      .join(" · ");
+  }
 
   function fechaSwift(s) { return typeof s === "number" ? new Date((s + 978307200) * 1000) : null; }
 
@@ -890,6 +905,18 @@ noindex: true
         });
         d.appendChild(g);
         if (algunoConPorque) d.appendChild(el("div", "lec-hint", T.tocaLibro));
+        return d;
+      case "intereses":
+        if (!c.intereses || !c.intereses.length) return null;
+        d = caja(T.intereses);
+        c.intereses.forEach(function (i) {
+          var k = el("div", "lec-card lec-interes");
+          k.appendChild(el("div", "m", ((i.emoji || "") + " " + (i.nombre || "")).trim()));
+          var cifras = cifrasInteres(i);
+          if (cifras) k.appendChild(el("div", "k", cifras));
+          if (i.porQue) k.appendChild(el("div", "o", i.porQue));
+          d.appendChild(k);
+        });
         return d;
       case "llevo":
         if (!c.frases || !c.frases.length) return null;
