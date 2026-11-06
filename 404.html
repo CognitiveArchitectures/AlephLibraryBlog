@@ -6,11 +6,14 @@ permalink: /404.html
 noindex: true
 ---
 {%- comment -%}
-  404.html — dos trabajos:
+  404.html — tres trabajos:
   0. alephlibrary.com/@alias/blog/<uid> = una entrada publicada de su blog (2026-10-09): registro
      `Entrada` (id blog_<uid>) de la base pública, Markdown pintado aquí con un lector mínimo y
-     seguro (todo con textContent; enlaces solo http(s); imágenes = sus archivos en CloudKit).
-     /@alias/blog lleva al perfil (su bloque «Mi blog» lista las entradas, desde `cuaderno`).
+     seguro (todo con textContent; enlaces solo http(s) o mailto; imágenes = sus archivos en CloudKit).
+  0b. alephlibrary.com/@alias/blog = la página del blog (2026-11-05, Diego: «cada usuario tiene su
+     página de blog que la puede pegar en social media»): título (`cuaderno.blogTitulo`, o «El blog
+     de <nombre>», nunca el alias) y subtítulo (`cuaderno.blogSubtitulo`), a un lado su perfil, y las
+     entradas con filtro. Spec: docs/spec-blog-publico.md en el repo de la app.
   1. alephlibrary.com/@alias = el perfil público de un lector de Aleph (2026-10-08). GitHub Pages
      no tiene rutas dinámicas: cualquier ruta que no existe cae aquí, y el script lee el @alias de
      la dirección. Con Aleph instalada, iOS abre la app antes de llegar aquí (Universal Links:
@@ -22,8 +25,8 @@ noindex: true
   Racha (2026-10-09): si el lector la prendió, el fuego con sus días, solo si el último día que
   contó (`cuaderno.rachaDia`) es hoy o ayer (`rachaVigente`, igual que la app).
   Perfil único (2026-10-14, docs/spec-social-perfil-2026-10.md §10 en el repo de la app): mismo
-  orden que la app. Cabecera · redes y blog en una línea bajo la bio (el blog abre una ventana con
-  sus entradas) · cifras (racha · libros leídos · horas del año; tocar = su año completo) · Leyendo
+  orden que la app. Cabecera · redes en una línea bajo la bio · cifras (racha · libros leídos ·
+  horas del año; tocar = su año completo) · Leyendo
   ahora + «También leyendo» (`cuaderno.leyendo`; perfiles viejos: el registro leyendo_<uid>) · Mi
   año de lectura (`cuaderno.anio`: semana, autores | libros, contexto, «Ver su año completo») ·
   los bloques en su orden (sin enlaces, blog, conversación ni comprobada, que ya van arriba).
@@ -37,8 +40,20 @@ noindex: true
   - rachaVigente(): igual que CuadernoLector.rachaVigente en la app (último día hoy o ayer).
   - Entrada del blog: registro blog_<uid>; mod_blog_<uid> si un moderador la ocultó. Perfil
     oculto por un moderador: mod_<uid> (Moderación › «Ocultar para todos»).
-  - Markdown: solo lo que escribe el editor de Aleph (títulos, citas, listas, separador, [img:N],
-    enlaces, negritas, itálicas, código y aleph://blog/<uid>).
+  - Página del blog: la lista sale de `cuaderno.blog`; cada entrada se confirma con su registro
+    (si no existe o está oculta, no sale) y de ahí salen su tipo, extracto, minutos, portada y citas.
+    Filtro = tags (`cuaderno.blog[i].tags`) o, si no tiene, su tipo si no es «General»: la misma regla
+    que `etiquetasDe` en BlogView. El tipo «Tema» es su propio filtro, antes que los tags.
+    En teléfono, `.bg-riel` y `.bg-main` usan display:contents y el orden lo pone `order`: el título
+    primero, luego quién escribe; en una entrada, quién escribe va después del texto.
+  - Markdown: lo que escribe el editor de Aleph, igual que MarkdownView en la app (títulos, citas,
+    listas, separador, [img:N], enlaces, negritas, itálicas con * o _, tachado, código, un salto de
+    línea es un salto de línea, y aleph://blog/<uid> o aleph://perfil/<alias>, en su línea o dentro
+    de un enlace). `enLinea` anida (**[texto](url)**). Un _ dentro de una palabra no es cursiva.
+    Las fórmulas se muestran como código (sin scripts de terceros).
+  - Citas (BlogCitas.conReferencias en la app): la entrada llega con marcas [1] o [1,2] y al final
+    líneas «**[n]** texto — *libro, autor, página*». Se reconocen por ese formato, no por el título
+    «Referencias», que va traducido. Una marca solo es enlace si existe su referencia.
   - Fechas del cuaderno: JSONEncoder de Swift = segundos desde 2001-01-01.
   - Enlaces de redes: mismas reglas que PlataformaSocial.url / EnlacesPerfilView en la app.
   En el JS que se publica no van comentarios internos (revisión 2026-10-09).
@@ -78,16 +93,117 @@ noindex: true
   .lec-cita .q{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:17.5px;line-height:1.45;text-wrap:pretty}
   .lec-cita .f{font-family:ui-monospace,monospace;font-size:11px;color:var(--ink-faint);margin-top:4px}
   .lec-mas{margin-top:14px;background:none;border:0;padding:0;font:inherit;font-size:14px;font-weight:600;color:var(--acento,var(--rubric));cursor:pointer}
-  #blog{scroll-margin-top:84px}
-  .lec-post{display:block;text-decoration:none}
-  .lec-post .t{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:19px;font-weight:600}
-  .lec-post .f{font-family:ui-monospace,monospace;font-size:11px;color:var(--ink-faint);margin-top:2px}
-  .lec-post .x{font-size:14px;color:var(--ink-soft);margin-top:6px;text-wrap:pretty}
-  .ent-h{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:clamp(28px,5vw,40px);font-weight:700;letter-spacing:-.02em;line-height:1.1;margin:10px 0 12px;text-wrap:balance}
-  .ent-meta{font-family:ui-monospace,monospace;font-size:12px;color:var(--ink-faint)}
-  .ent-autor{display:inline-flex;gap:8px;align-items:center;color:var(--ink-soft);font-size:14px;text-decoration:none;margin-bottom:22px}
+  body.en-blog nav.links a.nl{display:none}
+  .lector .wrap.bg-ancho{max-width:1160px}
+  .bg{display:grid;grid-template-columns:264px minmax(0,1fr);gap:clamp(40px,6vw,84px);align-items:start}
+  .bg-riel{position:sticky;top:88px;max-height:calc(100vh - 104px);overflow-y:auto;scrollbar-width:none;display:grid;gap:26px;font-size:15px;line-height:1.5}
+  .bg-riel::-webkit-scrollbar{display:none}
+  .bg-main{min-width:0}
+  .bg-quien{display:grid;gap:12px;text-decoration:none;color:inherit}
+  .bg-avatar{width:84px;height:84px;font-size:30px}
+  img.lec-avatar{background:var(--surface-2)}
+  .bg-nombre{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:22px;font-weight:700;letter-spacing:-.012em;line-height:1.15;text-wrap:balance}
+  .bg-quien .lec-alias{font-size:12.5px;margin-top:3px}
+  .bg-bio{margin-top:12px;color:var(--ink-soft);text-wrap:pretty}
+  .bg-redes{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+  .bg-redes a{width:30px;height:30px;border-radius:50%;background:var(--surface);border:1px solid var(--hair);color:var(--ink-soft);display:flex;align-items:center;justify-content:center;
+    font-family:ui-monospace,monospace;font-size:10px;text-decoration:none;transition:color .2s,border-color .2s}
+  .bg-redes a:hover{color:var(--ink);border-color:var(--ink-soft)}
+  .bg-mas{display:grid;gap:18px;padding-top:22px;border-top:1px solid var(--hair)}
+  .bg-mas .lec-now{margin:0;padding:0;background:none;border:0;border-radius:0}
+  .bg-mas .lec-now .t{font-size:17px;line-height:1.25}
+  .bg-mas .lec-now .eyebrow{font-size:10.5px;letter-spacing:.2em;color:var(--ink-faint)}
+  .bg-mas .lec-now .a{font-size:13px;color:var(--ink-soft)}
+  .bg-mas .lec-now .b{font-size:13px}
+  .bg-mas .lec-also{font-size:13px;color:var(--ink-soft)}
+  .bg-mas .lec-cifras{display:grid;grid-template-columns:minmax(0,1fr)!important;gap:6px;margin:0;padding:0;border:0;text-align:left}
+  .bg-mas .lec-cifras div{text-align:left}
+  .bg-mas .lec-cifras>div{display:flex;align-items:baseline;gap:7px}
+  .bg-mas .lec-cifras .n{font-size:15px;font-weight:700;white-space:nowrap}
+  .bg-mas .lec-cifras .l{font-size:13px;color:var(--ink-soft)}
+  .bg-gustos{display:flex;flex-wrap:wrap;gap:5px 12px;font-size:13.5px;color:var(--ink-soft)}
+  .bg-gustos .eyebrow{flex-basis:100%;font-size:10.5px;letter-spacing:.2em;color:var(--ink-faint)}
+  .bg-ver{margin:0;font-size:13.5px;text-decoration:none;color:var(--ink-soft)}
+  .bg-ver:hover{color:var(--ink)}
+  .bg-linea{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:38px}
+  .bg-share{padding:6px 13px;font-size:13px;color:var(--ink-soft)}
+  .bg-h{font-family:ui-serif,"New York","Iowan Old Style",Palatino,Georgia,serif;font-size:clamp(40px,6.4vw,68px);font-weight:700;letter-spacing:-.028em;line-height:1.02;max-width:none;margin:12px 0 0;text-wrap:balance;overflow-wrap:anywhere}
+  .bg-sub{font-family:ui-serif,"New York","Iowan Old Style",Palatino,Georgia,serif;font-style:italic;font-size:clamp(18px,2.2vw,21px);line-height:1.4;color:var(--ink-soft);margin-top:14px;max-width:44ch;text-wrap:pretty}
+  .bg-contenido{margin-top:clamp(28px,4vw,44px);min-width:0;max-width:100%}
+  .bg-filtros{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:18px}
+  .bg-filtros::-webkit-scrollbar{display:none}
+  .bg-chip{flex:none;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12.5px;line-height:1.3;padding:6px 12px;border-radius:999px;border:1px solid var(--hair-strong);background:none;color:var(--ink-soft);cursor:pointer;transition:color .2s,background .2s,border-color .2s}
+  .bg-chip:hover{color:var(--ink);border-color:var(--ink-soft)}
+  .bg-chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .bg-chip i{font-style:normal;opacity:.55;margin-left:6px}
+  .bg-lista{list-style:none;margin:0;padding:0}
+  .bg-anio{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;letter-spacing:.2em;color:var(--acento,var(--rubric));padding:26px 0 10px;border-top:1px solid var(--hair)}
+  .bg-anio:first-child{padding-top:18px}
+  .bg-item{display:grid;grid-template-columns:64px minmax(0,1fr) auto;column-gap:18px;padding:22px 0;border-top:1px solid var(--hair);text-decoration:none;color:inherit}
+  .bg-anio + li .bg-item{border-top:0;padding-top:6px}
+  .bg-f{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;color:var(--ink-faint);padding-top:9px;white-space:nowrap}
+  .bg-x{min-width:0}
+  .bg-t{font-family:ui-serif,"New York","Iowan Old Style",Palatino,Georgia,serif;font-size:clamp(23px,2.6vw,28px);font-weight:600;letter-spacing:-.014em;line-height:1.16;text-wrap:balance;transition:color .2s}
+  .bg-item:hover .bg-t{color:var(--rubric)}
+  .bg-e{font-size:16px;line-height:1.5;color:var(--ink-soft);margin-top:8px;text-wrap:pretty;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+  .bg-m{display:flex;flex-wrap:wrap;gap:3px 12px;margin-top:10px;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;color:var(--ink-faint)}
+  .bg-m .solo-tel{display:none}
+  .bg-p{width:128px;aspect-ratio:4/3;max-width:100%;object-fit:cover;border-radius:10px;background:var(--surface-2);margin-top:6px}
+  .bg-vacio{color:var(--ink-soft);padding:22px 0;border-top:1px solid var(--hair)}
+  .bg-cargando{display:grid;gap:30px;padding-top:24px;border-top:1px solid var(--hair)}
+  .bg-cargando i{display:block;height:58px;border-radius:10px;background:var(--surface-2);opacity:.7}
+  .bg-pie{margin-top:12px}
+  .bg-pie .lec-note{margin-top:20px}
+  .ent-autor{display:none;gap:10px;align-items:center;color:var(--ink-soft);font-size:14px;text-decoration:none;margin-top:16px}
+  .ent-autor img,.ent-autor .lec-avatar{width:28px;height:28px;font-size:11px}
+  .ent-volver{color:var(--ink-soft);font-size:14px;text-decoration:none;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ent-volver:hover{color:var(--ink)}
+  .ent-h{font-family:ui-serif,"New York","Iowan Old Style",Palatino,Georgia,serif;font-size:clamp(34px,5vw,54px);font-weight:700;letter-spacing:-.024em;line-height:1.06;max-width:none;margin:22px 0 0;text-wrap:balance;overflow-wrap:anywhere}
+  .ent-meta{display:flex;flex-wrap:wrap;gap:3px 12px;margin-top:14px;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;color:var(--ink-faint)}
+  .ent-cuerpo{margin-top:30px;max-width:66ch}
+  .ent-acciones{margin-top:30px}
+  .bg-sigue{margin-top:44px}
+  .bg-sigue .eyebrow{display:block;margin-bottom:14px;color:var(--ink-faint);font-size:11px}
+  .bg-sigue .bg-t{font-size:21px}
+  .bg-sigue .bg-e{font-size:15px;-webkit-line-clamp:2}
+  .bg-sigue .bg-item{grid-template-columns:64px minmax(0,1fr);padding:16px 0}
+  .bg-sigue .bg-f{padding-top:6px}
+  @media(max-width:900px){
+    .bg{display:flex;flex-direction:column;align-items:stretch;gap:0}
+    .bg-riel,.bg-main{display:contents}
+    .bg-cab{order:1}
+    .bg-id{order:2;margin-top:24px}
+    .bg-contenido{order:3}
+    .bg-mas{order:4;margin-top:36px}
+    .en-entrada .bg-contenido{order:2}
+    .en-entrada .bg-id{order:3;margin-top:44px;padding-top:26px;border-top:1px solid var(--hair)}
+    .ent-autor{display:inline-flex}
+    .bg-quien{grid-template-columns:auto minmax(0,1fr);align-items:center}
+    .bg-avatar{width:56px;height:56px;font-size:21px}
+    .bg-bio{margin-top:10px}
+    .bg-riel,.bg-id{font-size:15px;line-height:1.5}
+  }
+  @media(max-width:600px){
+    .bg-item{grid-template-columns:minmax(0,1fr) auto;column-gap:14px;padding:18px 0}
+    .bg-f{display:none}
+    .bg-m .solo-tel{display:inline}
+    .bg-p{width:84px;margin-top:4px}
+    .bg-e{font-size:15px}
+    .bg-sigue .bg-item{grid-template-columns:minmax(0,1fr)}
+  }
   .md{font-family:ui-serif,"New York","Iowan Old Style",Palatino,Georgia,serif;font-size:18.5px;line-height:1.65;color:var(--ink)}
   .md p{margin:0 0 16px;text-wrap:pretty}
+  .md>p:first-child{display:flow-root}
+  .md>p:first-child::first-letter{float:left;font-size:3.05em;line-height:.86;font-weight:700;padding:.07em .09em 0 0;color:var(--acento,var(--rubric))}
+  .md del{color:var(--ink-faint)}
+  .md .md-mate{white-space:pre-wrap}
+  .md .md-nota{font-family:ui-monospace,monospace;font-size:.62em;line-height:0;vertical-align:super;margin-left:1px}
+  .md .md-nota a{text-decoration:none;color:var(--acento,var(--rubric));scroll-margin-top:96px}
+  .md .md-refs{list-style:none;margin:0 0 16px;padding:0;font-size:16px;line-height:1.5}
+  .md .md-refs li{display:grid;grid-template-columns:26px minmax(0,1fr);gap:4px;margin:0;padding:14px 0;border-top:1px solid var(--hair);scroll-margin-top:84px}
+  .md .md-refs li:target{background:color-mix(in srgb,var(--acento,var(--rubric)) 10%,transparent)}
+  .md .md-refs .n{font-family:ui-monospace,monospace;font-size:12px;padding-top:4px;text-decoration:none;color:var(--acento,var(--rubric))}
+  .md .md-refs cite{display:block;margin-top:5px;font-family:-apple-system,sans-serif;font-style:normal;font-size:13px;color:var(--ink-soft)}
   .md h2,.md h3,.md h4{font-weight:700;letter-spacing:-.01em;margin:26px 0 10px;line-height:1.2}
   .md h2{font-size:26px}.md h3{font-size:21px}.md h4{font-size:18px}
   .md blockquote{margin:0 0 16px;padding-left:14px;border-left:3px solid var(--rubric);font-style:italic;color:var(--ink-soft)}
@@ -106,7 +222,7 @@ noindex: true
   .md .md-thumb{position:relative;aspect-ratio:16/9;max-width:100%;background:var(--surface-2)}
   .md .md-thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .md .md-play{position:absolute;inset:0;margin:auto;width:56px;height:56px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px}
-  .md .md-ref{display:inline-block;margin:0 0 16px;font-family:-apple-system,sans-serif;font-size:14px}
+  .md .md-interna .md-card-s{font-family:ui-monospace,monospace;font-size:11px;margin:0 0 2px}
   .lec-card .m{font-size:16px;font-weight:600;margin-top:8px;text-wrap:pretty}
   .lec-block{margin-top:40px}
   .lec-block h2{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:14px}
@@ -151,7 +267,7 @@ noindex: true
     padding:4px 12px 4px 4px;background:var(--surface);border:1px solid var(--hair);border-radius:999px;white-space:nowrap}
   .lec-linea b{width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;align-items:center;
     justify-content:center;font-family:ui-monospace,monospace;font-size:9.5px}
-  .lec-blogrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
+  .lec-blogrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:inherit;text-decoration:none}
   .lec-blogrow .t{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:19px;font-weight:700}
   .lec-blogrow .x{font-size:13.5px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .lec-blogrow .n{margin-left:auto;font-family:ui-monospace,monospace;font-size:12px;color:var(--ink-soft)}
@@ -255,14 +371,20 @@ noindex: true
 {% raw %}
 <script>
 (function () {
-  var m = location.pathname.match(/^\/@([A-Za-z0-9_.]{3,20})(?:\/blog(?:\/([A-Za-z0-9-]{8,64}))?)?\/?$/);
+  var m = location.pathname.match(/^\/@([A-Za-z0-9_.]{3,20})(\/blog(?:\/([A-Za-z0-9-]{8,64}))?)?\/?$/);
   if (!m) return;
   var alias = m[1].toLowerCase();
-  var uidEntrada = m[2] || null;
+  var enBlog = !!m[2];
+  var uidEntrada = m[3] || null;
   var es = (navigator.language || "en").toLowerCase().indexOf("es") === 0;
+  var loc = es ? "es" : "en";
   var T = es ? {
+    blogDe: function (n) { return "El blog de " + n; }, compartir: "Compartir", copiado: "Enlace copiado", todo: "Todo", tema: "Tema", temas: "Temas",
+    minLectura: function (n) { return n + " min de lectura"; }, citasMeta: function (n, l) { return n + (n === 1 ? " cita" : " citas") + (l ? " de " + l + (l === 1 ? " libro" : " libros") : ""); },
+    sinTitulo: "(sin título)", verPerfil: "Ver su perfil completo", sigue: "Sigue leyendo", refEntrada: "Referencia a una entrada", vacioBlog: "Todavía no hay entradas publicadas.",
+    ctaBlog: "Este blog se escribe en Aleph, la app de lectura para iPhone y iPad: subrayas, citas con su fuente y publicas lo que piensas de lo que lees.", notaBlog: "Este blog muestra solo lo que su autor decidió publicar.",
     titulo: "@" + alias + " en Aleph", leyendo: "Leyendo ahora", citas: "Lo que destaco de cada obra",
-    verTodas: function (n) { return "Ver las " + n; }, verMenos: "Ver menos", blog: "Mi blog", otraEntrada: "Otra entrada de este blog",
+    verTodas: function (n) { return "Ver las " + n; }, verMenos: "Ver menos", blog: "Mi blog",
     noEntrada: "Esta entrada ya no está.", noEntradaSub: "Su autor la despublicó o cambió de alias.", busco: "Lo que busco: ", tocaLibro: "Toca un libro para ver por qué está aquí.",
     destacados: "Destacados", llevo: "Lo que me llevo de mis obras leídas", ideas: "Mis ideas", conversacion: "Mi conversación",
     comprobada: "Mi año de lectura", logros: "Logros", enlaces: "Enlaces", estantes: "Mis estantes",
@@ -286,7 +408,7 @@ noindex: true
     sesiones: "Últimas sesiones", otroLibro: "Otro libro", horasLeyendo: function (h) { return h + " h leyéndolo"; },
     fraseLleva: "La frase que me llevo", opinion: "Mi opinión", destacoEste: "Lo que destaco de este libro", cerrar: "Cerrar",
     diasSeguidos: function (n) { return n === 1 ? "día seguido" : "días seguidos"; }, leidos: function (n) { return n === 1 ? "libro leído" : "libros leídos"; },
-    esteAnio: "este año", leyendoAnio: function (y) { return "leyendo en " + y; }, blogN: function (n) { return "Mi blog · " + n; },
+    esteAnio: "este año", leyendoAnio: function (y) { return "leyendo en " + y; },
     leyendoN: "leyendo", destaco: "Lo que destaco", llevoT: "Lo que me llevo", destacoSub: "Las palabras de los autores que marqué con ⭐",
     llevoSub: "Mi frase y mi opinión de cada obra que terminé", pct: function (t, p, n, tot) { return "#" + t + ": " + p + " % de sus cosechas (" + n + " de " + tot + ")."; },
     diasIni: ["D", "L", "M", "M", "J", "V", "S"], mesesIni: ["E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
@@ -294,8 +416,12 @@ noindex: true
     noHay: "No encontramos a @" + alias + ".", noHaySub: "Puede que haya cambiado de alias.",
     soloApp: "Este perfil se ve completo en la app."
   } : {
+    blogDe: function (n) { return n + "’s blog"; }, compartir: "Share", copiado: "Link copied", todo: "All", tema: "Topic", temas: "Topics",
+    minLectura: function (n) { return n + " min read"; }, citasMeta: function (n, l) { return n + (n === 1 ? " quote" : " quotes") + (l ? " from " + l + (l === 1 ? " book" : " books") : ""); },
+    sinTitulo: "(untitled)", verPerfil: "See their full profile", sigue: "Keep reading", refEntrada: "Reference to a post", vacioBlog: "No posts published yet.",
+    ctaBlog: "This blog is written in Aleph, the reading app for iPhone and iPad: highlight, quote with the source, and publish what you think about what you read.", notaBlog: "This blog shows only what its author chose to publish.",
     titulo: "@" + alias + " on Aleph", leyendo: "Reading now", citas: "What I highlight from each work",
-    verTodas: function (n) { return "See all " + n; }, verMenos: "See less", blog: "My blog", otraEntrada: "Another post from this blog",
+    verTodas: function (n) { return "See all " + n; }, verMenos: "See less", blog: "My blog",
     noEntrada: "This post is no longer available.", noEntradaSub: "Its author unpublished it or changed their alias.", busco: "What I'm looking for: ", tocaLibro: "Tap a book to see why it's here.",
     destacados: "Featured", llevo: "What I take from the works I've read", ideas: "My ideas", conversacion: "My conversation",
     comprobada: "My year in reading", logros: "Achievements", enlaces: "Links", estantes: "My shelves",
@@ -320,7 +446,7 @@ noindex: true
     sesiones: "Latest sessions", otroLibro: "Another book", horasLeyendo: function (h) { return h + " h reading it"; },
     fraseLleva: "The line I take with me", opinion: "My take", destacoEste: "What I highlight from this book", cerrar: "Close",
     diasSeguidos: function (n) { return n === 1 ? "day in a row" : "days in a row"; }, leidos: function (n) { return n === 1 ? "book read" : "books read"; },
-    esteAnio: "this year", leyendoAnio: function (y) { return "reading in " + y; }, blogN: function (n) { return "My blog · " + n; },
+    esteAnio: "this year", leyendoAnio: function (y) { return "reading in " + y; },
     leyendoN: "reading", destaco: "What I highlight", llevoT: "What I take", destacoSub: "Authors' words I marked with ⭐",
     llevoSub: "My line and my take on each work I finished", pct: function (t, p, n, tot) { return "#" + t + ": " + p + "% of their harvest (" + n + " of " + tot + ")."; },
     diasIni: ["S", "M", "T", "W", "T", "F", "S"], mesesIni: ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
@@ -336,6 +462,8 @@ noindex: true
   var raiz = document.getElementById("lector-raiz");
   seccion.hidden = false;
   document.title = T.titulo;
+  document.querySelectorAll('header.top a[href^="#"]').forEach(function (a) { a.setAttribute("href", "/" + a.getAttribute("href")); });
+  if (enBlog) document.body.classList.add("en-blog");
 
   function el(tag, cls, texto) {
     var e = document.createElement(tag);
@@ -345,9 +473,9 @@ noindex: true
   }
   function campo(r, k) { return r && r.fields && r.fields[k] ? r.fields[k].value : undefined; }
 
-  function cta() {
+  function cta(texto) {
     var c = el("div", "lec-cta");
-    c.appendChild(el("p", null, T.cta));
+    c.appendChild(el("p", null, texto || T.cta));
     var row = el("div", "row");
     var a1 = el("a", "btn btn-primary", T.conoce); a1.href = "/";
     var a2 = el("a", "btn btn-ghost", T.abrir); a2.href = "aleph://perfil/" + alias;
@@ -355,14 +483,18 @@ noindex: true
     return c;
   }
 
+  function avatar(nombre, url, cls) {
+    if (url) { var img = el("img", cls); img.src = url; img.alt = ""; return img; }
+    var ini = (nombre || alias).split(/\s+/).slice(0, 2).map(function (p) { return p.charAt(0); }).join("").toUpperCase();
+    return el("div", cls, ini || "ℵ");
+  }
+  function urlAvatar(p) {
+    var av = campo(p, "avatar");
+    return av && av.downloadURL ? av.downloadURL.replace("${f}", "avatar.jpg") : null;
+  }
   function cabecera(nombre, avatarURL, bio, lugar) {
     var h = el("div", "lec-head");
-    if (avatarURL) {
-      var img = el("img", "lec-avatar"); img.src = avatarURL; img.alt = ""; h.appendChild(img);
-    } else {
-      var ini = (nombre || alias).split(/\s+/).slice(0, 2).map(function (p) { return p.charAt(0); }).join("").toUpperCase();
-      h.appendChild(el("div", "lec-avatar", ini || "ℵ"));
-    }
+    h.appendChild(avatar(nombre, avatarURL, "lec-avatar"));
     var t = el("div", "lec-id");
     t.appendChild(el("h1", "lec-name", nombre || "@" + alias));
     if (nombre) t.appendChild(el("div", "lec-alias", "@" + alias));
@@ -397,6 +529,7 @@ noindex: true
 
   function soloAlias(titulo, sub) {
     raiz.textContent = "";
+    raiz.classList.remove("bg-ancho");
     cabecera("", null, titulo, sub);
     raiz.appendChild(cta());
   }
@@ -407,74 +540,456 @@ noindex: true
 
   var base = "https://api.apple-cloudkit.com/database/1/" + ck.container + "/" + ck.environment +
              "/public/records/lookup?ckAPIToken=" + encodeURIComponent(ck.token);
-  function lookup(nombres) {
+  function lookup(nombres, campos) {
     var ctl = new AbortController();
     setTimeout(function () { ctl.abort(); }, 9000);
+    var cuerpo = { zoneID: { zoneName: "_defaultZone" }, records: nombres.map(function (n) { return { recordName: n }; }) };
+    if (campos) cuerpo.desiredKeys = campos;
     return fetch(base, {
       method: "POST", signal: ctl.signal,
       headers: { "Content-Type": "text/plain;charset=UTF-8" },
-      body: JSON.stringify({ zoneID: { zoneName: "_defaultZone" }, records: nombres.map(function (n) { return { recordName: n }; }) })
+      body: JSON.stringify(cuerpo)
     }).then(function (r) { if (!r.ok) throw new Error("ck " + r.status); return r.json(); })
       .then(function (j) { return (j.records || []).filter(function (x) { return !x.serverErrorCode; }); });
   }
+  function leerUsuario(uid) {
+    return lookup(["perfil_" + uid, "leyendo_" + uid, "mod_" + uid]).then(function (rs) {
+      var perfil = rs.filter(function (x) { return x.recordType === "Perfil"; })[0];
+      if (!perfil || rs.some(function (x) { return x.recordType === "Moderacion"; })) return null;
+      var c = null;
+      try { c = JSON.parse(campo(perfil, "cuaderno") || "null"); } catch (e) { c = null; }
+      return { perfil: perfil, c: c, leyendo: rs.filter(function (x) { return x.recordType === "Leyendo"; })[0] };
+    });
+  }
+  function leerAlias() {
+    return lookup(["alias_" + alias]).then(function (rs) {
+      var uid = campo(rs[0], "usuario");
+      return uid ? leerUsuario(uid) : null;
+    });
+  }
 
-  if (uidEntrada) { pintarEntrada(uidEntrada); return; }
+  function tituloBlog(u) {
+    var propio = u.c && typeof u.c.blogTitulo === "string" ? u.c.blogTitulo.trim() : "";
+    return propio || T.blogDe(campo(u.perfil, "nombre") || "@" + aliasActual);
+  }
+  function fechaCorta(f) { return new Intl.DateTimeFormat(loc, { day: "numeric", month: "short" }).format(f); }
+  function fechaLarga(f) { return new Intl.DateTimeFormat(loc, { day: "numeric", month: "long", year: "numeric" }).format(f); }
+
+  var RE_REF = /^\*\*\[(\d+)\]\*\*\s+/;
+  var RE_REGLA = /^(-{3,}|\*{3,}|_{3,})$/;
+  var RE_URL_SOLA = /^(https?|aleph):\/\/\S+$/;
+  var TIPO_TEMA = "Tema";
+
+  function plano(s) {
+    return s.replace(/\[([^\]]+)\]\([^)\s]+\)/g, "$1")
+      .replace(/\[\d+(?:,\s?\d+)*\]/g, "")
+      .replace(/https?:\/\/\S+/g, "")
+      .replace(/\*\*\*|\*\*|~~|`/g, "")
+      .replace(/(^|[^\p{L}\p{N}])[*_]+(?=\S)/gu, "$1")
+      .replace(/(\S)[*_]+(?=$|[^\p{L}\p{N}])/gu, "$1")
+      .replace(/\s+/g, " ").trim();
+  }
+  function cortar(s, n) {
+    if (s.length <= n) return s;
+    var c = s.slice(0, n), i = c.lastIndexOf(" ");
+    return (i > n * .6 ? c.slice(0, i) : c).replace(/[\s.,;:—-]+$/, "") + "…";
+  }
+  function extractoDe(cuerpo) {
+    var lineas = cuerpo.split("\n"), t = [];
+    for (var i = 0; i < lineas.length; i++) {
+      var l = lineas[i].trim();
+      if (RE_REF.test(l)) { if (t.length && /^#/.test(lineas.slice(0, i).reverse().filter(function (x) { return x.trim(); })[0] || "")) t.pop(); break; }
+      if (RE_REGLA.test(l)) { if (t.length) break; continue; }
+      if (!l || /^\[img:\d+\]$/.test(l) || RE_URL_SOLA.test(l) || /^```/.test(l) || /^(\$\$|\\\[)/.test(l)) continue;
+      t.push(l.replace(/^#{1,3}\s+/, "").replace(/^>\s?/, "").replace(/^([-*]|\d+\.)\s+/, ""));
+    }
+    return cortar(plano(t.join(" ")), 280);
+  }
+  function portadaDe(cuerpo, imgs) {
+    var lineas = cuerpo.split("\n");
+    for (var i = 0; i < lineas.length; i++) {
+      var l = lineas[i].trim(), x = l.match(/^\[img:(\d+)\]$/);
+      if (x && imgs[parseInt(x[1], 10) - 1]) return imgs[parseInt(x[1], 10) - 1];
+      if (/^https?:\/\/\S+$/.test(l)) {
+        try { var yt = idYouTube(new URL(l)); if (yt && /^[A-Za-z0-9_-]{6,20}$/.test(yt)) return "https://i.ytimg.com/vi/" + yt + "/hqdefault.jpg"; } catch (e) {}
+      }
+    }
+    return null;
+  }
+  function imagenesDe(r) {
+    return (campo(r, "imagenes") || []).map(function (x) { return x && x.downloadURL ? x.downloadURL.replace("${f}", "imagen.jpg") : null; });
+  }
+  function citasDe(cuerpo) {
+    var n = 0, libros = {};
+    cuerpo.split("\n").forEach(function (l) {
+      if (!RE_REF.test(l.trim())) return;
+      n++;
+      var x = l.trim().match(/\s—\s\*([^*]+)\*$/);
+      if (x) libros[x[1].split(",")[0].trim()] = true;
+    });
+    return { n: n, libros: Object.keys(libros).length };
+  }
+  function urlDeEnlace(r) {
+    var u = (campo(r, "urlExterna") || "").trim();
+    try {
+      var v = new URL(/^https?:\/\//i.test(u) ? u : "https://" + u);
+      return /^https?:$/.test(v.protocol) ? v : null;
+    } catch (e) { return null; }
+  }
+  function etiquetasDe(tags, tipo) {
+    if (tags && tags.length) return tags;
+    tipo = (tipo || "").trim();
+    return !tipo || tipo === "General" ? [] : [tipo];
+  }
+  function entradasDe(c, completas) {
+    var lista = (c && c.blog) || [];
+    if (!lista.length) return Promise.resolve([]);
+    var nombres = [];
+    lista.forEach(function (e) { nombres.push("blog_" + e.uid, "mod_blog_" + e.uid); });
+    return lookup(nombres, completas ? null : ["tipo", "esLink", "urlExterna", "publicadaEn"]).then(function (rs) {
+      var regs = {}, ocultas = {};
+      rs.forEach(function (r) {
+        if (r.recordType === "Moderacion") ocultas[r.recordName.replace(/^mod_blog_/, "")] = true;
+        else if (r.recordType === "Entrada") regs[r.recordName.replace(/^blog_/, "")] = r;
+      });
+      return lista.filter(function (e) { return regs[e.uid] && !ocultas[e.uid]; }).map(function (e) {
+        var r = regs[e.uid], cuerpo = campo(r, "cuerpo") || "", esLink = campo(r, "esLink") === 1, destino = esLink ? urlDeEnlace(r) : null;
+        var f = campo(r, "publicadaEn");
+        return {
+          uid: e.uid, titulo: e.titulo || campo(r, "titulo") || T.sinTitulo,
+          fecha: f ? new Date(f) : fechaSwift(e.fecha),
+          etiquetas: etiquetasDe(e.tags, campo(r, "tipo")),
+          destino: destino ? destino.href : null,
+          extracto: destino ? destino.hostname.replace(/^www\./, "") : (completas ? extractoDe(cuerpo) : plano(e.extracto || "")),
+          minutos: completas && !esLink ? Math.max(1, Math.round(plano(cuerpo).split(" ").length / 220)) : 0,
+          citas: citasDe(cuerpo),
+          portada: completas ? portadaDe(cuerpo, imagenesDe(r)) : null
+        };
+      });
+    });
+  }
+
+  var RUTA_COMPARTIR = "M12 15V3m0 0L8 7m4-4 4 4M7 11H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1";
+  function botonCompartir(titulo) {
+    var ns = "http://www.w3.org/2000/svg", b = el("button", "btn btn-ghost bg-share"), rotulo = el("span", null, T.compartir);
+    var svg = document.createElementNS(ns, "svg"), path = document.createElementNS(ns, "path");
+    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true"); svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor"); svg.setAttribute("stroke-width", "1.8"); svg.setAttribute("stroke-linecap", "round"); svg.setAttribute("stroke-linejoin", "round");
+    path.setAttribute("d", RUTA_COMPARTIR); svg.appendChild(path);
+    b.type = "button"; b.appendChild(svg); b.appendChild(rotulo);
+    b.addEventListener("click", function () {
+      var url = location.origin + location.pathname;
+      if (navigator.share) { navigator.share({ title: titulo, url: url }).catch(function () {}); return; }
+      if (!navigator.clipboard) { rotulo.textContent = url; return; }
+      navigator.clipboard.writeText(url).then(function () {
+        rotulo.textContent = T.copiado;
+        setTimeout(function () { rotulo.textContent = T.compartir; }, 1800);
+      }, function () { rotulo.textContent = url; });
+    });
+    return b;
+  }
+
+  function redes(c) {
+    var enl = (c.enlaces || []).filter(function (e) { return urlRed(e.plataforma, e.valor); });
+    if (!enl.length) return null;
+    var d = el("div", "bg-redes");
+    enl.forEach(function (e) {
+      var a = el("a", null, MONO[e.plataforma] || "·");
+      a.href = urlRed(e.plataforma, e.valor); a.rel = "me noopener nofollow"; a.target = "_blank";
+      a.title = visible(e.plataforma, e.valor); a.setAttribute("aria-label", a.title);
+      d.appendChild(a);
+    });
+    return d;
+  }
+  function gustos(c) {
+    var d = el("div", "bg-gustos"), items = [], rotulo;
+    if (c.intereses && c.intereses.length) {
+      rotulo = T.intereses;
+      items = c.intereses.slice(0, 5).map(function (i) { return ((i.emoji || "") + " " + (i.nombre || "")).trim(); });
+    } else if (c.ideas && c.ideas.length) {
+      rotulo = T.ideas;
+      items = c.ideas.slice(0, 6).map(function (i) { return "#" + i.tag; });
+    }
+    if (!items.length) return null;
+    d.appendChild(el("span", "eyebrow", rotulo));
+    items.forEach(function (t) { d.appendChild(el("span", null, t)); });
+    return d;
+  }
+  function riel(u) {
+    var p = u.perfil, c = u.c, nombre = campo(p, "nombre") || "", bio = campo(p, "bio"), lugar = campo(p, "lugar");
+    var aside = el("aside", "bg-riel"), id = el("div", "bg-id"), quien = el("a", "bg-quien"), texto = el("div");
+    quien.href = "/@" + aliasActual;
+    quien.appendChild(avatar(nombre, urlAvatar(p), "lec-avatar bg-avatar"));
+    texto.appendChild(el("div", "bg-nombre", nombre || "@" + aliasActual));
+    texto.appendChild(el("div", "lec-alias", "@" + aliasActual));
+    quien.appendChild(texto); id.appendChild(quien);
+    if (bio) id.appendChild(el("p", "bg-bio", bio));
+    if (lugar) id.appendChild(el("p", "lec-place", lugar));
+    var rd = c ? redes(c) : null; if (rd) id.appendChild(rd);
+    aside.appendChild(id);
+    var mas = el("div", "bg-mas");
+    if (c && Array.isArray(c.leyendo) && c.leyendo.length) mas.appendChild(leyendoLista(c.leyendo));
+    var cif = cifras(c); if (cif) mas.appendChild(cif);
+    var gs = c ? gustos(c) : null; if (gs) mas.appendChild(gs);
+    var ver = el("a", "lec-mas bg-ver", T.verPerfil + " →"); ver.href = "/@" + aliasActual;
+    mas.appendChild(ver);
+    aside.appendChild(mas);
+    return aside;
+  }
+  function armarPagina(u, esEntrada) {
+    raiz.textContent = "";
+    raiz.classList.add("bg-ancho");
+    if (u.c && typeof u.c.acento === "number" && PALETA[u.c.acento]) seccion.style.setProperty("--acento", PALETA[u.c.acento]);
+    var bg = el("div", "bg" + (esEntrada ? " en-entrada" : "")), main = el("main", "bg-main");
+    bg.appendChild(riel(u)); bg.appendChild(main);
+    raiz.appendChild(bg);
+    return main;
+  }
+  function pie(notaT) {
+    var d = el("div", "bg-pie");
+    d.appendChild(cta(T.ctaBlog));
+    d.appendChild(el("p", "lec-note", notaT));
+    raiz.appendChild(d);
+  }
+
+  function filaEntrada(e) {
+    var li = el("li"), a = el("a", "bg-item"), x = el("div", "bg-x"), meta = el("div", "bg-m"), fecha = e.fecha ? fechaCorta(e.fecha) : "";
+    if (e.destino) { a.href = e.destino; a.target = "_blank"; a.rel = "noopener nofollow"; } else a.href = "/@" + aliasActual + "/blog/" + e.uid;
+    a.appendChild(el("div", "bg-f", fecha));
+    x.appendChild(el("h2", "bg-t", e.titulo + (e.destino ? " ↗" : "")));
+    if (e.extracto) x.appendChild(el("p", "bg-e", e.extracto));
+    if (fecha) meta.appendChild(el("span", "solo-tel", fecha));
+    if (e.minutos) meta.appendChild(el("span", null, T.minLectura(e.minutos)));
+    if (e.citas.n) meta.appendChild(el("span", null, T.citasMeta(e.citas.n, e.citas.libros)));
+    e.etiquetas.forEach(function (t) { meta.appendChild(el("span", null, t === TIPO_TEMA ? T.tema : "#" + t)); });
+    if (meta.childNodes.length) x.appendChild(meta);
+    a.appendChild(x);
+    if (e.portada) { var im = el("img", "bg-p"); im.src = e.portada; im.alt = ""; im.loading = "lazy"; a.appendChild(im); }
+    li.appendChild(a);
+    return li;
+  }
+  function pintarEntradas(cont, entradas) {
+    var cuenta = {};
+    entradas.forEach(function (e) { e.etiquetas.forEach(function (t) { cuenta[t] = (cuenta[t] || 0) + 1; }); });
+    var nombres = Object.keys(cuenta).sort(function (a, b) {
+      if ((a === TIPO_TEMA) !== (b === TIPO_TEMA)) return a === TIPO_TEMA ? -1 : 1;
+      return cuenta[b] - cuenta[a] || a.localeCompare(b, loc);
+    });
+    var pedido = ""; try { pedido = decodeURIComponent(location.hash.slice(1)); } catch (e) {}
+    var actual = cuenta[pedido] ? pedido : null, chips = [], lista = el("ol", "bg-lista");
+    var variosAnios = entradas.some(function (e) { return e.fecha && entradas[0].fecha && e.fecha.getFullYear() !== entradas[0].fecha.getFullYear(); });
+    function ver(valor) {
+      actual = valor;
+      chips.forEach(function (c) { c.b.setAttribute("aria-pressed", String(c.v === valor)); });
+      lista.textContent = "";
+      var anio = null;
+      entradas.filter(function (e) { return !valor || e.etiquetas.indexOf(valor) >= 0; }).forEach(function (e) {
+        var y = e.fecha ? e.fecha.getFullYear() : null;
+        if (variosAnios && y && y !== anio) { anio = y; lista.appendChild(el("li", "bg-anio", String(y))); }
+        lista.appendChild(filaEntrada(e));
+      });
+    }
+    function chip(rotulo, valor, n) {
+      var b = el("button", "bg-chip", rotulo); b.type = "button";
+      b.appendChild(el("i", null, String(n)));
+      b.addEventListener("click", function () {
+        ver(valor);
+        history.replaceState(null, "", valor ? "#" + encodeURIComponent(valor) : location.pathname);
+      });
+      chips.push({ b: b, v: valor });
+      return b;
+    }
+    if (nombres.length) {
+      var f = el("div", "bg-filtros");
+      f.appendChild(chip(T.todo, null, entradas.length));
+      nombres.forEach(function (t) { f.appendChild(chip(t === TIPO_TEMA ? T.temas : "#" + t, t, cuenta[t])); });
+      cont.appendChild(f);
+    }
+    cont.appendChild(lista);
+    ver(actual);
+  }
+
+  function pintarBlog() {
+    leerAlias().then(function (u) {
+      if (!u) { soloAlias(T.noHay, T.noHaySub); return; }
+      aliasActual = campo(u.perfil, "alias") || alias;
+      var titulo = tituloBlog(u), sub = u.c && typeof u.c.blogSubtitulo === "string" ? u.c.blogSubtitulo.trim() : "";
+      document.title = titulo + " · Aleph";
+      var main = armarPagina(u, false), cab = el("header", "bg-cab"), linea = el("div", "bg-linea");
+      linea.appendChild(el("span", "eyebrow", "Blog"));
+      linea.appendChild(botonCompartir(titulo));
+      cab.appendChild(linea);
+      cab.appendChild(el("h1", "bg-h", titulo));
+      if (sub) cab.appendChild(el("p", "bg-sub", sub));
+      main.appendChild(cab);
+      var cont = el("div", "bg-contenido"), carga = el("div", "bg-cargando");
+      carga.appendChild(el("i")); carga.appendChild(el("i")); carga.appendChild(el("i"));
+      cont.appendChild(carga); main.appendChild(cont);
+      pie(T.notaBlog);
+      return entradasDe(u.c, true).then(function (entradas) {
+        cont.textContent = "";
+        if (entradas.length) pintarEntradas(cont, entradas);
+        else cont.appendChild(el("p", "bg-vacio", T.vacioBlog));
+      });
+    }).catch(function () { soloAlias(T.soloApp, ""); });
+  }
 
   function pintarEntrada(uid) {
     lookup(["blog_" + uid, "mod_blog_" + uid]).then(function (rs) {
       var r = rs.filter(function (x) { return x.recordType === "Entrada"; })[0];
-      var oculta = rs.some(function (x) { return x.recordType === "Moderacion"; });
-      if (!r || oculta) { soloAlias(T.noEntrada, T.noEntradaSub); return; }
-      raiz.textContent = "";
-      var aliasR = campo(r, "alias") || alias, nombre = campo(r, "nombre") || "";
-      var tituloE = campo(r, "titulo") || "(sin título)";
-      document.title = tituloE + " · @" + aliasR;
-      var fecha = campo(r, "publicadaEn");
-      var meta = [campo(r, "tipo") && campo(r, "tipo") !== "General" ? campo(r, "tipo") : null,
-                  fecha ? new Intl.DateTimeFormat(es ? "es" : "en", { day: "numeric", month: "long", year: "numeric" }).format(new Date(fecha)) : null]
-        .filter(Boolean).join(" · ");
-      if (meta) raiz.appendChild(el("div", "ent-meta", meta));
-      raiz.appendChild(el("h1", "ent-h", tituloE));
-      var au = el("a", "ent-autor", nombre ? nombre + " · @" + aliasR : "@" + aliasR);
-      au.href = "/@" + aliasR;
-      raiz.appendChild(au);
-      if (campo(r, "esLink") === 1) {
-        var u = campo(r, "urlExterna") || "";
-        var a = enlaceSeguro(/^https?:\/\//i.test(u) ? u : "https://" + u, u);
-        if (a) { a.className = "btn btn-primary"; raiz.appendChild(a); }
-      } else {
-        var imgs = (campo(r, "imagenes") || []).map(function (x) { return x && x.downloadURL ? x.downloadURL.replace("${f}", "imagen.jpg") : null; });
-        raiz.appendChild(markdown(campo(r, "cuerpo") || "", imgs, aliasR));
-      }
-      raiz.appendChild(cta());
+      if (!r || rs.some(function (x) { return x.recordType === "Moderacion"; })) { soloAlias(T.noEntrada, T.noEntradaSub); return; }
+      return leerUsuario(campo(r, "usuario")).then(function (u) {
+        if (!u) { soloAlias(T.noEntrada, T.noEntradaSub); return; }
+        dibujarEntrada(r, u, uid);
+      });
     }).catch(function () { soloAlias(T.soloApp, ""); });
+  }
+  function dibujarEntrada(r, u, uid) {
+    aliasActual = campo(u.perfil, "alias") || campo(r, "alias") || alias;
+    if (aliasActual.toLowerCase() !== alias) history.replaceState(null, "", "/@" + aliasActual + "/blog/" + uid);
+    var c = u.c, nombre = campo(u.perfil, "nombre") || campo(r, "nombre") || "", tituloE = campo(r, "titulo") || T.sinTitulo;
+    document.title = tituloE + " · " + (nombre || "@" + aliasActual);
+    var main = armarPagina(u, true), cab = el("header", "bg-cab"), linea = el("div", "bg-linea");
+    var volver = el("a", "ent-volver", "← " + tituloBlog(u)); volver.href = "/@" + aliasActual + "/blog";
+    linea.appendChild(volver); linea.appendChild(botonCompartir(tituloE));
+    cab.appendChild(linea);
+    cab.appendChild(el("h1", "ent-h", tituloE));
+    var f = campo(r, "publicadaEn"), cuerpo = campo(r, "cuerpo") || "", esLink = campo(r, "esLink") === 1, meta = el("div", "ent-meta");
+    if (f) meta.appendChild(el("span", null, fechaLarga(new Date(f))));
+    if (!esLink && cuerpo) meta.appendChild(el("span", null, T.minLectura(Math.max(1, Math.round(plano(cuerpo).split(" ").length / 220)))));
+    var breve = (c && c.blog || []).filter(function (e) { return e.uid === uid; })[0];
+    etiquetasDe(breve && breve.tags, campo(r, "tipo")).forEach(function (t) { meta.appendChild(el("span", null, t === TIPO_TEMA ? T.tema : "#" + t)); });
+    cab.appendChild(meta);
+    var au = el("a", "ent-autor"); au.href = "/@" + aliasActual;
+    au.appendChild(avatar(nombre, urlAvatar(u.perfil), "lec-avatar"));
+    au.appendChild(el("span", null, nombre || "@" + aliasActual));
+    cab.appendChild(au);
+    main.appendChild(cab);
+
+    var cont = el("div", "bg-contenido");
+    var texto = el("div", "ent-cuerpo");
+    if (esLink) {
+      var d = urlDeEnlace(r), a = d ? enlaceSeguro(d.href, d.hostname.replace(/^www\./, "") + " ↗") : null;
+      if (a) { a.className = "btn btn-primary"; texto.appendChild(a); }
+    } else {
+      var titulos = {};
+      (c && c.blog || []).forEach(function (e) { titulos[e.uid] = e.titulo; });
+      texto.appendChild(markdown(cuerpo, { imgs: imagenesDe(r), alias: aliasActual, titulos: titulos }));
+    }
+    cont.appendChild(texto);
+    var acciones = el("div", "ent-acciones"); acciones.appendChild(botonCompartir(tituloE)); cont.appendChild(acciones);
+    var sigue = el("div", "bg-sigue"); cont.appendChild(sigue);
+    main.appendChild(cont);
+    pie(T.notaBlog);
+    entradasDe(c, false).then(function (todas) {
+      var i = todas.map(function (e) { return e.uid; }).indexOf(uid);
+      var otras = (i < 0 ? todas : todas.slice(i + 1).concat(todas.slice(0, i))).slice(0, 3);
+      if (!otras.length) return;
+      sigue.appendChild(el("span", "eyebrow", T.sigue));
+      var lista = el("ol", "bg-lista");
+      otras.forEach(function (e) { lista.appendChild(filaEntrada(e)); });
+      sigue.appendChild(lista);
+    }).catch(function () {});
   }
 
   function enlaceSeguro(href, texto) {
     try {
       var u = new URL(href);
-      if (!/^https?:$/.test(u.protocol)) return null;
+      if (!/^(https?|mailto):$/.test(u.protocol)) return null;
       var a = el("a", null, texto); a.href = u.href; a.target = "_blank"; a.rel = "noopener nofollow";
       return a;
     } catch (e) { return null; }
   }
-
-  function enLinea(s, padre) {
-    var re = /(\*\*([^*]+)\*\*)|(\*([^*]+)\*)|(`([^`]+)`)|(\[([^\]]+)\]\(([^)\s]+)\))|(https?:\/\/[^\s<]*[^\s<.,;:!?)\]"'])/g;
-    var ultimo = 0, mm;
-    while ((mm = re.exec(s))) {
-      if (mm.index > ultimo) padre.appendChild(document.createTextNode(s.slice(ultimo, mm.index)));
-      if (mm[1]) padre.appendChild(el("strong", null, mm[2]));
-      else if (mm[3]) padre.appendChild(el("em", null, mm[4]));
-      else if (mm[5]) padre.appendChild(el("code", null, mm[6]));
-      else if (mm[7]) padre.appendChild(enlaceSeguro(mm[9], mm[8]) || document.createTextNode(mm[8]));
-      else if (mm[10]) padre.appendChild(enlaceSeguro(mm[10], mm[10]) || document.createTextNode(mm[10]));
-      ultimo = re.lastIndex;
-    }
-    if (ultimo < s.length) padre.appendChild(document.createTextNode(s.slice(ultimo)));
+  function destinoAleph(href) {
+    var x = href.match(/^aleph:\/\/blog\/([A-Za-z0-9-]{8,64})$/);
+    if (x) return "/@" + aliasActual + "/blog/" + x[1];
+    x = href.match(/^aleph:\/\/perfil\/@?([A-Za-z0-9_.]{3,20})$/);
+    return x ? "/@" + x[1] : null;
   }
-  // Un enlace solo en su línea = tarjeta (como LinkPreviewCard en la app). YouTube con su
-  // miniatura y ▶; lo demás, con su dominio. Sin iframes ni scripts de terceros.
+  function enlaceMD(href, texto, ctx) {
+    var interno = destinoAleph(href), a;
+    if (interno) { a = el("a"); a.href = interno; }
+    else a = enlaceSeguro(href, "");
+    if (!a) a = el("span");
+    enLinea(texto, a, ctx);
+    return a;
+  }
+  function marcaCita(numeros, ctx) {
+    var sup = el("sup", "md-nota");
+    numeros.forEach(function (n, i) {
+      if (i) sup.appendChild(document.createTextNode(","));
+      var a = el("a", null, n); a.href = "#ref-" + n;
+      if (ctx.refs[n] !== true) a.title = ctx.refs[n];
+      ctx.vistas = ctx.vistas || {};
+      if (!ctx.vistas[n]) { ctx.vistas[n] = true; a.id = "cita-" + n; }
+      sup.appendChild(a);
+    });
+    return sup;
+  }
+  function cierreDe(s, desde, d) {
+    for (var j = desde; j <= s.length - d.length; j++) {
+      if (s[j] === "\\") { j++; continue; }
+      if (s.substr(j, d.length) !== d) continue;
+      var run = j; while (s[run + d.length] === d[0]) run++;
+      var antes = s[j - 1], tras = s[run + d.length];
+      if (d.length === 1 && (s[j + 1] === d || s[j - 1] === d)) { j = run + d.length - 1; continue; }
+      if (!antes || /\s/.test(antes)) { j = run + d.length - 1; continue; }
+      if (d[0] === "_" && tras && /[\p{L}\p{N}]/u.test(tras)) { j = run + d.length - 1; continue; }
+      return run;
+    }
+    return -1;
+  }
+  var ENFASIS = [["***", function () { var s = el("strong"), e = el("em"); s.appendChild(e); return [s, e]; }],
+                 ["___", function () { var s = el("strong"), e = el("em"); s.appendChild(e); return [s, e]; }],
+                 ["**", function () { var s = el("strong"); return [s, s]; }], ["__", function () { var s = el("strong"); return [s, s]; }],
+                 ["~~", function () { var s = el("del"); return [s, s]; }],
+                 ["*", function () { var s = el("em"); return [s, s]; }], ["_", function () { var s = el("em"); return [s, s]; }]];
+  function enLinea(s, padre, ctx) {
+    ctx = ctx || {};
+    var i = 0, buf = "", x;
+    function volcar() { if (buf) { padre.appendChild(document.createTextNode(buf)); buf = ""; } }
+    while (i < s.length) {
+      var ch = s[i];
+      if (ch === "\n") { volcar(); padre.appendChild(el("br")); i++; continue; }
+      if (ch === "\\" && /[\\`*_{}\[\]()#+\-.!~$]/.test(s[i + 1] || "")) { buf += s[i + 1]; i += 2; continue; }
+      if (ch === "`" && (x = s.slice(i).match(/^`([^`\n]+)`/))) { volcar(); padre.appendChild(el("code", null, x[1])); i += x[0].length; continue; }
+      if (ch === "$" && (x = s.slice(i).match(/^\$([^$\n]+)\$/)) && /[\\^_]/.test(x[1])) { volcar(); padre.appendChild(el("code", "md-mate", x[1])); i += x[0].length; continue; }
+      if (ch === "[") {
+        if ((x = s.slice(i).match(/^\[((?:[^\[\]\n]|\[[^\]\n]*\])+)\]\(([^)\s]+)\)/))) { volcar(); padre.appendChild(enlaceMD(x[2], x[1], ctx)); i += x[0].length; continue; }
+        if (ctx.refs && (x = s.slice(i).match(/^\[(\d+(?:,\s?\d+)*)\]/))) {
+          var nums = x[1].split(/,\s?/);
+          if (nums.every(function (n) { return ctx.refs[n]; })) { volcar(); padre.appendChild(marcaCita(nums, ctx)); i += x[0].length; continue; }
+        }
+      }
+      if (ch === "*" || ch === "_" || ch === "~") {
+        var hecho = false;
+        for (var k = 0; k < ENFASIS.length && !hecho; k++) {
+          var d = ENFASIS[k][0];
+          if (s.substr(i, d.length) !== d) continue;
+          var tras = s[i + d.length], antes = s[i - 1];
+          if (!tras || /\s/.test(tras)) continue;
+          if (ch === "_" && antes && /[\p{L}\p{N}]/u.test(antes)) continue;
+          var fin = cierreDe(s, i + d.length, d);
+          if (fin < 0) continue;
+          var par = ENFASIS[k][1]();
+          volcar();
+          enLinea(s.slice(i + d.length, fin), par[1], ctx);
+          padre.appendChild(par[0]);
+          i = fin + d.length;
+          hecho = true;
+        }
+        if (hecho) continue;
+      }
+      if (ch === "h" && !(s[i - 1] && /[\p{L}\p{N}]/u.test(s[i - 1])) && (x = s.slice(i).match(/^https?:\/\/[^\s<]*[^\s<.,;:!?)\]"']/))) {
+        volcar();
+        padre.appendChild(enlaceSeguro(x[0], x[0]) || document.createTextNode(x[0]));
+        i += x[0].length;
+        continue;
+      }
+      buf += ch; i++;
+    }
+    volcar();
+  }
   function idYouTube(u) {
     var h = u.hostname.replace(/^www\.|^m\./, "");
     if (h === "youtu.be") return u.pathname.slice(1).split("/")[0];
@@ -504,14 +1019,53 @@ noindex: true
     }
     return a;
   }
-  function markdown(texto, imgs, aliasR) {
-    var cont = el("div", "md"), lineas = texto.split("\n"), i = 0, parrafo = [];
-    function cerrar() { if (parrafo.length) { var p = el("p"); enLinea(parrafo.join(" "), p); cont.appendChild(p); parrafo = []; } }
+  function referenciasDe(lineas) {
+    var refs = {};
+    lineas.forEach(function (l) {
+      var y = l.trim().match(RE_REF);
+      if (y) refs[y[1]] = plano(l.trim().replace(RE_REF, "").replace(/\s—\s\*[^*]+\*$/, "")) || true;
+    });
+    return refs;
+  }
+  function filaReferencia(n, texto, ctx) {
+    var li = el("li"), num = el("a", "n", n), cuerpo = el("div"), partes = texto.match(/^([\s\S]*?)\s—\s\*([^*]+)\*$/);
+    li.id = "ref-" + n; num.href = "#cita-" + n; num.setAttribute("aria-label", "↑ " + n);
+    var sinMarcas = { alias: ctx.alias, titulos: ctx.titulos };
+    enLinea(partes ? partes[1] : texto, cuerpo, sinMarcas);
+    if (partes) cuerpo.appendChild(el("cite", null, partes[2]));
+    li.appendChild(num); li.appendChild(cuerpo);
+    return li;
+  }
+  function tarjetaInterna(href, ctx) {
+    var a = el("a", "md-card md-interna"), uid = (href.match(/^aleph:\/\/blog\/([A-Za-z0-9-]{8,64})$/) || [])[1];
+    var destino = destinoAleph(href);
+    if (!destino) return null;
+    a.href = destino;
+    a.appendChild(el("div", "md-card-s", uid ? T.refEntrada : "Aleph"));
+    a.appendChild(el("div", "md-card-t", "→ " + (uid ? (ctx.titulos && ctx.titulos[uid]) || T.sigue : "@" + destino.slice(2))));
+    return a;
+  }
+  function markdown(texto, ctx) {
+    var cont = el("div", "md"), lineas = texto.split("\n"), i = 0, parrafo = [], imgs = ctx.imgs || [];
+    ctx.refs = referenciasDe(lineas);
+    function cerrar() { if (parrafo.length) { var p = el("p"); enLinea(parrafo.join("\n"), p, ctx); cont.appendChild(p); parrafo = []; } }
     while (i < lineas.length) {
       var t = lineas[i].trim(), x;
       if (!t) { cerrar(); i++; continue; }
-      if ((x = t.match(/^(#{1,3})\s+(.*)$/))) { cerrar(); var h = el("h" + (x[1].length + 1)); enLinea(x[2], h); cont.appendChild(h); i++; continue; }
-      if (/^(-{3,}|\*{3,}|_{3,})$/.test(t)) { cerrar(); cont.appendChild(el("hr")); i++; continue; }
+      if (RE_REF.test(t)) {
+        cerrar(); var refs = el("ol", "md-refs");
+        while (i < lineas.length) {
+          var l = lineas[i].trim(), y = l.match(RE_REF);
+          if (!l) { i++; continue; }
+          if (!y) break;
+          var trozo = [l.replace(RE_REF, "")]; i++;
+          while (i < lineas.length && lineas[i].trim() && !RE_REF.test(lineas[i].trim())) { trozo.push(lineas[i].trim()); i++; }
+          refs.appendChild(filaReferencia(y[1], trozo.join("\n"), ctx));
+        }
+        cont.appendChild(refs); continue;
+      }
+      if ((x = t.match(/^(#{1,3})\s+(.*)$/))) { cerrar(); var h = el("h" + (x[1].length + 1)); enLinea(x[2], h, ctx); cont.appendChild(h); i++; continue; }
+      if (RE_REGLA.test(t)) { cerrar(); cont.appendChild(el("hr")); i++; continue; }
       if ((x = t.match(/^\[img:(\d+)\]$/))) {
         cerrar(); var src = imgs[parseInt(x[1], 10) - 1];
         if (src) { var im = el("img", "md-img"); im.src = src; im.alt = ""; im.loading = "lazy"; cont.appendChild(im); }
@@ -522,19 +1076,31 @@ noindex: true
         while (i < lineas.length && !/^```/.test(lineas[i].trim())) { codigo.push(lineas[i]); i++; }
         var pre = el("pre", "md-code"); pre.appendChild(el("code", null, codigo.join("\n"))); cont.appendChild(pre); i++; continue;
       }
-      if (/^https?:\/\/\S+$/.test(t)) { cerrar(); var tarjeta = tarjetaEnlace(t); if (tarjeta) cont.appendChild(tarjeta); i++; continue; }
-      if ((x = t.match(/^aleph:\/\/blog\/([A-Za-z0-9-]{8,64})$/))) {
-        cerrar(); var ref = el("a", "md-ref", "→ " + T.otraEntrada); ref.href = "/@" + aliasR + "/blog/" + x[1]; cont.appendChild(ref); i++; continue;
+      if (/^(\$\$|\\\[)/.test(t)) {
+        cerrar();
+        var cierra = t.indexOf("$$") === 0 ? "$$" : "\\]", resto = t.slice(2), formula = [], acabo = resto.indexOf(cierra);
+        if (acabo >= 0) { formula.push(resto.slice(0, acabo)); i++; }
+        else {
+          formula.push(resto); i++;
+          while (i < lineas.length) {
+            var fin = lineas[i].indexOf(cierra);
+            if (fin >= 0) { formula.push(lineas[i].slice(0, fin)); i++; break; }
+            formula.push(lineas[i]); i++;
+          }
+        }
+        var preF = el("pre", "md-code"); preF.appendChild(el("code", "md-mate", formula.join("\n").trim())); cont.appendChild(preF); continue;
       }
+      if (/^https?:\/\/\S+$/.test(t)) { cerrar(); var tarjeta = tarjetaEnlace(t); if (tarjeta) cont.appendChild(tarjeta); i++; continue; }
+      if (/^aleph:\/\/\S+$/.test(t)) { cerrar(); var ref = tarjetaInterna(t, ctx); if (ref) cont.appendChild(ref); i++; continue; }
       if (/^>\s?/.test(t)) {
         cerrar(); var q = [];
         while (i < lineas.length && /^>\s?/.test(lineas[i].trim())) { q.push(lineas[i].trim().replace(/^>\s?/, "")); i++; }
-        var bq = el("blockquote"); enLinea(q.join(" "), bq); cont.appendChild(bq); continue;
+        var bq = el("blockquote"); enLinea(q.join("\n"), bq, ctx); cont.appendChild(bq); continue;
       }
       if (/^([-*]|\d+\.)\s+/.test(t)) {
         cerrar(); var lista = el(/^\d+\./.test(t) ? "ol" : "ul");
         while (i < lineas.length && /^([-*]|\d+\.)\s+/.test(lineas[i].trim())) {
-          var li = el("li"); enLinea(lineas[i].trim().replace(/^([-*]|\d+\.)\s+/, ""), li); lista.appendChild(li); i++;
+          var li = el("li"); enLinea(lineas[i].trim().replace(/^([-*]|\d+\.)\s+/, ""), li, ctx); lista.appendChild(li); i++;
         }
         cont.appendChild(lista); continue;
       }
@@ -544,31 +1110,23 @@ noindex: true
     return cont;
   }
 
-  lookup(["alias_" + alias]).then(function (rs) {
-    var uid = campo(rs[0], "usuario");
-    if (!uid) { soloAlias(T.noHay, T.noHaySub); return; }
-    return lookup(["perfil_" + uid, "leyendo_" + uid, "mod_" + uid]).then(function (rs2) {
-      var perfil = rs2.filter(function (x) { return x.recordType === "Perfil"; })[0];
-      var leyendo = rs2.filter(function (x) { return x.recordType === "Leyendo"; })[0];
-      var oculto = rs2.some(function (x) { return x.recordType === "Moderacion"; });
-      if (!perfil || oculto) { soloAlias(T.noHay, T.noHaySub); return; }
-      pintar(perfil, leyendo);
-    });
-  }).catch(function () { soloAlias(T.soloApp, ""); });
+  function cargarPerfil() {
+    leerAlias().then(function (u) {
+      if (!u) { soloAlias(T.noHay, T.noHaySub); return; }
+      pintar(u);
+    }).catch(function () { soloAlias(T.soloApp, ""); });
+  }
 
-  function pintar(p, leyendo) {
+  function pintar(u) {
+    var p = u.perfil, leyendo = u.leyendo, c = u.c;
     raiz.textContent = "";
     var aliasReal = campo(p, "alias") || alias;
     aliasActual = aliasReal;
     document.title = (es ? "@" + aliasReal + " en Aleph" : "@" + aliasReal + " on Aleph");
-    var av = campo(p, "avatar");
-    var avatarURL = av && av.downloadURL ? av.downloadURL.replace("${f}", "avatar.jpg") : null;
-    cabecera(campo(p, "nombre"), avatarURL, campo(p, "bio"), campo(p, "lugar"));
+    cabecera(campo(p, "nombre"), urlAvatar(p), campo(p, "bio"), campo(p, "lugar"));
     var linea = raiz.querySelector(".lec-alias") || raiz.querySelector(".lec-name");
     linea.textContent = "@" + aliasReal;
 
-    var c = null;
-    try { c = JSON.parse(campo(p, "cuaderno") || "null"); } catch (e) { c = null; }
     if (c && typeof c.acento === "number" && c.acento >= 0 && PALETA[c.acento]) seccion.style.setProperty("--acento", PALETA[c.acento]);
     if (c) lineaEnlaces(c);
     var cif = cifras(c); if (cif) raiz.appendChild(cif);
@@ -607,7 +1165,6 @@ noindex: true
     }
     raiz.appendChild(cta());
     raiz.appendChild(el("p", "lec-note", T.nota));
-    if (/\/blog\/?$/.test(location.pathname) && c && c.blog && c.blog.length) abrirBlog(c);
   }
 
   function horas(min) {
@@ -651,18 +1208,6 @@ noindex: true
       ln.appendChild(a);
     });
     raiz.appendChild(ln);
-  }
-  function abrirBlog(c) {
-    var cuerpo = el("div", "lec-modal-b");
-    c.blog.forEach(function (e) {
-      var a = el("a", "lec-card lec-post"); a.href = "/@" + aliasActual + "/blog/" + e.uid;
-      a.appendChild(el("div", "t", e.titulo));
-      var f = fechaSwift(e.fecha);
-      if (f) a.appendChild(el("div", "f", new Intl.DateTimeFormat(es ? "es" : "en", { day: "numeric", month: "short", year: "numeric" }).format(f)));
-      if (e.extracto) a.appendChild(el("div", "x", e.extracto));
-      cuerpo.appendChild(a);
-    });
-    modal(T.blog, cuerpo);
   }
   function cifras(c) {
     if (!c) return null;
@@ -874,7 +1419,6 @@ noindex: true
     return d;
   }
   function caja(titulo) { var d = el("div", "lec-block"); d.appendChild(el("h2", null, titulo)); return d; }
-  // «12 libros · 30 h · 140 subrayados · 2 temas», sin las cifras en cero (Interes.textoCifras en la app).
   function cifrasInteres(i) {
     var loc = es ? "es" : "en";
     return [[i.libros, T.intLibro], [i.horas, ["h", "h"]], [i.subrayados, T.intSub], [i.temas, T.intTema]]
@@ -1010,13 +1554,12 @@ noindex: true
         d.appendChild(kc); return d;
       case "blog":
         if (!c.blog || !c.blog.length) return null;
-        d = el("div", "lec-block"); d.id = "blog";
-        var row = el("button", "lec-card lec-blogrow"); row.type = "button";
+        d = el("div", "lec-block");
+        var row = el("a", "lec-card lec-blogrow"); row.href = "/@" + aliasActual + "/blog";
         var tx = el("div"); tx.style.minWidth = "0";
-        tx.appendChild(el("div", "t", T.blog));
+        tx.appendChild(el("div", "t", typeof c.blogTitulo === "string" && c.blogTitulo.trim() ? c.blogTitulo.trim() : T.blog));
         tx.appendChild(el("div", "x", c.blog[0].titulo || ""));
         row.appendChild(tx); row.appendChild(el("span", "n", c.blog.length + " ›"));
-        row.addEventListener("click", function () { abrirBlog(c); });
         d.appendChild(row); return d;
       case "logros":
         if (!c.logros || !c.logros.length) return null;
@@ -1067,6 +1610,10 @@ noindex: true
     if (["Sitio web", "Email", "Mastodon", "Bluesky", "LinkedIn"].indexOf(p) >= 0) return t;
     return t.charAt(0) === "@" ? t : "@" + t;
   }
+
+  if (uidEntrada) pintarEntrada(uidEntrada);
+  else if (enBlog) pintarBlog();
+  else cargarPerfil();
 })();
 </script>
 {% endraw %}
