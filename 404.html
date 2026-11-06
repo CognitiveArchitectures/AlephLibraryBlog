@@ -51,6 +51,9 @@ noindex: true
     línea es un salto de línea, y aleph://blog/<uid> o aleph://perfil/<alias>, en su línea o dentro
     de un enlace). `enLinea` anida (**[texto](url)**). Un _ dentro de una palabra no es cursiva.
     Las fórmulas se muestran como código (sin scripts de terceros).
+  - YouTube se reproduce aquí (2026-11-05, Diego): miniatura de i.ytimg.com y, al tocar ▶, el
+    reproductor de youtube-nocookie.com. Antes de tocar no se carga nada más de YouTube. El enlace
+    de abajo lo abre allá. privacy.html lo explica.
   - Citas (BlogCitas.conReferencias en la app): la entrada llega con marcas [1] o [1,2] y al final
     líneas «**[n]** texto — *libro, autor, página*». Se reconocen por ese formato, no por el título
     «Referencias», que va traducido. Una marca solo es enlace si existe su referencia.
@@ -219,7 +222,10 @@ noindex: true
   .md .md-card-s{font-size:13px;color:var(--ink-soft);margin-top:2px;overflow-wrap:anywhere}
   .md .md-video{padding:0;overflow:hidden}
   .md .md-video .md-card-t{padding:10px 14px}
-  .md .md-thumb{position:relative;aspect-ratio:16/9;max-width:100%;background:var(--surface-2)}
+  .md .md-thumb{display:block;position:relative;width:100%;aspect-ratio:16/9;max-width:100%;padding:0;border:0;background:var(--surface-2);cursor:pointer}
+  .md iframe.md-thumb{cursor:auto;background:#000}
+  .md .md-thumb:hover .md-play{background:var(--rubric)}
+  .md .md-abrir{display:block;text-decoration:none;color:inherit}
   .md .md-thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .md .md-play{position:absolute;inset:0;margin:auto;width:56px;height:56px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px}
   .md .md-interna .md-card-s{font-family:ui-monospace,monospace;font-size:11px;margin:0 0 2px}
@@ -379,7 +385,7 @@ noindex: true
   var es = (navigator.language || "en").toLowerCase().indexOf("es") === 0;
   var loc = es ? "es" : "en";
   var T = es ? {
-    blogDe: function (n) { return "El blog de " + n; }, compartir: "Compartir", copiado: "Enlace copiado", todo: "Todo", tema: "Tema", temas: "Temas",
+    blogDe: function (n) { return "El blog de " + n; }, verVideo: "Reproducir el video", compartir: "Compartir", copiado: "Enlace copiado", todo: "Todo", tema: "Tema", temas: "Temas",
     minLectura: function (n) { return n + " min de lectura"; }, citasMeta: function (n, l) { return n + (n === 1 ? " cita" : " citas") + (l ? " de " + l + (l === 1 ? " libro" : " libros") : ""); },
     sinTitulo: "(sin título)", verPerfil: "Ver su perfil completo", sigue: "Sigue leyendo", refEntrada: "Referencia a una entrada", vacioBlog: "Todavía no hay entradas publicadas.",
     ctaBlog: "Este blog se escribe en Aleph, la app de lectura para iPhone y iPad: subrayas, citas con su fuente y publicas lo que piensas de lo que lees.", notaBlog: "Este blog muestra solo lo que su autor decidió publicar.",
@@ -416,7 +422,7 @@ noindex: true
     noHay: "No encontramos a @" + alias + ".", noHaySub: "Puede que haya cambiado de alias.",
     soloApp: "Este perfil se ve completo en la app."
   } : {
-    blogDe: function (n) { return n + "’s blog"; }, compartir: "Share", copiado: "Link copied", todo: "All", tema: "Topic", temas: "Topics",
+    blogDe: function (n) { return n + "’s blog"; }, verVideo: "Play the video", compartir: "Share", copiado: "Link copied", todo: "All", tema: "Topic", temas: "Topics",
     minLectura: function (n) { return n + " min read"; }, citasMeta: function (n, l) { return n + (n === 1 ? " quote" : " quotes") + (l ? " from " + l + (l === 1 ? " book" : " books") : ""); },
     sinTitulo: "(untitled)", verPerfil: "See their full profile", sigue: "Keep reading", refEntrada: "Reference to a post", vacioBlog: "No posts published yet.",
     ctaBlog: "This blog is written in Aleph, the reading app for iPhone and iPad: highlight, quote with the source, and publish what you think about what you read.", notaBlog: "This blog shows only what its author chose to publish.",
@@ -1000,23 +1006,39 @@ noindex: true
     }
     return null;
   }
+  function segundosDe(t) {
+    var m = (t || "").match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/);
+    return m ? (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0) : 0;
+  }
+  function videoYouTube(yt, u) {
+    var caja = el("div", "md-card md-video"), b = el("button", "md-thumb"), im = el("img");
+    var a = el("a", "md-card-t md-abrir", "YouTube ↗");
+    b.type = "button"; b.setAttribute("aria-label", T.verVideo);
+    im.src = "https://i.ytimg.com/vi/" + yt + "/hqdefault.jpg"; im.alt = ""; im.loading = "lazy";
+    b.appendChild(im); b.appendChild(el("span", "md-play", "▶"));
+    b.addEventListener("click", function () {
+      var f = document.createElement("iframe"), inicio = segundosDe(u.searchParams.get("t") || u.searchParams.get("start"));
+      f.className = "md-thumb";
+      f.src = "https://www.youtube-nocookie.com/embed/" + yt + "?autoplay=1&rel=0&playsinline=1" + (inicio ? "&start=" + inicio : "");
+      f.title = "YouTube";
+      f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+      f.allowFullscreen = true;
+      f.referrerPolicy = "strict-origin-when-cross-origin";
+      b.replaceWith(f);
+    });
+    a.href = u.href; a.target = "_blank"; a.rel = "noopener nofollow";
+    caja.appendChild(b); caja.appendChild(a);
+    return caja;
+  }
   function tarjetaEnlace(href) {
     var u; try { u = new URL(href); } catch (e) { return null; }
     if (!/^https?:$/.test(u.protocol)) return null;
-    var a = el("a", "md-card"); a.href = u.href; a.target = "_blank"; a.rel = "noopener nofollow";
     var yt = idYouTube(u);
-    if (yt && /^[A-Za-z0-9_-]{6,20}$/.test(yt)) {
-      a.classList.add("md-video");
-      var mini = el("div", "md-thumb");
-      var im = el("img"); im.src = "https://i.ytimg.com/vi/" + yt + "/hqdefault.jpg"; im.alt = ""; im.loading = "lazy";
-      mini.appendChild(im); mini.appendChild(el("span", "md-play", "▶"));
-      a.appendChild(mini);
-      a.appendChild(el("div", "md-card-t", "YouTube"));
-    } else {
-      a.appendChild(el("div", "md-card-t", u.hostname.replace(/^www\./, "")));
-      var ruta = (u.pathname + u.search).replace(/\/$/, "");
-      if (ruta) a.appendChild(el("div", "md-card-s", decodeURIComponent(ruta).slice(0, 80)));
-    }
+    if (yt && /^[A-Za-z0-9_-]{6,20}$/.test(yt)) return videoYouTube(yt, u);
+    var a = el("a", "md-card"); a.href = u.href; a.target = "_blank"; a.rel = "noopener nofollow";
+    a.appendChild(el("div", "md-card-t", u.hostname.replace(/^www\./, "")));
+    var ruta = (u.pathname + u.search).replace(/\/$/, "");
+    if (ruta) a.appendChild(el("div", "md-card-s", decodeURIComponent(ruta).slice(0, 80)));
     return a;
   }
   function referenciasDe(lineas) {
