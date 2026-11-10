@@ -5,64 +5,7 @@ description: "A reader's profile on Aleph."
 permalink: /404.html
 noindex: true
 ---
-{%- comment -%}
-  404.html — tres trabajos:
-  0. alephlibrary.com/@alias/blog/<uid> = una entrada publicada de su blog (2026-10-09): registro
-     `Entrada` (id blog_<uid>) de la base pública, Markdown pintado aquí con un lector mínimo y
-     seguro (todo con textContent; enlaces solo http(s) o mailto; imágenes = sus archivos en CloudKit).
-  0b. alephlibrary.com/@alias/blog = la página del blog (2026-11-05, Diego: «cada usuario tiene su
-     página de blog que la puede pegar en social media»): título (`cuaderno.blogTitulo`, o «El blog
-     de <nombre>», nunca el alias) y subtítulo (`cuaderno.blogSubtitulo`), a un lado su perfil, y las
-     entradas con filtro. Spec: docs/spec-blog-publico.md en el repo de la app.
-  1. alephlibrary.com/@alias = el perfil público de un lector de Aleph (2026-10-08). GitHub Pages
-     no tiene rutas dinámicas: cualquier ruta que no existe cae aquí, y el script lee el @alias de
-     la dirección. Con Aleph instalada, iOS abre la app antes de llegar aquí (Universal Links:
-     /.well-known/apple-app-site-association); esta página es para quien no la tiene.
-  2. Cualquier otra ruta: «página no encontrada».
-  Datos: CloudKit Web Services sobre la base PÚBLICA (lo mismo que ve cualquiera en la app):
-  alias_<alias> → usuario → perfil_<uid> + leyendo_<uid>. Solo se muestra lo que el lector
-  prendió (campo `cuaderno`, JSON de CuadernoLector en la app). Token en _config.yml › cloudkit.
-  Racha (2026-10-09): si el lector la prendió, el fuego con sus días, solo si el último día que
-  contó (`cuaderno.rachaDia`) es hoy o ayer (`rachaVigente`, igual que la app).
-  Perfil único (2026-10-14, docs/spec-social-perfil-2026-10.md §10 en el repo de la app): mismo
-  orden que la app. Cabecera · redes en una línea bajo la bio · cifras (racha · libros leídos ·
-  horas del año; tocar = su año completo) · Leyendo
-  ahora + «También leyendo» (`cuaderno.leyendo`; perfiles viejos: el registro leyendo_<uid>) · Mi
-  año de lectura (`cuaderno.anio`: semana, autores | libros, contexto, «Ver su año completo») ·
-  los bloques en su orden (sin enlaces, blog, conversación ni comprobada, que ya van arriba).
-  Tocar un Destacado abre una ventana con su porqué, sus horas y sus citas con ⭐. Las ventanas
-  son <dialog>. Los logros traen el nombre de su SF Symbol: se pintan con un emoji equivalente.
-  Notas del script (aquí y no en el JS: este bloque no se publica):
-  - PALETA = StudyPalette de la app (índices 0–6): lomos, ideas y color de acento.
-  - «Me interesa» (2026-11-02): `cuaderno.intereses` = InteresBreve de la app (emoji, nombre,
-    porQue, libros, horas, subrayados, temas); la app ya quita los ocultos y su id. Mismo dibujo
-    que filaInteres en la app: nombre, cifras y el porqué.
-  - rachaVigente(): igual que CuadernoLector.rachaVigente en la app (último día hoy o ayer).
-  - Entrada del blog: registro blog_<uid>; mod_blog_<uid> si un moderador la ocultó. Perfil
-    oculto por un moderador: mod_<uid> (Moderación › «Ocultar para todos»).
-  - Página del blog: la lista sale de `cuaderno.blog`; cada entrada se confirma con su registro
-    (si no existe o está oculta, no sale) y de ahí salen su tipo, extracto, minutos, portada y citas.
-    Filtro = tags (`cuaderno.blog[i].tags`) o, si no tiene, su tipo si no es «General»: la misma regla
-    que `etiquetasDe` en BlogView. El tipo «Tema» es su propio filtro, antes que los tags.
-    En teléfono, `.bg-riel` y `.bg-main` usan display:contents y el orden lo pone `order`: el título
-    primero, luego quién escribe; en una entrada, quién escribe va después del texto.
-  - Markdown: lo que escribe el editor de Aleph, igual que MarkdownView en la app (títulos, citas,
-    listas, separador, [img:N], enlaces, negritas, itálicas con * o _, tachado, código, un salto de
-    línea es un salto de línea, y aleph://blog/<uid> o aleph://perfil/<alias>, en su línea o dentro
-    de un enlace). `enLinea` anida (**[texto](url)**). Un _ dentro de una palabra no es cursiva.
-    Las fórmulas se muestran como código (sin scripts de terceros).
-  - YouTube se reproduce aquí (2026-11-05, Diego): miniatura de i.ytimg.com y, al tocar ▶, el
-    reproductor de youtube-nocookie.com. Antes de tocar no se carga nada más de YouTube. El enlace
-    de abajo lo abre allá. privacy.html lo explica.
-  - Citas (BlogCitas.conReferencias en la app): la entrada llega con marcas [1] o [1,2] y al final
-    líneas «**[n]** texto — *libro, autor, página*». Se reconocen por ese formato, no por el título
-    «Referencias», que va traducido. Una marca solo es enlace si existe su referencia.
-  - Fechas del cuaderno: JSONEncoder de Swift = segundos desde 2001-01-01.
-  - Enlaces de redes: mismas reglas que PlataformaSocial.url / EnlacesPerfilView en la app.
-  En el JS que se publica no van comentarios internos (revisión 2026-10-09).
-  Reglas: todo el texto del lector entra con textContent (nunca innerHTML); los enlaces solo
-  http(s) o mailto; noindex (no se indexan perfiles).
-{%- endcomment -%}
+{%- comment -%} Notas internas: repo privado de la app, docs/sitio-notas-internas.md {%- endcomment -%}
 <style>
   .lector{padding:clamp(40px,7vw,80px) 0;position:relative;z-index:2}
   .lector .wrap{max-width:720px}

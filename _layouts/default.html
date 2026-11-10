@@ -8,7 +8,9 @@
   <title>{{ page_title }}</title>
   <meta name="description" content="{{ page.description | default: site.description }}">
   {%- if page.noindex %}
-  <meta name="robots" content="noindex">
+  <meta name="robots" content="noindex, noai, noimageai">
+  {%- else %}
+  <meta name="robots" content="noai, noimageai">
   {%- endif %}
   <link rel="canonical" href="{{ page.url | absolute_url }}">
   <meta name="author" content="{{ site.author }}">
@@ -432,7 +434,6 @@
       }
       window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
 
-      // Countdown to launch
       (function(){
         var cd = document.querySelector('.countdown[data-launch]');
         if(!cd) return;
@@ -458,7 +459,6 @@
         timer = setInterval(tick, 1000); tick();
       })();
 
-      // Waitlist: submit in the background, show an inline thank-you (never leave the page)
       (function(){
         function thanks(form){
           var box = document.createElement('div');
@@ -476,7 +476,6 @@
             var btn = form.querySelector('button[type="submit"]');
             if(btn){ btn.disabled = true; btn.textContent = 'Joining…'; }
             var body = 'email=' + encodeURIComponent(email) + '&embed=1';
-            // no-cors: the request reaches Buttondown; the response is opaque, so we optimistically confirm.
             fetch(form.action, {
               method: 'POST', mode: 'no-cors',
               headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

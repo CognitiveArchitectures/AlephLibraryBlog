@@ -4,29 +4,7 @@ title: Share your favorite books — Aleph
 description: "Pick your favorite books, add your photo and your handle, and share them as an image. Free, no sign-up, nothing is saved."
 permalink: /shareyourbooks/
 ---
-{%- comment -%}
-  shareyourbooks.html — alephlibrary.com/shareyourbooks: «Share your favorite books» (2026-10-09).
-  Diego vio en X las cuadrículas de libros favoritos y pidió algo FUNCIONAL en el sitio para que
-  cualquiera, sin la app, arme la suya y la comparte; sin el «9» en el nombre para no sonar a copia.
-  Cada imagen publicada lleva «alephlibrary.com/shareyourbooks» (y la página invita a la lista de
-  espera).
-  Qué tiene: hasta 9 libros buscados en Open Library (search.json; portadas en covers.openlibrary.org,
-  las dos con CORS abierto, así el lienzo no queda «manchado» y se puede descargar); título; tu foto
-  (de la compu o del iPhone, recortada a cuadrado y reducida a 320 px en el navegador) y tu usuario
-  de una red (Instagram, X, TikTok o Facebook), cada una con su ícono monocromo dibujado en el
-  lienzo (uso nominativo: indicar dónde encontrarte); una línea de bio; «La frase que se te quedó»
-  (de uno de tus libros: la tarjeta con cita es la que más se comparte, según Shelfies; y es lo
-  propio de Aleph). Formato: Publicación 1080×1350 (retrato de Instagram; sirve en X) o Historia
-  1080×1920 (respeta los márgenes de la interfaz de Instagram y TikTok). Estilo: Papel, Noche o
-  Rúbrica (StoryGraph: los lectores piden diseños más bonitos y variados). Pie: «Join the Great
-  Conversation» con la dirección de la página. Descargar = PNG;
-  Copiar = el PNG al portapapeles; Compartir = hoja del sistema con el archivo (si el navegador puede). Lo elegido, incluida la foto,
-  se recuerda solo en este navegador (localStorage, con try/catch): nada sale a un servidor nuestro.
-  Idioma: inglés por defecto y español si el navegador está en español (como el perfil, 404.html).
-  Reglas: todo texto de Open Library o del usuario entra con textContent; sin innerHTML con datos.
-  Íconos de X y TikTok: trazos de Simple Icons (CC0); Instagram y Facebook, dibujados con figuras
-  (monocromos, sin alterar la forma reconocible).
-{%- endcomment -%}
+{%- comment -%} Notas internas: repo privado de la app, docs/sitio-notas-internas.md {%- endcomment -%}
 <style>
   .compartir{padding:clamp(40px,7vw,80px) 0;position:relative;z-index:2}
   .compartir .wrap{max-width:1080px}
@@ -221,8 +199,6 @@ permalink: /shareyourbooks/
   });
   if (es) { document.documentElement.lang = "es"; document.title = "Comparte tus libros favoritos — Aleph"; }
 
-  // Íconos de las redes: X y TikTok con trazos de Simple Icons (CC0, viewBox 24); Instagram y
-  // Facebook con figuras. Se usan en los botones (SVG) y en el lienzo (Path2D / figuras).
   var TRAZO = {
     x: "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z",
     tiktok: "M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"
@@ -248,7 +224,6 @@ permalink: /shareyourbooks/
     return s;
   }
 
-  // Paleta de lomos de Aleph (StudyPalette) para los libros sin portada.
   var PALETA = ["#7FA88B", "#6E8CB0", "#6FB0AE", "#9182B0", "#C08BA0", "#9A968F", "#CF9A6A"];
   var CLAVE = "aleph.compartirLibros";
   var vacios = function () { return [null, null, null, null, null, null, null, null, null]; };
@@ -263,12 +238,10 @@ permalink: /shareyourbooks/
   function portadaURL(id, tam) { return "https://covers.openlibrary.org/b/id/" + encodeURIComponent(id) + "-" + tam + ".jpg"; }
   function colorDe(t) { var h = 0; for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0; return PALETA[h % PALETA.length]; }
 
-  // --- Título ---
   var $titulo = document.getElementById("cl-titulo");
   $titulo.placeholder = T.tituloDefault; $titulo.value = st.titulo;
   $titulo.addEventListener("input", function () { st.titulo = $titulo.value; guardar(); dibujar(); });
 
-  // --- Red y usuario ---
   var $redes = document.getElementById("cl-redes"), $usuario = document.getElementById("cl-usuario");
   $usuario.value = st.usuario;
   function pintarRedes() {
@@ -287,14 +260,12 @@ permalink: /shareyourbooks/
     guardar(); dibujar();
   });
 
-  // --- Bio, la frase y el diseño ---
   var $bio = document.getElementById("cl-bio"), $frase = document.getElementById("cl-frase");
   var $fraseLibro = document.getElementById("cl-frase-libro");
   $bio.value = st.bio || ""; $frase.value = st.frase || "";
   $bio.addEventListener("input", function () { st.bio = $bio.value; guardar(); dibujar(); });
   $frase.addEventListener("input", function () { st.frase = $frase.value; guardar(); dibujar(); });
   $fraseLibro.addEventListener("change", function () { st.fraseLibro = Number($fraseLibro.value); guardar(); dibujar(); });
-  /// Las opciones de «De»: tus libros elegidos (por su casilla) o «Otro libro».
   function pintarFraseLibro() {
     $fraseLibro.textContent = "";
     var hay = false;
@@ -330,7 +301,6 @@ permalink: /shareyourbooks/
     });
   }
 
-  // --- Tu foto (recortada a cuadrado y reducida a 320 px, solo en el navegador) ---
   var $foto = document.getElementById("cl-foto"), $fotoInput = document.getElementById("cl-foto-input");
   var $fotoBtn = document.getElementById("cl-foto-elegir");
   var fotoImg = null;
@@ -364,7 +334,6 @@ permalink: /shareyourbooks/
     im.src = u;
   });
 
-  // Imágenes de portada (para el lienzo), con CORS.
   var imgs = {};
   function imagen(id) {
     if (!id) return null;
@@ -376,7 +345,6 @@ permalink: /shareyourbooks/
     return im;
   }
 
-  // --- Las casillas ---
   var $grid = document.getElementById("cl-grid");
   var destino = 0;
   function pintarCasillas() {
@@ -409,7 +377,6 @@ permalink: /shareyourbooks/
   function mover(a, b) { if (b < 0 || b > 8) return; var t = st.libros[a]; st.libros[a] = st.libros[b]; st.libros[b] = t; cambio(); }
   function cambio() { guardar(); pintarCasillas(); pintarFraseLibro(); dibujar(); }
 
-  // --- Búsqueda (Open Library) ---
   var $dlg = document.getElementById("cl-dlg"), $q = document.getElementById("cl-q");
   var $res = document.getElementById("cl-res"), $estado = document.getElementById("cl-estado");
   $q.placeholder = T.placeholder;
@@ -456,14 +423,12 @@ permalink: /shareyourbooks/
       .catch(function () { if (mio === turno) $estado.textContent = T.sinRed; });
   }
 
-  // --- La imagen: Publicación 1080×1350 o Historia 1080×1920, en Papel, Noche o Rúbrica ---
   var $canvas = document.getElementById("cl-canvas"), ctx = $canvas.getContext("2d");
   var W = 1080, M = 90;
   var SERIF = 'ui-serif, "New York", "Iowan Old Style", Palatino, Georgia, serif';
   var SANS = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif';
   var logo = new Image(); logo.onload = dibujar; logo.src = "/aleph_logo_tinta_transparente.png";
   var logos = {};
-  /// El ℵ del logo pintado del color del estilo (la imagen original es tinta oscura).
   function logoDe(color) {
     if (!logo.complete || !logo.naturalWidth) return null;
     if (logos[color]) return logos[color];
@@ -486,7 +451,6 @@ permalink: /shareyourbooks/
     ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
     ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
   }
-  /// El ícono de la red, de `t` px, con su esquina superior izquierda en (x, y).
   function iconoRed(id, x, y, t, color, fondo) {
     ctx.save(); ctx.translate(x, y); ctx.scale(t / 24, t / 24); ctx.fillStyle = color; ctx.strokeStyle = color;
     if (TRAZO[id] && window.Path2D) { ctx.fill(new Path2D(TRAZO[id])); }
@@ -507,7 +471,6 @@ permalink: /shareyourbooks/
     var H = historia ? 1920 : 1350;
     if ($canvas.height !== H) $canvas.height = H;
     var t = TEMAS[st.tema] || TEMAS.papel;
-    // Márgenes: en una historia, Instagram y TikTok tapan arriba (perfil) y abajo (responder).
     var arriba = historia ? 230 : 64, abajo = historia ? 250 : 0;
     ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
     ctx.fillStyle = t.fondo; ctx.fillRect(0, 0, W, H);
@@ -515,7 +478,6 @@ permalink: /shareyourbooks/
     var lg = logoDe(t.tinta);
     if (lg) { var lh = 40, lw = lg.width * lh / lg.height; ctx.drawImage(lg, M, arriba, lw, lh); }
 
-    // Encabezado: tu foto + título + tu usuario + tu línea
     var y = arriba + 84, xTexto = M, F = historia ? 156 : 140;
     var conFoto = !!fotoImg;
     if (conFoto) xTexto = M + F + 34;
@@ -548,10 +510,8 @@ permalink: /shareyourbooks/
     }
     var top = y + altoEnc + (historia ? 70 : 46);
 
-    // Pie
     var pieY = H - abajo - 52, lineaPie = H - abajo - 96;
 
-    // La frase (arriba del pie)
     var frase = (st.frase || "").trim(), fuente = "";
     if (frase) {
       var lb = st.fraseLibro >= 0 ? st.libros[st.fraseLibro] : null;
@@ -572,7 +532,6 @@ permalink: /shareyourbooks/
       fondoFrase = fy0 - (historia ? 60 : 40);
     }
 
-    // Cuadrícula (hasta 9; 3 por fila; la última fila centrada)
     var elegidos = st.libros.filter(Boolean);
     var cw = historia ? 262 : 236, ch = cw * 1.5, gx = 34, gy = 30;
     var filas = Math.max(1, Math.ceil(elegidos.length / 3));
@@ -608,7 +567,6 @@ permalink: /shareyourbooks/
       ctx.restore();
     });
 
-    // Pie: ℵ Aleph · Join the Great Conversation  ·····  alephlibrary.com/shareyourbooks
     ctx.fillStyle = t.linea; ctx.fillRect(M, lineaPie, W - 2 * M, 1);
     ctx.font = "italic 400 25px " + SERIF; ctx.fillStyle = t.suave;
     ctx.fillText("Aleph · " + T.lema, M, pieY);
@@ -617,10 +575,6 @@ permalink: /shareyourbooks/
     ctx.textAlign = "left";
   }
 
-  // --- Guardar, copiar y compartir ---
-  // En iPhone/iPad, «Descargar» manda a Archivos, no a Fotos, y ninguna página puede guardar
-  // directo en Fotos: la hoja de compartir del sistema sí («Guardar imagen» → carrete). Así que
-  // ahí el botón principal es «Guardar en Fotos» y abre esa hoja.
   function archivo(cb) { $canvas.toBlob(function (b) { cb(b); }, "image/png"); }
   var puedeArchivos = false;
   try {
@@ -648,8 +602,6 @@ permalink: /shareyourbooks/
       setTimeout(function () { URL.revokeObjectURL(u); }, 2000);
     });
   });
-  // Copiar al portapapeles: la promesa del PNG va DENTRO del ClipboardItem, creado en el mismo toque
-  // (Safari lo exige así).
   var $copiar = document.getElementById("cl-copiar");
   if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) $copiar.hidden = false;
   $copiar.addEventListener("click", function () {

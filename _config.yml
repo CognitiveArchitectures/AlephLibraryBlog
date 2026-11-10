@@ -25,4 +25,3 @@ cloudkit:
 exclude:
   - README.md
   - .gitignore
-  - cloudflare/

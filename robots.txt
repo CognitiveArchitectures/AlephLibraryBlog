@@ -1,4 +1,56 @@
+# Search engines are welcome. AI training, AI agents and scrapers are not.
+
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-Web
+User-agent: anthropic-ai
+User-agent: CCBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Bytespider
+User-agent: meta-externalagent
+User-agent: meta-externalfetcher
+User-agent: FacebookBot
+User-agent: Amazonbot
+User-agent: cohere-ai
+User-agent: cohere-training-data-crawler
+User-agent: Perplexity-User
+User-agent: MistralAI-User
+User-agent: DuckAssistBot
+User-agent: Diffbot
+User-agent: ImagesiftBot
+User-agent: Omgili
+User-agent: Omgilibot
+User-agent: YouBot
+User-agent: Timpibot
+User-agent: AI2Bot
+User-agent: Ai2Bot-Dolma
+User-agent: PanguBot
+User-agent: Kangaroo Bot
+User-agent: Webzio-Extended
+User-agent: VelenPublicWebCrawler
+User-agent: Brightbot
+User-agent: TikTokSpider
+User-agent: Crawlspace
+User-agent: FirecrawlAgent
+User-agent: Scrapy
+User-agent: img2dataset
+Disallow: /
+
+User-agent: OAI-SearchBot
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+Allow: /$
+Allow: /about/
+Allow: /announcements/
+Allow: /privacy/
+Allow: /terms/
+Disallow: /
+
 User-agent: *
+Content-Signal: search=yes, ai-train=no, ai-input=no
 Allow: /
 
 Sitemap: https://alephlibrary.com/sitemap.xml
