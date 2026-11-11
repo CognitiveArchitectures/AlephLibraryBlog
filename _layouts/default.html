@@ -471,9 +471,10 @@
       })();
 
       (function(){
+        var inicio = Date.now();
         var MENSAJES = {
           correo: 'That email doesn’t look right. Please check it.',
-          verificacion: 'We couldn’t verify your browser. Please try again, or write to ' + 'hello' + '@' + 'alephlibrary.com' + ' and we’ll add you.',
+          verificacion: 'We couldn’t sign you up just now. Please try again in a minute, or write to ' + 'hello' + '@' + 'alephlibrary.com' + ' and we’ll add you.',
           espera: 'One moment, checking your browser…',
           tocar: 'Tick the box below to confirm you’re human.'
         };
@@ -487,10 +488,13 @@
           var box = document.createElement('div');
           box.className = 'notify-thanks';
           box.setAttribute('role', 'status');
+          var repetido = d && d.nuevo === false;
+          var primeros = d && d.primeros;
           var fuerte = document.createElement('strong');
-          fuerte.textContent = d && d.lugar ? 'You’re on the list: spot #' + d.lugar + '.' : 'You’re on the list.';
+          fuerte.textContent = repetido ? 'You’re already on the list.' : (primeros ? 'You’re one of the first 100 readers:' : 'You’re on the list.');
           box.appendChild(fuerte);
-          box.appendChild(document.createTextNode(' ' + (d && d.primeros ? 'You’re one of the first 100, so your first year is free. ' : '') + 'Check your inbox for a welcome email.'));
+          var resto = repetido ? (primeros ? ' Your first year is free.' : '') : (primeros ? ' your first year is free.' : '') + ' Check your inbox for a welcome email.';
+          if(resto) box.appendChild(document.createTextNode(resto));
           var fino = form.nextElementSibling;
           if(fino && fino.classList.contains('fine')) fino.remove();
           form.replaceWith(box);
@@ -503,12 +507,6 @@
           var f = form.querySelector('[name="cf-turnstile-response"]');
           return f ? f.value : '';
         }
-        function fallo(form){
-          delete form.dataset.esperando;
-          clearTimeout(form._reloj);
-          aviso(form, MENSAJES.verificacion + (form._error ? ' (' + form._error + ')' : ''));
-          boton(form);
-        }
         function montar(form){
           if(form._widget !== undefined || !form._pedido || !window.turnstile) return;
           var caja = form.querySelector('.cf-turnstile');
@@ -518,22 +516,25 @@
               sitekey: caja.getAttribute('data-sitekey'),
               appearance: 'interaction-only',
               size: 'flexible',
-              callback: function(){ form._interactivo = false; form._error = ''; if(form.dataset.esperando) enviar(form); },
-              'before-interactive-callback': function(){ form._interactivo = true; if(form.dataset.esperando) aviso(form, MENSAJES.tocar); },
-              'error-callback': function(codigo){ form._error = String(codigo || ''); return true; }
+              callback: function(){ if(form.dataset.esperando) enviar(form); },
+              'before-interactive-callback': function(){ form._interactivo = true; if(form.dataset.esperando) esperar(form, 20000, MENSAJES.tocar); },
+              'error-callback': function(){ form._fallo = true; if(form.dataset.esperando) enviar(form, true); return true; }
             });
-          } catch(e){ form._error = 'render'; }
+          } catch(e){}
         }
         function pedir(form){ form._pedido = true; montar(form); }
         document.addEventListener('aleph-turnstile', function(){ formularios.forEach(montar); });
-        function enviar(form){
+        function esperar(form, ms, texto){
+          form.dataset.esperando = '1';
+          aviso(form, texto);
+          clearTimeout(form._reloj);
+          form._reloj = setTimeout(function(){ if(form.dataset.esperando) enviar(form, true); }, ms);
+        }
+        function enviar(form, sinFicha){
           var token = ficha(form);
-          if(!token){
-            form.dataset.esperando = '1';
+          if(!token && !sinFicha && !form._fallo){
             pedir(form);
-            aviso(form, form._interactivo ? MENSAJES.tocar : MENSAJES.espera);
-            clearTimeout(form._reloj);
-            form._reloj = setTimeout(function(){ if(form.dataset.esperando) fallo(form); }, 40000);
+            esperar(form, form._interactivo ? 20000 : 4000, form._interactivo ? MENSAJES.tocar : MENSAJES.espera);
             return;
           }
           delete form.dataset.esperando;
@@ -545,6 +546,7 @@
             idioma: navigator.language || 'en',
             origen: location.pathname,
             turnstile: token,
+            tiempo: Date.now() - inicio,
             sitio: (form.querySelector('input[name="sitio"]') || {}).value || ''
           };
           fetch('/api/lista', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cuerpo) })
