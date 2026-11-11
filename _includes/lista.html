@@ -1,9 +1,12 @@
+{%- assign idioma_lista = page.lang | default: 'en' -%}
+{%- assign tl = site.data.i18n[idioma_lista] -%}
+{%- if idioma_lista == 'en' -%}{%- assign pre_lista = '' -%}{%- else -%}{%- capture pre_lista -%}/{{ idioma_lista }}{%- endcapture -%}{%- endif -%}
 <form class="notify" action="/api/lista" method="post">
-  <input class="notify-input" type="email" name="correo" required placeholder="you@email.com" autocomplete="email" aria-label="Your email address">
+  <input class="notify-input" type="email" name="correo" required placeholder="{{ tl.form_placeholder }}" autocomplete="email" aria-label="{{ tl.form_label }}">
   <button class="btn btn-primary" type="submit">{{ include.boton }}</button>
-  <label class="notify-beta"><input type="checkbox" name="beta" value="1"> I’d also like to try the beta</label>
-  <label class="notify-beta"><input type="checkbox" name="novedades" value="1"> Keep me posted on Aleph updates and announcements</label>
+  <label class="notify-beta"><input type="checkbox" name="beta" value="1"> {{ tl.form_beta }}</label>
+  <label class="notify-beta"><input type="checkbox" name="novedades" value="1"> {{ tl.form_novedades }}</label>
   <input class="notify-trampa" type="text" name="sitio" tabindex="-1" autocomplete="off" aria-hidden="true">
   <div class="cf-turnstile" data-sitekey="{{ site.turnstile_sitekey }}"></div>
 </form>
-<p class="fine">Only about Aleph: a welcome note now, the beta if you ask, launch day, and updates if you tick the box. Unsubscribe anytime. <a href="{{ '/privacy/' | relative_url }}">Privacy</a></p>
+<p class="fine">{{ tl.form_fino }} <a href="{{ pre_lista | append: '/privacy/' | relative_url }}">{{ tl.privacy }}</a></p>

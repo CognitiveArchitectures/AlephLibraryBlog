@@ -4,6 +4,7 @@ title: Aleph
 description: "A reader's profile on Aleph."
 permalink: /404.html
 noindex: true
+auto_idioma: true
 ---
 {%- comment -%} Notas internas: repo privado de la app, docs/sitio-notas-internas.md {%- endcomment -%}
 <style>
@@ -325,9 +326,12 @@ noindex: true
   var alias = m[1].toLowerCase();
   var enBlog = !!m[2];
   var uidEntrada = m[3] || null;
-  var es = (navigator.language || "en").toLowerCase().indexOf("es") === 0;
-  var loc = es ? "es" : "en";
-  var T = es ? {
+  var IDIOMAS = ["en", "es", "fr", "pt", "ru"];
+  var pedido = (new URLSearchParams(location.search).get("idioma") || "").toLowerCase();
+  var loc = IDIOMAS.indexOf(pedido) >= 0 ? pedido : (navigator.language || "en").toLowerCase().slice(0, 2);
+  if (IDIOMAS.indexOf(loc) < 0) loc = "en";
+  function pl(n, f) { var a = n % 10, b = n % 100; return f[a === 1 && b !== 11 ? 0 : a >= 2 && a <= 4 && (b < 12 || b > 14) ? 1 : 2]; }
+  var DICC = { es: {
     blogDe: function (n) { return "El blog de " + n; }, verVideo: "Reproducir el video", compartir: "Compartir", copiado: "Enlace copiado", todo: "Todo", tema: "Tema", temas: "Temas",
     minLectura: function (n) { return n + " min de lectura"; }, citasMeta: function (n, l) { return n + (n === 1 ? " cita" : " citas") + (l ? " de " + l + (l === 1 ? " libro" : " libros") : ""); },
     sinTitulo: "(sin título)", verPerfil: "Ver su perfil completo", sigue: "Sigue leyendo", refEntrada: "Referencia a una entrada", vacioBlog: "Todavía no hay entradas publicadas.",
@@ -363,8 +367,9 @@ noindex: true
     diasIni: ["D", "L", "M", "M", "J", "V", "S"], mesesIni: ["E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
     meses: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
     noHay: "No encontramos a @" + alias + ".", noHaySub: "Puede que haya cambiado de alias.",
-    soloApp: "Este perfil se ve completo en la app."
-  } : {
+    soloApp: "Este perfil se ve completo en la app.",
+    aC: " a. C.", tituloPagina: function (a) { return "@" + a + " en Aleph"; }, pag: "pág. "
+  }, en: {
     blogDe: function (n) { return n + "’s blog"; }, verVideo: "Play the video", compartir: "Share", copiado: "Link copied", todo: "All", tema: "Topic", temas: "Topics",
     minLectura: function (n) { return n + " min read"; }, citasMeta: function (n, l) { return n + (n === 1 ? " quote" : " quotes") + (l ? " from " + l + (l === 1 ? " book" : " books") : ""); },
     sinTitulo: "(untitled)", verPerfil: "See their full profile", sigue: "Keep reading", refEntrada: "Reference to a post", vacioBlog: "No posts published yet.",
@@ -401,9 +406,130 @@ noindex: true
     diasIni: ["S", "M", "T", "W", "T", "F", "S"], mesesIni: ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
     meses: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     noHay: "We couldn't find @" + alias + ".", noHaySub: "They may have changed their alias.",
-    soloApp: "The full profile is in the app."
-  };
-  function anio(n) { return n < 0 ? (-n) + (es ? " a. C." : " BC") : String(n); }
+    soloApp: "The full profile is in the app.",
+    aC: " BC", tituloPagina: function (a) { return "@" + a + " on Aleph"; }, pag: "p. "
+  }, fr: {
+    blogDe: function (n) { return "Le blog de " + n; }, verVideo: "Lire la vidéo", compartir: "Partager", copiado: "Lien copié", todo: "Tout", tema: "Thème", temas: "Thèmes",
+    minLectura: function (n) { return n + " min de lecture"; }, citasMeta: function (n, l) { return n + (n === 1 ? " citation" : " citations") + (l ? " de " + l + (l === 1 ? " livre" : " livres") : ""); },
+    sinTitulo: "(sans titre)", verPerfil: "Voir son profil complet", sigue: "Continuer la lecture", refEntrada: "Référence à un article", vacioBlog: "Aucun article publié pour l’instant.",
+    ctaBlog: "Ce blog est écrit dans Aleph, l’app de lecture pour iPhone et iPad : on surligne, on cite avec la source et on publie ce qu’on pense de ce qu’on lit.", notaBlog: "Ce blog ne montre que ce que son auteur a choisi de publier.",
+    titulo: "@" + alias + " sur Aleph", leyendo: "En cours de lecture", citas: "Ce que je retiens de chaque œuvre",
+    verTodas: function (n) { return "Voir les " + n; }, verMenos: "Voir moins", blog: "Mon blog",
+    noEntrada: "Cet article n’est plus disponible.", noEntradaSub: "Son auteur l’a dépublié ou a changé d’alias.", busco: "Ce que je cherche : ", tocaLibro: "Touchez un livre pour voir pourquoi il est ici.",
+    destacados: "À la une", llevo: "Ce que je garde des œuvres lues", ideas: "Mes idées", conversacion: "Ma conversation",
+    comprobada: "Mon année de lecture", logros: "Succès", enlaces: "Liens", estantes: "Mes étagères",
+    intereses: "Ce qui m’intéresse", intLibro: ["livre", "livres"], intSub: ["surlignage", "surlignages"], intTema: ["thème", "thèmes"],
+    totalLibros: function (n) { return n.toLocaleString("fr") + " livres dans ma bibliothèque"; },
+    conv: function (a, b) { return "En conversation avec des auteurs de " + anio(a) + " à " + anio(b); },
+    convSub: function (n) { return n + " ans d’œuvres, de la plus ancienne à la plus récente que j’ai lue."; },
+    horas: "de lecture vérifiée", libros: function (n) { return n === 1 ? "livre terminé cette année" : "livres terminés cette année"; },
+    cta: "Aleph est une app de lecture pour iPhone et iPad : vos livres, ce que vous surlignez et ce que vous apprenez, reliés. Les heures de lecture sont vérifiées pendant que vous lisez.",
+    conoce: "Découvrir Aleph", abrir: "J’ai Aleph : ouvrir",
+    nota: "Ce profil ne montre que ce que son lecteur a choisi de partager.",
+    dias: function (n) { return n === 1 ? "jour" : "jours"; },
+    rachaLabel: function (n) { return "Série de lecture : " + n + (n === 1 ? " jour d’affilée" : " jours d’affilée"); },
+    tambien: function (n) { return "Lit aussi · " + n; }, releyendo: "RELECTURE",
+    anioT: "Mon année de lecture", fraseAnio: function (h, n) { return "Cette année, j’ai lu " + h + (n ? " et terminé " + n + (n === 1 ? " livre." : " livres.") : "."); },
+    sinAnio: "Pas encore de lecture enregistrée cette année.", comprobadasA: function (h) { return "✓ " + h + " de lecture vérifiée"; },
+    estaSemana: "cette semaine", rachaLarga: "plus longue série", misAutores: "Mes auteurs", misLibros: "Mes livres",
+    obras: function (a, b) { return "Œuvres de " + anio(a) + " à " + anio(b); }, paises: function (n) { return "auteurs de " + n + " pays"; },
+    momento: function (m) { return ({ "de madrugada": "je lis au cœur de la nuit", "por la mañana": "je lis le matin", "por la tarde": "je lis l’après-midi", "de noche": "je lis le soir" })[m] || ""; },
+    verAnio: "Voir son année complète", mesAMes: "Mois par mois",
+    mejorMes: function (m, h) { return "Mon meilleur mois : " + m + ", avec " + h + "."; }, terminadosA: function (n) { return "Terminés cette année · " + n; },
+    sesiones: "Dernières séances", otroLibro: "Un autre livre", horasLeyendo: function (h) { return h + " h de lecture"; },
+    fraseLleva: "La phrase que je garde", opinion: "Mon avis", destacoEste: "Ce que je retiens de ce livre", cerrar: "Fermer",
+    diasSeguidos: function (n) { return n === 1 ? "jour d’affilée" : "jours d’affilée"; }, leidos: function (n) { return n === 1 ? "livre lu" : "livres lus"; },
+    esteAnio: "cette année", leyendoAnio: function (y) { return "en lecture en " + y; },
+    leyendoN: "en lecture", destaco: "Ce que je retiens", llevoT: "Ce que je garde", destacoSub: "Les mots des auteurs marqués d’une ⭐",
+    llevoSub: "Ma phrase et mon avis sur chaque œuvre terminée", pct: function (t, p, n, tot) { return "#" + t + " : " + p + " % de sa récolte (" + n + " sur " + tot + ")."; },
+    diasIni: ["D", "L", "M", "M", "J", "V", "S"], mesesIni: ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
+    meses: ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
+    noHay: "Impossible de trouver @" + alias + ".", noHaySub: "L’alias a peut-être changé.",
+    soloApp: "Le profil complet est dans l’app.",
+    aC: " av. J.-C.", tituloPagina: function (a) { return "@" + a + " sur Aleph"; }, pag: "p. "
+  }, pt: {
+    blogDe: function (n) { return "O blog de " + n; }, verVideo: "Reproduzir o vídeo", compartir: "Compartilhar", copiado: "Link copiado", todo: "Tudo", tema: "Tema", temas: "Temas",
+    minLectura: function (n) { return n + " min de leitura"; }, citasMeta: function (n, l) { return n + (n === 1 ? " citação" : " citações") + (l ? " de " + l + (l === 1 ? " livro" : " livros") : ""); },
+    sinTitulo: "(sem título)", verPerfil: "Ver o perfil completo", sigue: "Continue lendo", refEntrada: "Referência a um post", vacioBlog: "Ainda não há posts publicados.",
+    ctaBlog: "Este blog é escrito no Aleph, o app de leitura para iPhone e iPad: você destaca, cita com a fonte e publica o que pensa sobre o que lê.", notaBlog: "Este blog mostra só o que o autor decidiu publicar.",
+    titulo: "@" + alias + " no Aleph", leyendo: "Lendo agora", citas: "O que destaco de cada obra",
+    verTodas: function (n) { return "Ver as " + n; }, verMenos: "Ver menos", blog: "Meu blog",
+    noEntrada: "Este post não está mais disponível.", noEntradaSub: "O autor despublicou ou mudou de alias.", busco: "O que procuro: ", tocaLibro: "Toque num livro para ver por que ele está aqui.",
+    destacados: "Destaques", llevo: "O que levo das obras que li", ideas: "Minhas ideias", conversacion: "Minha conversa",
+    comprobada: "Meu ano de leitura", logros: "Conquistas", enlaces: "Links", estantes: "Minhas estantes",
+    intereses: "O que me interessa", intLibro: ["livro", "livros"], intSub: ["destaque", "destaques"], intTema: ["tema", "temas"],
+    totalLibros: function (n) { return n.toLocaleString("pt") + " livros na minha biblioteca"; },
+    conv: function (a, b) { return "Converso com autores de " + anio(a) + " a " + anio(b); },
+    convSub: function (n) { return n + " anos de obras, da mais antiga à mais nova que li."; },
+    horas: "de leitura comprovada", libros: function (n) { return n === 1 ? "livro terminado este ano" : "livros terminados este ano"; },
+    cta: "O Aleph é um app de leitura para iPhone e iPad: seus livros, o que você destaca e o que aprende, conectados. As horas de leitura são comprovadas enquanto você lê.",
+    conoce: "Conheça o Aleph", abrir: "Já tenho o Aleph: abrir",
+    nota: "Este perfil mostra só o que o leitor decidiu compartilhar.",
+    dias: function (n) { return n === 1 ? "dia" : "dias"; },
+    rachaLabel: function (n) { return "Sequência de leitura: " + n + (n === 1 ? " dia seguido" : " dias seguidos"); },
+    tambien: function (n) { return "Também lendo · " + n; }, releyendo: "RELENDO",
+    anioT: "Meu ano de leitura", fraseAnio: function (h, n) { return "Este ano li " + h + (n ? " e terminei " + n + (n === 1 ? " livro." : " livros.") : "."); },
+    sinAnio: "Ainda não há leituras registradas este ano.", comprobadasA: function (h) { return "✓ " + h + " de leitura comprovada"; },
+    estaSemana: "esta semana", rachaLarga: "maior sequência", misAutores: "Meus autores", misLibros: "Meus livros",
+    obras: function (a, b) { return "Obras de " + anio(a) + " a " + anio(b); }, paises: function (n) { return "autores de " + n + " países"; },
+    momento: function (m) { return ({ "de madrugada": "leio de madrugada", "por la mañana": "leio de manhã", "por la tarde": "leio à tarde", "de noche": "leio à noite" })[m] || ""; },
+    verAnio: "Ver o ano completo", mesAMes: "Mês a mês",
+    mejorMes: function (m, h) { return "Meu melhor mês: " + m + ", com " + h + "."; }, terminadosA: function (n) { return "Terminados este ano · " + n; },
+    sesiones: "Últimas sessões", otroLibro: "Outro livro", horasLeyendo: function (h) { return h + " h lendo"; },
+    fraseLleva: "A frase que levo comigo", opinion: "Minha opinião", destacoEste: "O que destaco deste livro", cerrar: "Fechar",
+    diasSeguidos: function (n) { return n === 1 ? "dia seguido" : "dias seguidos"; }, leidos: function (n) { return n === 1 ? "livro lido" : "livros lidos"; },
+    esteAnio: "este ano", leyendoAnio: function (y) { return "lendo em " + y; },
+    leyendoN: "lendo", destaco: "O que destaco", llevoT: "O que levo", destacoSub: "As palavras dos autores que marquei com ⭐",
+    llevoSub: "Minha frase e minha opinião sobre cada obra que terminei", pct: function (t, p, n, tot) { return "#" + t + ": " + p + "% da sua colheita (" + n + " de " + tot + ")."; },
+    diasIni: ["D", "S", "T", "Q", "Q", "S", "S"], mesesIni: ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
+    meses: ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"],
+    noHay: "Não encontramos @" + alias + ".", noHaySub: "Talvez o alias tenha mudado.",
+    soloApp: "O perfil completo está no app.",
+    aC: " a.C.", tituloPagina: function (a) { return "@" + a + " no Aleph"; }, pag: "p. "
+  }, ru: {
+    blogDe: function (n) { return "Блог: " + n; }, verVideo: "Смотреть видео", compartir: "Поделиться", copiado: "Ссылка скопирована", todo: "Все", tema: "Тема", temas: "Темы",
+    minLectura: function (n) { return n + " мин чтения"; }, citasMeta: function (n, l) { return n + " " + pl(n, ["цитата", "цитаты", "цитат"]) + (l ? " из " + l + " " + pl(l, ["книги", "книг", "книг"]) : ""); },
+    sinTitulo: "(без названия)", verPerfil: "Открыть полный профиль", sigue: "Читать дальше", refEntrada: "Ссылка на запись", vacioBlog: "Пока нет опубликованных записей.",
+    ctaBlog: "Этот блог ведётся в Aleph, приложении для чтения на iPhone и iPad: выделяйте, цитируйте с указанием источника и публикуйте мысли о прочитанном.", notaBlog: "В этом блоге только то, что автор решил опубликовать.",
+    titulo: "@" + alias + " в Aleph", leyendo: "Сейчас читаю", citas: "Что я выделяю в каждом произведении",
+    verTodas: function (n) { return "Показать все " + n; }, verMenos: "Свернуть", blog: "Мой блог",
+    noEntrada: "Этой записи больше нет.", noEntradaSub: "Автор снял её с публикации или сменил alias.", busco: "Что я ищу: ", tocaLibro: "Нажмите на книгу, чтобы узнать, почему она здесь.",
+    destacados: "Избранное", llevo: "Что я вынес(ла) из прочитанного", ideas: "Мои идеи", conversacion: "Мой разговор",
+    comprobada: "Мой год чтения", logros: "Достижения", enlaces: "Ссылки", estantes: "Мои полки",
+    intereses: "Мне интересно", intLibro: ["книга", "книги", "книг"], intSub: ["выделение", "выделения", "выделений"], intTema: ["тема", "темы", "тем"],
+    totalLibros: function (n) { return n.toLocaleString("ru") + " " + pl(n, ["книга", "книги", "книг"]) + " в моей библиотеке"; },
+    conv: function (a, b) { return "В разговоре с авторами от " + anio(a) + " до " + anio(b); },
+    convSub: function (n) { var k = parseInt(String(n).replace(/\D/g, ""), 10) || 0; return n + " " + pl(k, ["год", "года", "лет"]) + " произведений: от самого старого до самого нового из прочитанного."; },
+    horas: "подтверждённого чтения", libros: function (n) { return pl(n, ["книга дочитана в этом году", "книги дочитаны в этом году", "книг дочитано в этом году"]); },
+    cta: "Aleph — приложение для чтения на iPhone и iPad: ваши книги, выделения и то, что вы узнаёте, связаны между собой. Часы чтения подтверждаются, пока вы читаете.",
+    conoce: "Узнать об Aleph", abrir: "У меня есть Aleph: открыть",
+    nota: "В этом профиле только то, чем читатель решил поделиться.",
+    dias: function (n) { return pl(n, ["день", "дня", "дней"]); },
+    rachaLabel: function (n) { return "Серия чтения: " + n + " " + pl(n, ["день", "дня", "дней"]) + " подряд"; },
+    tambien: function (n) { return "Также читаю · " + n; }, releyendo: "ПЕРЕЧИТЫВАЮ",
+    anioT: "Мой год чтения", fraseAnio: function (h, n) { return "В этом году: " + h + " чтения" + (n ? ", дочитано " + n + " " + pl(n, ["книга", "книги", "книг"]) : "") + "."; },
+    sinAnio: "В этом году ещё нет записанного чтения.", comprobadasA: function (h) { return "✓ " + h + " подтверждённого чтения"; },
+    estaSemana: "на этой неделе", rachaLarga: "самая длинная серия", misAutores: "Мои авторы", misLibros: "Мои книги",
+    obras: function (a, b) { return "Произведения от " + anio(a) + " до " + anio(b); }, paises: function (n) { return "авторы из " + n + " " + pl(n, ["страны", "стран", "стран"]); },
+    momento: function (m) { return ({ "de madrugada": "читаю перед рассветом", "por la mañana": "читаю утром", "por la tarde": "читаю днём", "de noche": "читаю вечером" })[m] || ""; },
+    verAnio: "Открыть весь год", mesAMes: "По месяцам",
+    mejorMes: function (m, h) { return "Мой лучший месяц: " + m + ", " + h + "."; }, terminadosA: function (n) { return "Дочитано в этом году · " + n; },
+    sesiones: "Последние сессии", otroLibro: "Другая книга", horasLeyendo: function (h) { return h + " ч за чтением"; },
+    fraseLleva: "Фраза, которую я забираю с собой", opinion: "Моё мнение", destacoEste: "Что я выделяю в этой книге", cerrar: "Закрыть",
+    diasSeguidos: function (n) { return pl(n, ["день подряд", "дня подряд", "дней подряд"]); }, leidos: function (n) { return pl(n, ["книга прочитана", "книги прочитаны", "книг прочитано"]); },
+    esteAnio: "в этом году", leyendoAnio: function (y) { return "читаю в " + y; },
+    leyendoN: "читаю", destaco: "Что я выделяю", llevoT: "Что я выношу", destacoSub: "Слова авторов, отмеченные ⭐",
+    llevoSub: "Моя фраза и моё мнение о каждом дочитанном произведении", pct: function (t, p, n, tot) { return "#" + t + ": " + p + " % собранного (" + n + " из " + tot + ")."; },
+    diasIni: ["В", "П", "В", "С", "Ч", "П", "С"], mesesIni: ["Я", "Ф", "М", "А", "М", "И", "И", "А", "С", "О", "Н", "Д"],
+    meses: ["январь", "февраль", "март", "апрель", "май", "июнь", "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"],
+    noHay: "Не удалось найти @" + alias + ".", noHaySub: "Возможно, alias изменился.",
+    soloApp: "Полный профиль доступен в приложении.",
+    aC: " до н. э.", tituloPagina: function (a) { return "@" + a + " в Aleph"; }, pag: "с. "
+  } };
+  var T = DICC[loc];
+  if (loc !== "en") document.documentElement.lang = loc;
+  document.querySelectorAll("[data-idioma-auto]").forEach(function (a) { if (a.getAttribute("data-idioma-auto") === loc) a.setAttribute("aria-current", "page"); });
+  function anio(n) { return n < 0 ? (-n) + T.aC : String(n); }
   var PALETA = ["#7FA88B", "#6E8CB0", "#6FB0AE", "#9182B0", "#C08BA0", "#9A968F", "#CF9A6A"];
 
   document.getElementById("no-encontrada").hidden = true;
@@ -1087,7 +1213,7 @@ noindex: true
     raiz.textContent = "";
     var aliasReal = campo(p, "alias") || alias;
     aliasActual = aliasReal;
-    document.title = (es ? "@" + aliasReal + " en Aleph" : "@" + aliasReal + " on Aleph");
+    document.title = T.tituloPagina(aliasReal);
     cabecera(campo(p, "nombre"), urlAvatar(p), campo(p, "bio"), campo(p, "lugar"));
     var linea = raiz.querySelector(".lec-alias") || raiz.querySelector(".lec-name");
     linea.textContent = "@" + aliasReal;
@@ -1334,7 +1460,7 @@ noindex: true
       var ls = el("div");
       a.sesiones.forEach(function (s) {
         var f = el("div", "lec-fila"), fecha = fechaSwift(s.fecha);
-        var txt = (fecha ? new Intl.DateTimeFormat(es ? "es" : "en", { day: "numeric", month: "short" }).format(fecha) + " · " : "") + (s.titulo || T.otroLibro);
+        var txt = (fecha ? new Intl.DateTimeFormat(loc, { day: "numeric", month: "short" }).format(fecha) + " · " : "") + (s.titulo || T.otroLibro);
         f.appendChild(el("div", s.titulo ? null : "f", txt));
         f.appendChild(el("div", "s", s.minutos + " min" + (s.comprobada ? " ✓" : "")));
         ls.appendChild(f);
@@ -1385,10 +1511,9 @@ noindex: true
   }
   function caja(titulo) { var d = el("div", "lec-block"); d.appendChild(el("h2", null, titulo)); return d; }
   function cifrasInteres(i) {
-    var loc = es ? "es" : "en";
     return [[i.libros, T.intLibro], [i.horas, ["h", "h"]], [i.subrayados, T.intSub], [i.temas, T.intTema]]
       .filter(function (p) { return p[0] > 0; })
-      .map(function (p) { return p[0].toLocaleString(loc) + " " + p[1][p[0] === 1 ? 0 : 1]; })
+      .map(function (p) { return p[0].toLocaleString(loc) + " " + (p[1].length === 3 ? pl(p[0], p[1]) : p[1][p[0] === 1 ? 0 : 1]); })
       .join(" · ");
   }
 
@@ -1433,7 +1558,7 @@ noindex: true
         c.frases.forEach(function (f) {
           var k = el("div", "lec-card");
           var fecha = fechaSwift(f.terminado);
-          var meta = f.titulo + (fecha ? " · " + new Intl.DateTimeFormat(es ? "es" : "en", { month: "short", year: "numeric" }).format(fecha) : "");
+          var meta = f.titulo + (fecha ? " · " + new Intl.DateTimeFormat(loc, { month: "short", year: "numeric" }).format(fecha) : "");
           k.appendChild(el("div", "k", meta));
           if (f.frase) k.appendChild(el("div", "q", "“" + f.frase + "”"));
           if (f.opinion) k.appendChild(el("div", "o", f.opinion));
@@ -1467,7 +1592,7 @@ noindex: true
         d = caja(T.conversacion);
         var k2 = el("div", "lec-card");
         var q = el("div", "q", T.conv(a, z)); q.style.marginTop = "0"; k2.appendChild(q);
-        k2.appendChild(el("p", "lec-sub", T.convSub((z - a).toLocaleString(es ? "es" : "en"))));
+        k2.appendChild(el("p", "lec-sub", T.convSub((z - a).toLocaleString(loc))));
         d.appendChild(k2); return d;
       case "comprobada":
         if (!(c.horasComprobadas > 0 || c.terminadosAnio > 0)) return null;
@@ -1505,7 +1630,7 @@ noindex: true
           (abiertas ? c.citas : c.citas.slice(0, 4)).forEach(function (x) {
             var q = el("div", "lec-cita");
             q.appendChild(el("div", "q", "“" + x.texto + "”"));
-            q.appendChild(el("div", "f", ["— " + (x.titulo || ""), x.autor || "", x.pagina ? (es ? "pág. " : "p. ") + x.pagina : ""]
+            q.appendChild(el("div", "f", ["— " + (x.titulo || ""), x.autor || "", x.pagina ? T.pag + x.pagina : ""]
               .filter(function (t) { return t && t !== "— "; }).join(" · ")));
             kc.appendChild(q);
           });

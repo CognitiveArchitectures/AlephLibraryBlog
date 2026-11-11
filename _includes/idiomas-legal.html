@@ -1,0 +1,13 @@
+{%- assign actual = page.lang | default: 'en' -%}
+<nav class="idiomas" aria-label="{{ site.data.i18n[actual].idiomas_label }}">
+{%- for i in site.data.idiomas -%}
+  {%- if i.codigo == 'en' -%}{%- capture url -%}/{{ page.ref }}/{%- endcapture -%}{%- else -%}{%- capture url -%}/{{ i.codigo }}/{{ page.ref }}/{%- endcapture -%}{%- endif -%}
+  {%- if i.codigo == actual -%}<span aria-current="page" lang="{{ i.codigo }}">{{ i.nombre }}</span>{%- else -%}<a href="{{ url | relative_url }}" lang="{{ i.codigo }}" hreflang="{{ i.codigo }}">{{ i.nombre }}</a>{%- endif -%}
+  {%- unless forloop.last %} · {% endunless -%}
+{%- endfor -%}
+</nav>
+{%- if actual != 'en' -%}
+{%- for i in site.data.idiomas -%}{%- if i.codigo == actual %}
+<p class="traduccion">{{ i.nota }}</p>
+{%- endif -%}{%- endfor -%}
+{%- endif %}

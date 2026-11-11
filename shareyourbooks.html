@@ -3,6 +3,7 @@ layout: default
 title: Share your favorite books — Aleph
 description: "Pick your favorite books, add your photo and your handle, and share them as an image. Free, no sign-up, nothing is saved."
 permalink: /shareyourbooks/
+auto_idioma: true
 ---
 {%- comment -%} Notas internas: repo privado de la app, docs/sitio-notas-internas.md {%- endcomment -%}
 <style>
@@ -152,8 +153,7 @@ permalink: /shareyourbooks/
 {% raw %}
 <script>
 (function () {
-  var es = (navigator.language || "en").toLowerCase().indexOf("es") === 0;
-  var T = es ? {
+  var DICC = { es: {
     eyebrow: "Comparte tus libros", h1: "Comparte tus libros favoritos",
     lead: "Elige tus favoritos, agrega tu foto y tu usuario, y comparte la imagen. Gratis, sin cuenta, y nada de lo que eliges sale de tu navegador.",
     fotoElegir: "Agrega tu foto", fotoCambiar: "Cambiar foto", fotoQuitar: "Quitar", fotoNota: "De tu compu o de tu teléfono. Se queda en tu dispositivo.",
@@ -173,7 +173,7 @@ permalink: /shareyourbooks/
     sinPortada: function (q) { return "Agregar «" + q + "» sin portada"; },
     agregar: "Agregar libro", mover: "Mover", quitar: "Quitar",
     pie: "alephlibrary.com/shareyourbooks", archivo: "mis-libros-favoritos-aleph.png", vacio: "Agrega tus libros"
-  } : {
+  }, en: {
     eyebrow: "Share your books", h1: "Share your favorite books",
     lead: "Pick your favorites, add your photo and your handle, and share the image. Free, no sign-up, and nothing you choose leaves your browser.",
     fotoElegir: "Add your photo", fotoCambiar: "Change photo", fotoQuitar: "Remove", fotoNota: "From your computer or your phone. It stays on your device.",
@@ -193,11 +193,79 @@ permalink: /shareyourbooks/
     sinPortada: function (q) { return "Add “" + q + "” without a cover"; },
     agregar: "Add a book", mover: "Move", quitar: "Remove",
     pie: "alephlibrary.com/shareyourbooks", archivo: "my-favorite-books-aleph.png", vacio: "Add your books"
-  };
+  }, fr: {
+    eyebrow: "Partagez vos livres", h1: "Partagez vos livres préférés",
+    lead: "Choisissez vos préférés, ajoutez votre photo et votre pseudo, puis partagez l’image. Gratuit, sans inscription, et rien de ce que vous choisissez ne quitte votre navigateur.",
+    fotoElegir: "Ajouter votre photo", fotoCambiar: "Changer de photo", fotoQuitar: "Retirer", fotoNota: "Depuis votre ordinateur ou votre téléphone. Elle reste sur votre appareil.",
+    lTitulo: "Titre", lRed: "Votre pseudo (facultatif)", ninguna: "Aucun",
+    secTu: "Vous", secLista: "Votre liste", secFrase: "La phrase qui vous est restée", secDiseno: "Design",
+    lBio: "Une ligne sur vous (facultatif)", lFrase: "Une phrase de l’un de vos livres (facultatif)", lFraseLibro: "Tirée de",
+    otroLibro: "Un autre livre", post: "Publication", historia: "Story", papel: "Papier", noche: "Nuit", rubrica: "Carmin",
+    guardarFotos: "Enregistrer dans Photos", notaFotos: "Dans le menu, touchez « Enregistrer l’image » : elle va dans votre pellicule.",
+    lema: "Rejoignez la Grande Conversation",
+    hint: "Touchez une case vide pour ajouter un livre (jusqu’à 9). Utilisez les flèches pour changer l’ordre.",
+    descargar: "Télécharger l’image", compartir: "Partager", limpiar: "Recommencer", copiar: "Copier l’image", copiada: "Copiée ✓", noCopio: "Impossible de copier",
+    cta: "Dans Aleph, vos livres préférés gardent la phrase qui vous est restée et les heures que vous avez vraiment passées à les lire.",
+    ctaLink: "Les 100 premiers ont une année offerte.",
+    buscar: "Chercher un livre", placeholder: "Titre ou auteur", cerrar: "Fermer",
+    tituloDefault: "Mes livres préférés", buscando: "Recherche…",
+    nada: "Introuvable.", sinRed: "Recherche impossible. Vérifiez votre connexion.",
+    sinPortada: function (q) { return "Ajouter « " + q + " » sans couverture"; },
+    agregar: "Ajouter un livre", mover: "Déplacer", quitar: "Retirer",
+    pie: "alephlibrary.com/shareyourbooks", archivo: "mes-livres-preferes-aleph.png", vacio: "Ajoutez vos livres"
+  }, pt: {
+    eyebrow: "Compartilhe seus livros", h1: "Compartilhe seus livros favoritos",
+    lead: "Escolha seus favoritos, adicione sua foto e seu usuário e compartilhe a imagem. Grátis, sem cadastro, e nada do que você escolhe sai do seu navegador.",
+    fotoElegir: "Adicionar sua foto", fotoCambiar: "Trocar foto", fotoQuitar: "Remover", fotoNota: "Do computador ou do celular. Ela fica no seu dispositivo.",
+    lTitulo: "Título", lRed: "Seu usuário (opcional)", ninguna: "Nenhuma",
+    secTu: "Você", secLista: "Sua lista", secFrase: "A frase que ficou com você", secDiseno: "Design",
+    lBio: "Uma linha sobre você (opcional)", lFrase: "Uma frase de um dos seus livros (opcional)", lFraseLibro: "De",
+    otroLibro: "Outro livro", post: "Post", historia: "Story", papel: "Papel", noche: "Noite", rubrica: "Carmim",
+    guardarFotos: "Salvar em Fotos", notaFotos: "No menu, toque em “Salvar Imagem”: ela vai para a sua fototeca.",
+    lema: "Junte-se à Grande Conversa",
+    hint: "Toque num quadro vazio para adicionar um livro (até 9). Use as setas para mudar a ordem.",
+    descargar: "Baixar imagem", compartir: "Compartilhar", limpiar: "Começar de novo", copiar: "Copiar imagem", copiada: "Copiada ✓", noCopio: "Não foi possível copiar",
+    cta: "No Aleph, seus livros favoritos guardam a frase que ficou com você e as horas que você realmente passou lendo cada um.",
+    ctaLink: "Os 100 primeiros ganham um ano grátis.",
+    buscar: "Buscar um livro", placeholder: "Título ou autor", cerrar: "Fechar",
+    tituloDefault: "Meus livros favoritos", buscando: "Buscando…",
+    nada: "Não encontramos.", sinRed: "Não conseguimos buscar. Verifique sua conexão.",
+    sinPortada: function (q) { return "Adicionar “" + q + "” sem capa"; },
+    agregar: "Adicionar livro", mover: "Mover", quitar: "Remover",
+    pie: "alephlibrary.com/shareyourbooks", archivo: "meus-livros-favoritos-aleph.png", vacio: "Adicione seus livros"
+  }, ru: {
+    eyebrow: "Поделитесь книгами", h1: "Поделитесь любимыми книгами",
+    lead: "Выберите любимые книги, добавьте фото и свой ник и поделитесь картинкой. Бесплатно, без регистрации, и ничего из выбранного не покидает ваш браузер.",
+    fotoElegir: "Добавить фото", fotoCambiar: "Сменить фото", fotoQuitar: "Убрать", fotoNota: "С компьютера или телефона. Фото остаётся на вашем устройстве.",
+    lTitulo: "Название", lRed: "Ваш ник (необязательно)", ninguna: "Нет",
+    secTu: "Вы", secLista: "Ваш список", secFrase: "Фраза, которая запомнилась", secDiseno: "Оформление",
+    lBio: "Строка о себе (необязательно)", lFrase: "Фраза из одной из ваших книг (необязательно)", lFraseLibro: "Из книги",
+    otroLibro: "Другая книга", post: "Пост", historia: "Сторис", papel: "Бумага", noche: "Ночь", rubrica: "Кармин",
+    guardarFotos: "Сохранить в Фото", notaFotos: "В меню нажмите «Сохранить изображение»: оно попадёт в вашу медиатеку.",
+    lema: "Присоединяйтесь к Великому разговору",
+    hint: "Нажмите на пустую клетку, чтобы добавить книгу (до 9). Стрелками можно менять порядок.",
+    descargar: "Скачать картинку", compartir: "Поделиться", limpiar: "Начать заново", copiar: "Копировать картинку", copiada: "Скопировано ✓", noCopio: "Не удалось скопировать",
+    cta: "В Aleph ваши любимые книги хранят фразу, которая вам запомнилась, и часы, которые вы действительно провели за чтением.",
+    ctaLink: "Первые 100 получают год бесплатно.",
+    buscar: "Найти книгу", placeholder: "Название или автор", cerrar: "Закрыть",
+    tituloDefault: "Мои любимые книги", buscando: "Ищем…",
+    nada: "Ничего не нашлось.", sinRed: "Не удалось выполнить поиск. Проверьте подключение.",
+    sinPortada: function (q) { return "Добавить «" + q + "» без обложки"; },
+    agregar: "Добавить книгу", mover: "Переместить", quitar: "Убрать",
+    pie: "alephlibrary.com/shareyourbooks", archivo: "moi-lyubimye-knigi-aleph.png", vacio: "Добавьте свои книги"
+  } };
+  var pedido = (new URLSearchParams(location.search).get("idioma") || "").toLowerCase();
+  var idioma = DICC[pedido] ? pedido : (navigator.language || "en").toLowerCase().slice(0, 2);
+  if (!DICC[idioma]) idioma = "en";
+  var T = DICC[idioma];
   document.querySelectorAll("[data-t]").forEach(function (n) {
     var v = T[n.getAttribute("data-t")]; if (typeof v === "string") n.textContent = v;
   });
-  if (es) { document.documentElement.lang = "es"; document.title = "Comparte tus libros favoritos — Aleph"; }
+  if (idioma !== "en") {
+    document.documentElement.lang = idioma; document.title = T.h1 + " — Aleph";
+    var irAPortada = document.querySelector('[data-t="ctaLink"]'); if (irAPortada) irAPortada.setAttribute("href", "/" + idioma + "/#notify");
+  }
+  document.querySelectorAll("[data-idioma-auto]").forEach(function (a) { if (a.getAttribute("data-idioma-auto") === idioma) a.setAttribute("aria-current", "page"); });
 
   var TRAZO = {
     x: "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z",

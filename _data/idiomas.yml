@@ -1,0 +1,22 @@
+- codigo: en
+  nombre: English
+- codigo: es
+  nombre: Español
+  guia: "Este sitio también está en español. Leer en español →"
+  cerrar: Cerrar
+  nota: "Traducción del original en inglés. Si hubiera diferencias, prevalece la versión en inglés, salvo donde la ley de tu país exija la versión en tu idioma."
+- codigo: fr
+  nombre: Français
+  guia: "Ce site existe aussi en français. Lire en français →"
+  cerrar: Fermer
+  nota: "Traduction de l’original anglais. En cas de divergence, la version anglaise prévaut, sauf lorsque la loi de votre pays impose la version dans votre langue."
+- codigo: pt
+  nombre: Português
+  guia: "Este site também está em português. Ler em português →"
+  cerrar: Fechar
+  nota: "Tradução do original em inglês. Em caso de divergência, prevalece a versão em inglês, exceto quando a lei do seu país exigir a versão no seu idioma."
+- codigo: ru
+  nombre: Русский
+  guia: "Этот сайт есть и на русском. Читать по-русски →"
+  cerrar: Закрыть
+  nota: "Перевод с английского оригинала. При расхождениях преимущественную силу имеет английская версия, если закон вашей страны не требует версии на вашем языке."

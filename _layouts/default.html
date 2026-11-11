@@ -1,5 +1,9 @@
+{%- assign idioma = page.lang | default: site.lang | default: 'en' -%}
+{%- assign t = site.data.i18n[idioma] -%}
+{%- if idioma == 'en' -%}{%- assign pre = '' -%}{%- else -%}{%- capture pre -%}/{{ idioma }}{%- endcapture -%}{%- endif -%}
+{%- capture inicio -%}{{ pre }}/{%- endcapture -%}
 <!DOCTYPE html>
-<html lang="{{ site.lang | default: 'en' }}">
+<html lang="{{ idioma }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -13,6 +17,14 @@
   <meta name="robots" content="noai, noimageai">
   {%- endif %}
   <link rel="canonical" href="{{ page.url | absolute_url }}">
+  {%- if page.ref %}
+  {%- for i in site.data.idiomas %}
+  {%- if i.codigo == 'en' -%}{%- assign pre_h = '' -%}{%- else -%}{%- capture pre_h -%}/{{ i.codigo }}{%- endcapture -%}{%- endif -%}
+  {%- if page.ref == 'home' -%}{%- capture url_h -%}{{ pre_h }}/{%- endcapture -%}{%- else -%}{%- capture url_h -%}{{ pre_h }}/{{ page.ref }}/{%- endcapture -%}{%- endif %}
+  <link rel="alternate" hreflang="{{ i.codigo }}" href="{{ url_h | absolute_url }}">
+  {%- endfor %}
+  <link rel="alternate" hreflang="x-default" href="{% if page.ref == 'home' %}{{ '/' | absolute_url }}{% else %}{{ '/' | append: page.ref | append: '/' | absolute_url }}{% endif %}">
+  {%- endif %}
   <meta name="author" content="{{ site.author }}">
   <meta name="theme-color" content="#F4F0E7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0D0D10" media="(prefers-color-scheme: dark)">
@@ -31,8 +43,8 @@
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Aleph — the goal is not to read books. It is to interconnect their ideas. Coming to iOS, December 1.">
-  <meta property="og:locale" content="en_US">
+  <meta property="og:image:alt" content="{{ t.og_alt }}">
+  <meta property="og:locale" content="{{ t.og_locale }}">
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
@@ -360,8 +372,23 @@
     .legal strong{color:var(--ink);font-weight:600}
     .legal a{color:var(--rubric);text-decoration:underline;text-underline-offset:2px}
     .legal .back{display:inline-block;margin-top:42px;font-size:14px;font-family:ui-monospace,monospace;letter-spacing:.04em}
-    .legal .ver-domicilio{font:inherit;color:var(--rubric);background:none;border:0;padding:0;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+    .legal .ver-domicilio{font:inherit;color:var(--rubric);background:none;border:0;padding:0;text-decoration:underline;text-underline-offset:2px;cursor:pointer;animation:aparecer .45s ease}
     .legal .ver-domicilio:disabled{opacity:.6;cursor:progress}
+    .legal .domicilio-texto{display:inline-block;opacity:0;transform:translateY(4px);filter:blur(3px);transition:opacity .45s ease,transform .45s ease,filter .45s ease}
+    .legal .domicilio-texto.visible{opacity:1;transform:none;filter:none}
+    @keyframes aparecer{from{opacity:0}to{opacity:1}}
+    @media (prefers-reduced-motion: reduce){.legal .domicilio-texto,.legal .ver-domicilio{transition:none;animation:none}}
+    .legal .idiomas{margin:-20px 0 24px;font-family:ui-monospace,monospace;font-size:12.5px;letter-spacing:.04em;color:var(--ink-faint);line-height:1.9}
+    .legal .idiomas a{color:var(--ink-soft);text-decoration:none}
+    .legal .idiomas a:hover{color:var(--rubric)}
+    .legal .idiomas [aria-current]{color:var(--rubric);font-weight:600}
+    .legal .traduccion{font-size:14.5px;line-height:1.55;padding:12px 16px;border:1px solid var(--hair);border-radius:12px;margin-bottom:28px}
+    footer .idiomas-pie span[aria-current]{color:var(--rubric);font-weight:600;margin:0 8px}
+    footer .idiomas-pie a[aria-current]{color:var(--rubric);font-weight:600}
+    .idioma-guia{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);z-index:60;width:max-content;max-width:calc(100% - 32px)}
+    .idioma-guia p{display:flex;align-items:center;gap:12px;margin:0;padding:8px 8px 8px 18px;background:var(--surface);border:1px solid var(--hair-strong);border-radius:999px;box-shadow:var(--shadow-lg);font-size:14.5px;animation:aparecer .45s ease}
+    .idioma-guia a{color:var(--rubric);font-weight:600;text-decoration:none}
+    .idioma-cerrar{font:inherit;font-size:18px;line-height:1;width:30px;height:30px;border-radius:50%;border:0;background:var(--hair);color:var(--ink-soft);cursor:pointer;flex:none}
 
     /* MANIFESTO / ABOUT */
     .manifesto{padding:clamp(60px,9vw,104px) 0;position:relative;z-index:2}
@@ -406,30 +433,42 @@
   <header class="top" id="top">
     <div class="wrap">
       <div class="brand">
-        <a class="mark" href="{{ '/' | relative_url }}#home" aria-label="Aleph — home">
+        <a class="mark" href="{{ inicio | relative_url }}#home" aria-label="{{ t.home_label }}">
           <img src="{{ '/aleph_logo_tinta_transparente.png' | relative_url }}" alt="">
           <span>Aleph</span>
         </a>
-        <a class="tagline" href="#conversation">Join the Great Conversation</a>
+        <a class="tagline" href="{{ inicio | relative_url }}#conversation">{{ t.tagline }}</a>
       </div>
-      <nav class="links" aria-label="Primary">
-        <a class="nl" href="#idea">The Idea</a>
-        <a class="nl" href="#graph">The Graph</a>
-        <a class="nl" href="#craft">The Craft</a>
-        <a class="nl" href="#conversation">Conversation</a>
-        <a class="btn btn-ghost" href="#notify">Notify me</a>
+      <nav class="links" aria-label="{{ t.nav_label }}">
+        <a class="nl" href="{{ inicio | relative_url }}#idea">{{ t.nav_idea }}</a>
+        <a class="nl" href="{{ inicio | relative_url }}#graph">{{ t.nav_graph }}</a>
+        <a class="nl" href="{{ inicio | relative_url }}#craft">{{ t.nav_craft }}</a>
+        <a class="nl" href="{{ inicio | relative_url }}#conversation">{{ t.nav_conversation }}</a>
+        <a class="btn btn-ghost" href="{{ inicio | relative_url }}#notify">{{ t.notify }}</a>
       </nav>
     </div>
   </header>
 
   {{ content }}
 
+  {% include idioma-guia.html %}
+
   <footer>
     <div class="wrap">
       <img class="wm" src="{{ '/aleph_wordmark-2.png' | relative_url }}" alt="Aleph">
-      <p class="tag">Engineered by a small team, with severe rigor. For those who read to build mental models—not to show off a counter.</p>
-      <p class="meta">Coming December 1 to iOS</p>
-      <p class="legal-links"><a href="{{ '/about/' | relative_url }}">About</a> · <a href="{{ '/shareyourbooks/' | relative_url }}">Share your books</a> · <a href="{{ '/announcements/' | relative_url }}">News</a> · <a href="{{ '/feedback/' | relative_url }}">Feedback</a> · <a href="{{ '/privacy/' | relative_url }}">Privacy</a> · <a href="{{ '/terms/' | relative_url }}">Terms</a> · <a href="mailto:support@alephlibrary.com">support@alephlibrary.com</a></p>
+      <p class="tag">{{ t.footer_tag }}</p>
+      <p class="meta">{{ t.footer_meta }}</p>
+      <p class="legal-links"><a href="{{ pre | append: '/about/' | relative_url }}">{{ t.about }}</a> · <a href="{{ '/shareyourbooks/' | relative_url }}">{{ t.share }}</a> · <a href="{{ pre | append: '/announcements/' | relative_url }}">{{ t.news }}</a> · <a href="{{ pre | append: '/feedback/' | relative_url }}">{{ t.feedback }}</a> · <a href="{{ pre | append: '/privacy/' | relative_url }}">{{ t.privacy }}</a> · <a href="{{ pre | append: '/terms/' | relative_url }}">{{ t.terms }}</a> · <a href="mailto:support@alephlibrary.com">support@alephlibrary.com</a></p>
+      <p class="legal-links idiomas-pie" aria-label="{{ t.idiomas_label }}">
+      {%- for i in site.data.idiomas -%}
+        {%- if page.auto_idioma -%}<a href="?idioma={{ i.codigo }}" lang="{{ i.codigo }}" data-idioma-auto="{{ i.codigo }}">{{ i.nombre }}</a>{%- else -%}
+        {%- if i.codigo == 'en' -%}{%- assign pre_i = '' -%}{%- else -%}{%- capture pre_i -%}/{{ i.codigo }}{%- endcapture -%}{%- endif -%}
+        {%- if page.ref and page.ref != 'home' -%}{%- capture url_i -%}{{ pre_i }}/{{ page.ref }}/{%- endcapture -%}{%- else -%}{%- capture url_i -%}{{ pre_i }}/{%- endcapture -%}{%- endif -%}
+        {%- if i.codigo == idioma -%}<span aria-current="page" lang="{{ i.codigo }}">{{ i.nombre }}</span>{%- else -%}<a href="{{ url_i | relative_url }}" lang="{{ i.codigo }}" hreflang="{{ i.codigo }}">{{ i.nombre }}</a>{%- endif -%}
+        {%- endif -%}
+        {%- unless forloop.last %} · {% endunless -%}
+      {%- endfor -%}
+      </p>
       <p class="meta">&copy; {{ site.time | date: '%Y' }} <a href="https://cognitivearchs.com">{{ site.author }}</a></p>
     </div>
   </footer>
@@ -437,6 +476,7 @@
   <script>
     (function(){
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var TX = {{ t.js | jsonify }};
       if('scrollRestoration' in history) history.scrollRestoration = 'manual';
       var header = document.getElementById('top');
       var bar = document.getElementById('progress');
@@ -460,8 +500,9 @@
           var diff = Math.floor((target - Date.now()) / 1000);
           if(diff <= 0){
             cd.classList.add('launched');
-            cd.innerHTML = '<span class="cd-live">Available now on the App Store</span>';
-            var lbl = document.querySelector('.launch-label'); if(lbl) lbl.textContent = 'It’s here';
+            cd.innerHTML = '';
+            var vivo = document.createElement('span'); vivo.className = 'cd-live'; vivo.textContent = TX.disponible; cd.appendChild(vivo);
+            var lbl = document.querySelector('.launch-label'); if(lbl) lbl.textContent = TX.yaEsta;
             if(timer) clearInterval(timer);
             return;
           }
@@ -477,10 +518,10 @@
         var inicio = Date.now();
         var CORREO = 'hello' + '@' + 'alephlibrary.com';
         var MENSAJES = {
-          correo: 'That email doesn’t look right. Please check it.',
-          verificacion: 'We couldn’t sign you up just now',
-          espera: 'One moment, checking your browser…',
-          tocar: 'Tick the box below to confirm you’re human.'
+          correo: TX.correo,
+          verificacion: TX.verificacion,
+          espera: TX.espera,
+          tocar: TX.tocar
         };
         var formularios = Array.prototype.slice.call(document.querySelectorAll('form.notify'));
         function parrafo(form){
@@ -492,17 +533,17 @@
         function marcada(form, nombre){ return !!(form.querySelector('input[name="' + nombre + '"]') || {}).checked; }
         function fallo(form, texto, codigos){
           var correo = ((form.querySelector('input[type="email"]') || {}).value || '').trim();
-          var cuerpo = ['Hi Aleph,', '', 'Please add me to the waitlist.', '', 'My email: ' + correo,
-            'Try the beta: ' + (marcada(form, 'beta') ? 'yes' : 'no'),
-            'Updates and announcements: ' + (marcada(form, 'novedades') ? 'yes' : 'no'),
-            '', 'What the site said: ' + codigos].join('\r\n');
+          var cuerpo = [TX.cuerpoHola, '', TX.cuerpoAgrega, '', TX.cuerpoCorreo + ' ' + correo,
+            TX.cuerpoBeta + ' ' + (marcada(form, 'beta') ? TX.afirmativo : TX.negativo),
+            TX.cuerpoNovedades + ' ' + (marcada(form, 'novedades') ? TX.afirmativo : TX.negativo),
+            '', TX.cuerpoSitio + ' ' + codigos].join('\r\n');
           var a = document.createElement('a');
-          a.href = 'mailto:' + CORREO + '?subject=' + encodeURIComponent('Add me to the Aleph waitlist') + '&body=' + encodeURIComponent(cuerpo);
+          a.href = 'mailto:' + CORREO + '?subject=' + encodeURIComponent(TX.asuntoCorreo) + '&body=' + encodeURIComponent(cuerpo);
           a.textContent = CORREO;
           var p = parrafo(form);
-          p.textContent = texto + '. Try again in a minute, or write to ';
+          p.textContent = texto + '. ' + TX.reintenta + ' ';
           p.appendChild(a);
-          p.appendChild(document.createTextNode(' and we’ll add you.'));
+          p.appendChild(document.createTextNode(' ' + TX.teAgregamos));
         }
         function gracias(form, d){
           var box = document.createElement('div');
@@ -512,9 +553,9 @@
           var repetido = d && d.nuevo === false && !vuelve;
           var primeros = d && d.primeros;
           var fuerte = document.createElement('strong');
-          fuerte.textContent = vuelve ? 'Welcome back:' : repetido ? 'You’re already on the list.' : (primeros ? 'You’re one of the first 100 readers:' : 'You’re on the list.');
+          fuerte.textContent = vuelve ? TX.vuelve : repetido ? TX.repetido : (primeros ? TX.primeros : TX.enLista);
           box.appendChild(fuerte);
-          var resto = vuelve ? ' you’re on the list again. Check your inbox.' : repetido ? (d.beta ? ' Check your inbox for your beta invitation.' : (primeros ? ' Your first year is free.' : '')) + (d.novedades ? ' We’ll keep you posted.' : '') : (primeros ? ' your first year is free.' : '') + ' Check your inbox for a welcome email.';
+          var resto = vuelve ? ' ' + TX.vuelveResto : repetido ? (d.beta ? ' ' + TX.betaRevisa : (primeros ? ' ' + TX.primerAnio : '')) + (d.novedades ? ' ' + TX.novedades : '') : (primeros ? ' ' + TX.primerAnioMin : '') + ' ' + TX.revisaBienvenida;
           if(resto) box.appendChild(document.createTextNode(resto));
           var fino = form.nextElementSibling;
           if(fino && fino.classList.contains('fine')) fino.remove();
@@ -565,7 +606,7 @@
             correo: input.value.trim(),
             beta: marcada(form, 'beta'),
             novedades: marcada(form, 'novedades'),
-            idioma: navigator.language || 'en',
+            idioma: document.documentElement.lang !== 'en' ? document.documentElement.lang : (navigator.language || 'en'),
             origen: location.pathname,
             turnstile: token,
             tiempo: Date.now() - inicio,
@@ -578,12 +619,12 @@
               if(res.j.error === 'correo') aviso(form, MENSAJES.correo);
               else {
                 var codigos = res.j.codigos && res.j.codigos.length ? res.j.codigos.join(', ') : (res.j.error || 'error');
-                fallo(form, (MENSAJES[res.j.error] || 'Something went wrong') + ' (' + codigos + ')', codigos);
+                fallo(form, (MENSAJES[res.j.error] || TX.algoFallo) + ' (' + codigos + ')', codigos);
               }
               if(window.turnstile && form._widget !== undefined) window.turnstile.reset(form._widget);
               boton(form);
             })
-            .catch(function(){ fallo(form, 'Network error', 'network'); boton(form); });
+            .catch(function(){ fallo(form, TX.redFallo, 'network'); boton(form); });
         }
         formularios.forEach(function(form){
           if('IntersectionObserver' in window){
@@ -598,29 +639,66 @@
             var input = form.querySelector('input[type="email"]');
             if(!input || !input.value.trim() || !input.checkValidity()){ if(input) input.reportValidity(); return; }
             var btn = form.querySelector('button[type="submit"]');
-            if(btn){ btn.dataset.texto = btn.dataset.texto || btn.textContent; btn.disabled = true; btn.textContent = 'Joining…'; }
+            if(btn){ btn.dataset.texto = btn.dataset.texto || btn.textContent; btn.disabled = true; btn.textContent = TX.uniendo; }
             enviar(form);
           });
         });
       })();
 
+      var datosDomicilio = null;
+      function mostrarDomicilio(caja, btn, j){
+        var texto = document.createElement('span');
+        texto.className = 'domicilio-texto';
+        texto.appendChild(document.createTextNode(j.domicilio));
+        if(caja.hasAttribute('data-telefono') && j.telefono){ texto.appendChild(document.createElement('br')); texto.appendChild(document.createTextNode(TX.telefono + ': ' + j.telefono)); }
+        btn.hidden = true;
+        caja.appendChild(texto);
+        requestAnimationFrame(function(){ requestAnimationFrame(function(){ texto.classList.add('visible'); }); });
+        var reloj;
+        function ocultar(){
+          texto.classList.remove('visible');
+          setTimeout(function(){ texto.remove(); btn.hidden = false; btn.disabled = false; }, reduce ? 0 : 450);
+        }
+        function programar(){ clearTimeout(reloj); reloj = setTimeout(ocultar, 15000); }
+        texto.addEventListener('pointerenter', function(){ clearTimeout(reloj); });
+        texto.addEventListener('pointerleave', programar);
+        programar();
+      }
       document.querySelectorAll('.ver-domicilio').forEach(function(btn){
         btn.addEventListener('click', function(){
+          var caja = btn.parentNode;
           btn.disabled = true;
-          fetch('/api/domicilio', { headers: { 'X-Aleph': 'domicilio' } })
-            .then(function(r){ return r.json(); })
+          (datosDomicilio ? Promise.resolve(datosDomicilio) : fetch('/api/domicilio', { headers: { 'X-Aleph': 'domicilio' } }).then(function(r){ return r.json(); }))
             .then(function(j){
               if(!j || !j.domicilio) throw new Error('domicilio');
-              document.querySelectorAll('.domicilio').forEach(function(caja){
-                caja.textContent = j.domicilio;
-                if(caja.hasAttribute('data-telefono') && j.telefono){ caja.appendChild(document.createElement('br')); caja.appendChild(document.createTextNode('Phone: ' + j.telefono)); }
-              });
+              datosDomicilio = j;
+              mostrarDomicilio(caja, btn, j);
             })
             .catch(function(){
-              btn.parentNode.textContent = 'Not available right now. Write to ' + 'support' + '@' + 'alephlibrary.com' + ' and we’ll send it.';
+              caja.textContent = TX.noDisponible.replace('{correo}', 'support' + '@' + 'alephlibrary.com');
             });
         });
       });
+
+      (function(){
+        var guia = document.querySelector('.idioma-guia');
+        if(!guia) return;
+        try { if(localStorage.getItem('aleph-guia-cerrada')) return; } catch(e){}
+        var preferidos = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
+        for(var i = 0; i < preferidos.length; i++){
+          var codigo = String(preferidos[i]).slice(0, 2).toLowerCase();
+          if(codigo === 'en') return;
+          var linea = guia.querySelector('[data-idioma="' + codigo + '"]');
+          if(linea){
+            linea.hidden = false; guia.hidden = false;
+            linea.querySelector('.idioma-cerrar').addEventListener('click', function(){
+              guia.hidden = true;
+              try { localStorage.setItem('aleph-guia-cerrada', '1'); } catch(e){}
+            });
+            return;
+          }
+        }
+      })();
 
       if(reduce){
         document.querySelectorAll('.rev').forEach(function(el){el.classList.add('in')});

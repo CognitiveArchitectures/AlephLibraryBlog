@@ -1,0 +1,9 @@
+{%- assign idioma_guia = page.lang | default: 'en' -%}
+{%- if idioma_guia == 'en' and page.auto_idioma != true -%}
+<div class="idioma-guia" hidden>
+{%- for i in site.data.idiomas -%}{%- if i.codigo != 'en' -%}
+{%- if page.ref and page.ref != 'home' -%}{%- capture url_guia -%}/{{ i.codigo }}/{{ page.ref }}/{%- endcapture -%}{%- else -%}{%- capture url_guia -%}/{{ i.codigo }}/{%- endcapture -%}{%- endif %}
+  <p data-idioma="{{ i.codigo }}" lang="{{ i.codigo }}" hidden><a href="{{ url_guia | relative_url }}">{{ i.guia }}</a><button type="button" class="idioma-cerrar" aria-label="{{ i.cerrar }}">×</button></p>
+{%- endif -%}{%- endfor %}
+</div>
+{%- endif -%}
