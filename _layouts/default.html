@@ -391,12 +391,9 @@
   </style>
   {%- if page.lista %}
   <script>
-    function alephLista(tipo, valor){ document.dispatchEvent(new CustomEvent('aleph-lista', { detail: { tipo: tipo, valor: valor } })); return true; }
-    function alephListaOk(){ return alephLista('ok'); }
-    function alephListaTocar(){ return alephLista('tocar'); }
-    function alephListaError(codigo){ return alephLista('error', codigo); }
+    function alephTurnstileListo(){ document.dispatchEvent(new CustomEvent('aleph-turnstile')); }
   </script>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=alephTurnstileListo" async defer></script>
   {%- endif %}
 </head>
 <body>
@@ -476,12 +473,11 @@
       (function(){
         var MENSAJES = {
           correo: 'That email doesn’t look right. Please check it.',
-          verificacion: 'We couldn’t verify your browser. Please try again.',
+          verificacion: 'We couldn’t verify your browser. Please try again, or write to ' + 'hello' + '@' + 'alephlibrary.com' + ' and we’ll add you.',
           espera: 'One moment, checking your browser…',
           tocar: 'Tick the box below to confirm you’re human.'
         };
-        var ultimoError = '';
-        var interactivo = false;
+        var formularios = Array.prototype.slice.call(document.querySelectorAll('form.notify'));
         function aviso(form, texto){
           var p = form.querySelector('.notify-error');
           if(!p){ p = document.createElement('p'); p.className = 'notify-error'; p.setAttribute('role', 'alert'); form.appendChild(p); }
@@ -507,22 +503,37 @@
           var f = form.querySelector('[name="cf-turnstile-response"]');
           return f ? f.value : '';
         }
-        function fallo(form, detalle){
+        function fallo(form){
           delete form.dataset.esperando;
           clearTimeout(form._reloj);
-          aviso(form, MENSAJES.verificacion + (detalle ? ' (' + detalle + ')' : ''));
+          aviso(form, MENSAJES.verificacion + (form._error ? ' (' + form._error + ')' : ''));
           boton(form);
         }
-        function esperando(){
-          return Array.prototype.filter.call(document.querySelectorAll('form.notify'), function(f){ return !!f.dataset.esperando; });
+        function montar(form){
+          if(form._widget !== undefined || !form._pedido || !window.turnstile) return;
+          var caja = form.querySelector('.cf-turnstile');
+          if(!caja) return;
+          try {
+            form._widget = window.turnstile.render(caja, {
+              sitekey: caja.getAttribute('data-sitekey'),
+              appearance: 'interaction-only',
+              size: 'flexible',
+              callback: function(){ form._interactivo = false; form._error = ''; if(form.dataset.esperando) enviar(form); },
+              'before-interactive-callback': function(){ form._interactivo = true; if(form.dataset.esperando) aviso(form, MENSAJES.tocar); },
+              'error-callback': function(codigo){ form._error = String(codigo || ''); return true; }
+            });
+          } catch(e){ form._error = 'render'; }
         }
+        function pedir(form){ form._pedido = true; montar(form); }
+        document.addEventListener('aleph-turnstile', function(){ formularios.forEach(montar); });
         function enviar(form){
           var token = ficha(form);
           if(!token){
             form.dataset.esperando = '1';
-            aviso(form, interactivo ? MENSAJES.tocar : MENSAJES.espera);
+            pedir(form);
+            aviso(form, form._interactivo ? MENSAJES.tocar : MENSAJES.espera);
             clearTimeout(form._reloj);
-            form._reloj = setTimeout(function(){ if(form.dataset.esperando) fallo(form, ultimoError); }, 60000);
+            form._reloj = setTimeout(function(){ if(form.dataset.esperando) fallo(form); }, 40000);
             return;
           }
           delete form.dataset.esperando;
@@ -542,23 +553,19 @@
               if(res.ok && res.j.ok){ gracias(form, res.j); return; }
               var detalle = res.j.codigos && res.j.codigos.length ? ' (' + res.j.codigos.join(', ') + ')' : '';
               aviso(form, (MENSAJES[res.j.error] || 'Something went wrong. Please try again in a moment.') + detalle);
-              if(window.turnstile){ var w = form.querySelector('.cf-turnstile'); if(w) window.turnstile.reset(w); }
+              if(window.turnstile && form._widget !== undefined) window.turnstile.reset(form._widget);
               boton(form);
             })
             .catch(function(){ aviso(form, 'Network error. Please try again.'); boton(form); });
         }
-        document.addEventListener('aleph-lista', function(e){
-          var tipo = e.detail.tipo;
-          if(tipo === 'ok') interactivo = false;
-          if(tipo === 'tocar') interactivo = true;
-          if(tipo === 'error') ultimoError = String(e.detail.valor || '');
-          esperando().forEach(function(form){
-            if(tipo === 'ok' && ficha(form)) enviar(form);
-            else if(tipo === 'tocar') aviso(form, MENSAJES.tocar);
-            else if(tipo === 'error') fallo(form, ultimoError);
-          });
-        });
-        document.querySelectorAll('form.notify').forEach(function(form){
+        formularios.forEach(function(form){
+          if('IntersectionObserver' in window){
+            var vista = new IntersectionObserver(function(entradas){
+              entradas.forEach(function(e){ if(e.isIntersecting){ vista.disconnect(); setTimeout(function(){ pedir(form); }, 1000); } });
+            }, { threshold: 0.5 });
+            vista.observe(form);
+          } else { pedir(form); }
+          form.addEventListener('focusin', function(){ pedir(form); });
           form.addEventListener('submit', function(e){
             e.preventDefault();
             var input = form.querySelector('input[type="email"]');
