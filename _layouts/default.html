@@ -611,7 +611,10 @@
             .then(function(r){ return r.json(); })
             .then(function(j){
               if(!j || !j.domicilio) throw new Error('domicilio');
-              document.querySelectorAll('.domicilio').forEach(function(caja){ caja.textContent = j.domicilio; });
+              document.querySelectorAll('.domicilio').forEach(function(caja){
+                caja.textContent = j.domicilio;
+                if(caja.hasAttribute('data-telefono') && j.telefono){ caja.appendChild(document.createElement('br')); caja.appendChild(document.createTextNode('Phone: ' + j.telefono)); }
+              });
             })
             .catch(function(){
               btn.parentNode.textContent = 'Not available right now. Write to ' + 'support' + '@' + 'alephlibrary.com' + ' and we’ll send it.';
