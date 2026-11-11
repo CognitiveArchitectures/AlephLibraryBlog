@@ -2,8 +2,8 @@ title: Aleph Personal Library
 description: "The goal is not to read books. It is to interconnect them. A living graph of ideas for iOS."
 author: Cognitive Architectures S.A.S.
 lang: en
-# Lista de espera (Buttondown).
-buttondown_username: "alephlibrary"
+# Lista de espera: Worker propio (alephlibrary.com/api/lista) con Turnstile. La clave del sitio es pública.
+turnstile_sitekey: "0x4AAAAAAF8INclDTH43zm0L"
 url: "https://alephlibrary.com"
 baseurl: ""  # Debe quedar absolutamente vacío si usas un dominio TLD.
 permalink: /:title/

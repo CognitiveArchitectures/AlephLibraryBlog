@@ -323,6 +323,11 @@
     .notify-input::placeholder{color:var(--ink-faint)}
     .notify-input:focus{outline:none;border-color:var(--rubric);box-shadow:0 0 0 3px color-mix(in srgb,var(--rubric) 18%,transparent)}
     .notify .btn-primary{flex:0 0 auto}
+    .notify-beta{flex:1 1 100%;display:flex;align-items:center;justify-content:center;gap:9px;font-size:15px;color:var(--ink-soft);cursor:pointer}
+    .notify-beta input{width:18px;height:18px;accent-color:var(--rubric);margin:0}
+    .notify-trampa{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+    .notify .cf-turnstile{flex:1 1 100%;display:flex;justify-content:center}
+    .notify-error{flex:1 1 100%;margin:2px 0 0;font-size:14.5px;color:var(--rubric);text-align:center}
     .notify-thanks{margin:34px auto 0;max-width:520px;text-align:center;padding:20px 24px;
       border:1px solid var(--rubric);border-radius:16px;background:color-mix(in srgb,var(--rubric) 7%,transparent);
       color:var(--ink-soft);font-size:17px;line-height:1.5;text-wrap:pretty;animation:thanksIn .45s var(--ease) both}
@@ -384,6 +389,9 @@
       .g-edge{stroke-dashoffset:0}.g-node{transform:none;opacity:1}.g-label{opacity:1}
     }
   </style>
+  {%- if page.lista %}
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  {%- endif %}
 </head>
 <body>
   <div class="grain" aria-hidden="true"></div>
@@ -460,27 +468,68 @@
       })();
 
       (function(){
-        function thanks(form){
+        var MENSAJES = {
+          correo: 'That email doesn’t look right. Please check it.',
+          verificacion: 'We couldn’t verify your browser. Please try again.',
+          espera: 'One moment, checking your browser…'
+        };
+        function aviso(form, texto){
+          var p = form.querySelector('.notify-error');
+          if(!p){ p = document.createElement('p'); p.className = 'notify-error'; p.setAttribute('role', 'alert'); form.appendChild(p); }
+          p.textContent = texto;
+        }
+        function gracias(form, d){
           var box = document.createElement('div');
           box.className = 'notify-thanks';
           box.setAttribute('role', 'status');
-          box.innerHTML = "<strong>You’re on the list.</strong> Thank you — we’ll let you know the moment Aleph launches.";
+          var fuerte = document.createElement('strong');
+          fuerte.textContent = d && d.lugar ? 'You’re on the list: spot #' + d.lugar + '.' : 'You’re on the list.';
+          box.appendChild(fuerte);
+          box.appendChild(document.createTextNode(' ' + (d && d.primeros ? 'You’re one of the first 100, so your first year is free. ' : '') + 'Check your inbox for a welcome email.'));
+          var fino = form.nextElementSibling;
+          if(fino && fino.classList.contains('fine')) fino.remove();
           form.replaceWith(box);
+        }
+        function enviar(form, intento){
+          var input = form.querySelector('input[type="email"]');
+          var btn = form.querySelector('button[type="submit"]');
+          var ficha = form.querySelector('[name="cf-turnstile-response"]');
+          var token = ficha ? ficha.value : '';
+          if(!token){
+            if(intento < 8){ aviso(form, MENSAJES.espera); setTimeout(function(){ enviar(form, intento + 1); }, 750); return; }
+            aviso(form, MENSAJES.verificacion);
+            if(btn){ btn.disabled = false; btn.textContent = btn.dataset.texto; }
+            return;
+          }
+          var cuerpo = {
+            correo: input.value.trim(),
+            beta: !!(form.querySelector('input[name="beta"]') || {}).checked,
+            idioma: navigator.language || 'en',
+            origen: location.pathname,
+            turnstile: token,
+            sitio: (form.querySelector('input[name="sitio"]') || {}).value || ''
+          };
+          fetch('/api/lista', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cuerpo) })
+            .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, j: j }; }); })
+            .then(function(res){
+              if(res.ok && res.j.ok){ gracias(form, res.j); return; }
+              aviso(form, MENSAJES[res.j.error] || 'Something went wrong. Please try again in a moment.');
+              if(window.turnstile){ var w = form.querySelector('.cf-turnstile'); if(w) window.turnstile.reset(w); }
+              if(btn){ btn.disabled = false; btn.textContent = btn.dataset.texto; }
+            })
+            .catch(function(){
+              aviso(form, 'Network error. Please try again.');
+              if(btn){ btn.disabled = false; btn.textContent = btn.dataset.texto; }
+            });
         }
         document.querySelectorAll('form.notify').forEach(function(form){
           form.addEventListener('submit', function(e){
             e.preventDefault();
             var input = form.querySelector('input[type="email"]');
-            var email = input ? input.value.trim() : '';
-            if(!email){ if(input) input.reportValidity(); return; }
+            if(!input || !input.value.trim() || !input.checkValidity()){ if(input) input.reportValidity(); return; }
             var btn = form.querySelector('button[type="submit"]');
-            if(btn){ btn.disabled = true; btn.textContent = 'Joining…'; }
-            var body = 'email=' + encodeURIComponent(email) + '&embed=1';
-            fetch(form.action, {
-              method: 'POST', mode: 'no-cors',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: body
-            }).then(function(){ thanks(form); }, function(){ thanks(form); });
+            if(btn){ btn.dataset.texto = btn.dataset.texto || btn.textContent; btn.disabled = true; btn.textContent = 'Joining…'; }
+            enviar(form, 0);
           });
         });
       })();

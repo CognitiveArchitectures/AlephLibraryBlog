@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Announcements — Aleph
+lista: true
 description: "The first 100 readers get their first year of Aleph free. Join the waitlist before Aleph launches on December 1."
 permalink: /announcements/
 ---
@@ -26,11 +27,7 @@ permalink: /announcements/
       </div>
     </div>
 
-    <form class="notify" action="https://buttondown.com/api/emails/embed-subscribe/{{ site.buttondown_username }}" method="post">
-      <input class="notify-input" type="email" name="email" required placeholder="you@email.com" autocomplete="email" aria-label="Your email address">
-      <button class="btn btn-primary" type="submit">Join &amp; claim your free year</button>
-    </form>
-    <p class="fine">One free year for the first 100. No spam — one email at launch.</p>
+    {% include lista.html boton="Join &amp; claim your free year" %}
   </article>
 
   <p style="text-align:center"><a class="back" href="{{ '/' | relative_url }}">← Back to Aleph</a></p>

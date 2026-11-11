@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Aleph — Reading with purpose
+lista: true
 description: "Aleph turns what you read—your highlights, your notes, your questions—into a living graph of ideas. Apple Books measures minutes. Aleph measures connections. Coming to iOS."
 ---
 <main id="home">
@@ -276,11 +277,7 @@ description: "Aleph turns what you read—your highlights, your notes, your ques
       <div class="card rev">
         <h2 class="serif">Coming December 1.</h2>
         <p>Aleph lands on the App Store on December 1. Leave your name and be among the first readers—<a href="{{ '/announcements/' | relative_url }}" style="color:var(--rubric);font-weight:600">the first 100 get a free year.</a></p>
-        <form class="notify" action="https://buttondown.com/api/emails/embed-subscribe/{{ site.buttondown_username }}" method="post">
-          <input class="notify-input" type="email" name="email" required placeholder="you@email.com" autocomplete="email" aria-label="Your email address">
-          <button class="btn btn-primary" type="submit">Notify me at launch</button>
-        </form>
-        <p class="fine">No spam. One email, when it's ready.</p>
+        {% include lista.html boton="Notify me at launch" %}
       </div>
     </div>
   </section>

@@ -1,0 +1,8 @@
+<form class="notify" action="/api/lista" method="post">
+  <input class="notify-input" type="email" name="correo" required placeholder="you@email.com" autocomplete="email" aria-label="Your email address">
+  <button class="btn btn-primary" type="submit">{{ include.boton }}</button>
+  <label class="notify-beta"><input type="checkbox" name="beta" value="1"> I’d also like to try the beta</label>
+  <input class="notify-trampa" type="text" name="sitio" tabindex="-1" autocomplete="off" aria-hidden="true">
+  <div class="cf-turnstile" data-sitekey="{{ site.turnstile_sitekey }}" data-appearance="interaction-only" data-size="flexible"></div>
+</form>
+<p class="fine">Only about Aleph: a welcome note now, the beta if you ask, and launch day. Unsubscribe anytime. <a href="{{ '/privacy/' | relative_url }}">Privacy</a></p>
