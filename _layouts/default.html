@@ -328,6 +328,7 @@
     .notify-trampa{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
     .notify .cf-turnstile{flex:1 1 100%;display:flex;justify-content:center}
     .notify-error{flex:1 1 100%;margin:2px 0 0;font-size:14.5px;color:var(--rubric);text-align:center}
+    .notify-error a{color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:2px}
     .notify-thanks{margin:34px auto 0;max-width:520px;text-align:center;padding:20px 24px;
       border:1px solid var(--rubric);border-radius:16px;background:color-mix(in srgb,var(--rubric) 7%,transparent);
       color:var(--ink-soft);font-size:17px;line-height:1.5;text-wrap:pretty;animation:thanksIn .45s var(--ease) both}
@@ -359,6 +360,8 @@
     .legal strong{color:var(--ink);font-weight:600}
     .legal a{color:var(--rubric);text-decoration:underline;text-underline-offset:2px}
     .legal .back{display:inline-block;margin-top:42px;font-size:14px;font-family:ui-monospace,monospace;letter-spacing:.04em}
+    .legal .ver-domicilio{font:inherit;color:var(--rubric);background:none;border:0;padding:0;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+    .legal .ver-domicilio:disabled{opacity:.6;cursor:progress}
 
     /* MANIFESTO / ABOUT */
     .manifesto{padding:clamp(60px,9vw,104px) 0;position:relative;z-index:2}
@@ -472,17 +475,34 @@
 
       (function(){
         var inicio = Date.now();
+        var CORREO = 'hello' + '@' + 'alephlibrary.com';
         var MENSAJES = {
           correo: 'That email doesn’t look right. Please check it.',
-          verificacion: 'We couldn’t sign you up just now. Please try again in a minute, or write to ' + 'hello' + '@' + 'alephlibrary.com' + ' and we’ll add you.',
+          verificacion: 'We couldn’t sign you up just now',
           espera: 'One moment, checking your browser…',
           tocar: 'Tick the box below to confirm you’re human.'
         };
         var formularios = Array.prototype.slice.call(document.querySelectorAll('form.notify'));
-        function aviso(form, texto){
+        function parrafo(form){
           var p = form.querySelector('.notify-error');
           if(!p){ p = document.createElement('p'); p.className = 'notify-error'; p.setAttribute('role', 'alert'); form.appendChild(p); }
-          p.textContent = texto;
+          return p;
+        }
+        function aviso(form, texto){ parrafo(form).textContent = texto; }
+        function marcada(form, nombre){ return !!(form.querySelector('input[name="' + nombre + '"]') || {}).checked; }
+        function fallo(form, texto, codigos){
+          var correo = ((form.querySelector('input[type="email"]') || {}).value || '').trim();
+          var cuerpo = ['Hi Aleph,', '', 'Please add me to the waitlist.', '', 'My email: ' + correo,
+            'Try the beta: ' + (marcada(form, 'beta') ? 'yes' : 'no'),
+            'Updates and announcements: ' + (marcada(form, 'novedades') ? 'yes' : 'no'),
+            '', 'What the site said: ' + codigos].join('\r\n');
+          var a = document.createElement('a');
+          a.href = 'mailto:' + CORREO + '?subject=' + encodeURIComponent('Add me to the Aleph waitlist') + '&body=' + encodeURIComponent(cuerpo);
+          a.textContent = CORREO;
+          var p = parrafo(form);
+          p.textContent = texto + '. Try again in a minute, or write to ';
+          p.appendChild(a);
+          p.appendChild(document.createTextNode(' and we’ll add you.'));
         }
         function gracias(form, d){
           var box = document.createElement('div');
@@ -543,8 +563,8 @@
           var input = form.querySelector('input[type="email"]');
           var cuerpo = {
             correo: input.value.trim(),
-            beta: !!(form.querySelector('input[name="beta"]') || {}).checked,
-            novedades: !!(form.querySelector('input[name="novedades"]') || {}).checked,
+            beta: marcada(form, 'beta'),
+            novedades: marcada(form, 'novedades'),
             idioma: navigator.language || 'en',
             origen: location.pathname,
             turnstile: token,
@@ -555,12 +575,15 @@
             .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, j: j }; }); })
             .then(function(res){
               if(res.ok && res.j.ok){ gracias(form, res.j); return; }
-              var detalle = res.j.codigos && res.j.codigos.length ? ' (' + res.j.codigos.join(', ') + ')' : '';
-              aviso(form, (MENSAJES[res.j.error] || 'Something went wrong. Please try again in a moment.') + detalle);
+              if(res.j.error === 'correo') aviso(form, MENSAJES.correo);
+              else {
+                var codigos = res.j.codigos && res.j.codigos.length ? res.j.codigos.join(', ') : (res.j.error || 'error');
+                fallo(form, (MENSAJES[res.j.error] || 'Something went wrong') + ' (' + codigos + ')', codigos);
+              }
               if(window.turnstile && form._widget !== undefined) window.turnstile.reset(form._widget);
               boton(form);
             })
-            .catch(function(){ aviso(form, 'Network error. Please try again.'); boton(form); });
+            .catch(function(){ fallo(form, 'Network error', 'network'); boton(form); });
         }
         formularios.forEach(function(form){
           if('IntersectionObserver' in window){
@@ -580,6 +603,21 @@
           });
         });
       })();
+
+      document.querySelectorAll('.ver-domicilio').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          btn.disabled = true;
+          fetch('/api/domicilio', { headers: { 'X-Aleph': 'domicilio' } })
+            .then(function(r){ return r.json(); })
+            .then(function(j){
+              if(!j || !j.domicilio) throw new Error('domicilio');
+              document.querySelectorAll('.domicilio').forEach(function(caja){ caja.textContent = j.domicilio; });
+            })
+            .catch(function(){
+              btn.parentNode.textContent = 'Not available right now. Write to ' + 'support' + '@' + 'alephlibrary.com' + ' and we’ll send it.';
+            });
+        });
+      });
 
       if(reduce){
         document.querySelectorAll('.rev').forEach(function(el){el.classList.add('in')});
