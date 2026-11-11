@@ -385,10 +385,12 @@
     .legal .traduccion{font-size:14.5px;line-height:1.55;padding:12px 16px;border:1px solid var(--hair);border-radius:12px;margin-bottom:28px}
     footer .idiomas-pie span[aria-current]{color:var(--rubric);font-weight:600;margin:0 8px}
     footer .idiomas-pie a[aria-current]{color:var(--rubric);font-weight:600}
-    .idioma-guia{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);z-index:60;width:max-content;max-width:calc(100% - 32px)}
-    .idioma-guia p{display:flex;align-items:center;gap:12px;margin:0;padding:8px 8px 8px 18px;background:var(--surface);border:1px solid var(--hair-strong);border-radius:999px;box-shadow:var(--shadow-lg);font-size:14.5px;animation:aparecer .45s ease}
+    .idioma-guia{position:relative;z-index:51;background:var(--surface);border-bottom:1px solid var(--hair)}
+    .idioma-guia p{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 auto;padding:9px 16px;font-size:13.5px;color:var(--ink-soft);text-align:center}
+    .idioma-guia p[hidden]{display:none}
     .idioma-guia a{color:var(--rubric);font-weight:600;text-decoration:none}
-    .idioma-cerrar{font:inherit;font-size:18px;line-height:1;width:30px;height:30px;border-radius:50%;border:0;background:var(--hair);color:var(--ink-soft);cursor:pointer;flex:none}
+    .idioma-cerrar{font:inherit;font-size:16px;line-height:1;width:24px;height:24px;border-radius:50%;border:0;background:none;color:var(--ink-faint);cursor:pointer;flex:none}
+    .idioma-cerrar:hover{background:var(--hair);color:var(--ink)}
 
     /* MANIFESTO / ABOUT */
     .manifesto{padding:clamp(60px,9vw,104px) 0;position:relative;z-index:2}
@@ -427,6 +429,7 @@
   {%- endif %}
 </head>
 <body>
+  {% include idioma-guia.html %}
   <div class="grain" aria-hidden="true"></div>
   <div class="progress" id="progress" aria-hidden="true"></div>
 
@@ -450,8 +453,6 @@
   </header>
 
   {{ content }}
-
-  {% include idioma-guia.html %}
 
   <footer>
     <div class="wrap">
