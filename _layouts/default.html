@@ -488,12 +488,13 @@
           var box = document.createElement('div');
           box.className = 'notify-thanks';
           box.setAttribute('role', 'status');
-          var repetido = d && d.nuevo === false;
+          var vuelve = d && d.vuelve;
+          var repetido = d && d.nuevo === false && !vuelve;
           var primeros = d && d.primeros;
           var fuerte = document.createElement('strong');
-          fuerte.textContent = repetido ? 'You’re already on the list.' : (primeros ? 'You’re one of the first 100 readers:' : 'You’re on the list.');
+          fuerte.textContent = vuelve ? 'Welcome back:' : repetido ? 'You’re already on the list.' : (primeros ? 'You’re one of the first 100 readers:' : 'You’re on the list.');
           box.appendChild(fuerte);
-          var resto = repetido ? (primeros ? ' Your first year is free.' : '') : (primeros ? ' your first year is free.' : '') + ' Check your inbox for a welcome email.';
+          var resto = vuelve ? ' you’re on the list again. Check your inbox.' : repetido ? (d.beta ? ' Check your inbox for your beta invitation.' : (primeros ? ' Your first year is free.' : '')) : (primeros ? ' your first year is free.' : '') + ' Check your inbox for a welcome email.';
           if(resto) box.appendChild(document.createTextNode(resto));
           var fino = form.nextElementSibling;
           if(fino && fino.classList.contains('fine')) fino.remove();
