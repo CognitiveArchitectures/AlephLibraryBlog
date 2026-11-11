@@ -494,7 +494,7 @@
           var fuerte = document.createElement('strong');
           fuerte.textContent = vuelve ? 'Welcome back:' : repetido ? 'You’re already on the list.' : (primeros ? 'You’re one of the first 100 readers:' : 'You’re on the list.');
           box.appendChild(fuerte);
-          var resto = vuelve ? ' you’re on the list again. Check your inbox.' : repetido ? (d.beta ? ' Check your inbox for your beta invitation.' : (primeros ? ' Your first year is free.' : '')) : (primeros ? ' your first year is free.' : '') + ' Check your inbox for a welcome email.';
+          var resto = vuelve ? ' you’re on the list again. Check your inbox.' : repetido ? (d.beta ? ' Check your inbox for your beta invitation.' : (primeros ? ' Your first year is free.' : '')) + (d.novedades ? ' We’ll keep you posted.' : '') : (primeros ? ' your first year is free.' : '') + ' Check your inbox for a welcome email.';
           if(resto) box.appendChild(document.createTextNode(resto));
           var fino = form.nextElementSibling;
           if(fino && fino.classList.contains('fine')) fino.remove();
@@ -544,6 +544,7 @@
           var cuerpo = {
             correo: input.value.trim(),
             beta: !!(form.querySelector('input[name="beta"]') || {}).checked,
+            novedades: !!(form.querySelector('input[name="novedades"]') || {}).checked,
             idioma: navigator.language || 'en',
             origen: location.pathname,
             turnstile: token,
