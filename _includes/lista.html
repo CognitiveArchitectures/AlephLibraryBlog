@@ -3,6 +3,6 @@
   <button class="btn btn-primary" type="submit">{{ include.boton }}</button>
   <label class="notify-beta"><input type="checkbox" name="beta" value="1"> I’d also like to try the beta</label>
   <input class="notify-trampa" type="text" name="sitio" tabindex="-1" autocomplete="off" aria-hidden="true">
-  <div class="cf-turnstile" data-sitekey="{{ site.turnstile_sitekey }}" data-appearance="interaction-only" data-size="flexible"></div>
+  <div class="cf-turnstile" data-sitekey="{{ site.turnstile_sitekey }}" data-appearance="interaction-only" data-size="flexible" data-callback="alephListaOk" data-before-interactive-callback="alephListaTocar" data-error-callback="alephListaError"></div>
 </form>
 <p class="fine">Only about Aleph: a welcome note now, the beta if you ask, and launch day. Unsubscribe anytime. <a href="{{ '/privacy/' | relative_url }}">Privacy</a></p>

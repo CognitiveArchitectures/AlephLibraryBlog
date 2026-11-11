@@ -390,6 +390,12 @@
     }
   </style>
   {%- if page.lista %}
+  <script>
+    function alephLista(tipo, valor){ document.dispatchEvent(new CustomEvent('aleph-lista', { detail: { tipo: tipo, valor: valor } })); return true; }
+    function alephListaOk(){ return alephLista('ok'); }
+    function alephListaTocar(){ return alephLista('tocar'); }
+    function alephListaError(codigo){ return alephLista('error', codigo); }
+  </script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   {%- endif %}
 </head>
@@ -471,8 +477,11 @@
         var MENSAJES = {
           correo: 'That email doesn’t look right. Please check it.',
           verificacion: 'We couldn’t verify your browser. Please try again.',
-          espera: 'One moment, checking your browser…'
+          espera: 'One moment, checking your browser…',
+          tocar: 'Tick the box below to confirm you’re human.'
         };
+        var ultimoError = '';
+        var interactivo = false;
         function aviso(form, texto){
           var p = form.querySelector('.notify-error');
           if(!p){ p = document.createElement('p'); p.className = 'notify-error'; p.setAttribute('role', 'alert'); form.appendChild(p); }
@@ -490,17 +499,35 @@
           if(fino && fino.classList.contains('fine')) fino.remove();
           form.replaceWith(box);
         }
-        function enviar(form, intento){
-          var input = form.querySelector('input[type="email"]');
+        function boton(form){
           var btn = form.querySelector('button[type="submit"]');
-          var ficha = form.querySelector('[name="cf-turnstile-response"]');
-          var token = ficha ? ficha.value : '';
+          if(btn){ btn.disabled = false; btn.textContent = btn.dataset.texto; }
+        }
+        function ficha(form){
+          var f = form.querySelector('[name="cf-turnstile-response"]');
+          return f ? f.value : '';
+        }
+        function fallo(form, detalle){
+          delete form.dataset.esperando;
+          clearTimeout(form._reloj);
+          aviso(form, MENSAJES.verificacion + (detalle ? ' (' + detalle + ')' : ''));
+          boton(form);
+        }
+        function esperando(){
+          return Array.prototype.filter.call(document.querySelectorAll('form.notify'), function(f){ return !!f.dataset.esperando; });
+        }
+        function enviar(form){
+          var token = ficha(form);
           if(!token){
-            if(intento < 8){ aviso(form, MENSAJES.espera); setTimeout(function(){ enviar(form, intento + 1); }, 750); return; }
-            aviso(form, MENSAJES.verificacion);
-            if(btn){ btn.disabled = false; btn.textContent = btn.dataset.texto; }
+            form.dataset.esperando = '1';
+            aviso(form, interactivo ? MENSAJES.tocar : MENSAJES.espera);
+            clearTimeout(form._reloj);
+            form._reloj = setTimeout(function(){ if(form.dataset.esperando) fallo(form, ultimoError); }, 60000);
             return;
           }
+          delete form.dataset.esperando;
+          clearTimeout(form._reloj);
+          var input = form.querySelector('input[type="email"]');
           var cuerpo = {
             correo: input.value.trim(),
             beta: !!(form.querySelector('input[name="beta"]') || {}).checked,
@@ -513,15 +540,24 @@
             .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, j: j }; }); })
             .then(function(res){
               if(res.ok && res.j.ok){ gracias(form, res.j); return; }
-              aviso(form, MENSAJES[res.j.error] || 'Something went wrong. Please try again in a moment.');
+              var detalle = res.j.codigos && res.j.codigos.length ? ' (' + res.j.codigos.join(', ') + ')' : '';
+              aviso(form, (MENSAJES[res.j.error] || 'Something went wrong. Please try again in a moment.') + detalle);
               if(window.turnstile){ var w = form.querySelector('.cf-turnstile'); if(w) window.turnstile.reset(w); }
-              if(btn){ btn.disabled = false; btn.textContent = btn.dataset.texto; }
+              boton(form);
             })
-            .catch(function(){
-              aviso(form, 'Network error. Please try again.');
-              if(btn){ btn.disabled = false; btn.textContent = btn.dataset.texto; }
-            });
+            .catch(function(){ aviso(form, 'Network error. Please try again.'); boton(form); });
         }
+        document.addEventListener('aleph-lista', function(e){
+          var tipo = e.detail.tipo;
+          if(tipo === 'ok') interactivo = false;
+          if(tipo === 'tocar') interactivo = true;
+          if(tipo === 'error') ultimoError = String(e.detail.valor || '');
+          esperando().forEach(function(form){
+            if(tipo === 'ok' && ficha(form)) enviar(form);
+            else if(tipo === 'tocar') aviso(form, MENSAJES.tocar);
+            else if(tipo === 'error') fallo(form, ultimoError);
+          });
+        });
         document.querySelectorAll('form.notify').forEach(function(form){
           form.addEventListener('submit', function(e){
             e.preventDefault();
@@ -529,7 +565,7 @@
             if(!input || !input.value.trim() || !input.checkValidity()){ if(input) input.reportValidity(); return; }
             var btn = form.querySelector('button[type="submit"]');
             if(btn){ btn.dataset.texto = btn.dataset.texto || btn.textContent; btn.disabled = true; btn.textContent = 'Joining…'; }
-            enviar(form, 0);
+            enviar(form);
           });
         });
       })();
