@@ -275,6 +275,11 @@ auto_idioma: true
   dialog.lec-modal{margin:auto;inset:0;width:min(560px,calc(100vw - 32px));max-height:min(80vh,760px);border:1px solid var(--hair);border-radius:20px;
     padding:0;background:var(--paper);color:var(--ink);box-shadow:0 24px 60px -20px rgba(0,0,0,.45)}
   dialog.lec-modal::backdrop{background:rgba(20,16,12,.45)}
+  /* 2026-11-24: lo que antes abría una ventana encima (un Destacado, tu año) se despliega debajo. */
+  .lec-despliegue{margin-top:12px;border:1px solid var(--hair);border-radius:16px;background:var(--paper);overflow:hidden;animation:lecBaja .22s ease-out}
+  .lec-despliegue .lec-modal-h{position:static}
+  @keyframes lecBaja{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.lec-despliegue{animation:none}}
   .lec-modal-h{position:sticky;top:0;display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--paper);border-bottom:1px solid var(--hair)}
   .lec-modal-h .t{flex:1;font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:18px;font-weight:700;min-width:0}
   .lec-x{background:var(--surface);border:1px solid var(--hair);border-radius:999px;width:32px;height:32px;font-size:18px;line-height:1;cursor:pointer;color:var(--ink)}
@@ -1275,6 +1280,23 @@ auto_idioma: true
     var m = typeof t === "string" ? t.match(/^(\d{4})-(\d{2})-(\d{2})$/) : null;
     return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
   }
+  // Despliega `cuerpo` justo debajo de `ancla` (sin ventana encima). Tocar lo mismo otra vez lo cierra;
+  // tocar otra cosa del mismo lugar lo reemplaza.
+  function desplegar(ancla, clave, titulo, cuerpo) {
+    var prev = ancla.nextElementSibling;
+    if (prev && prev.classList.contains("lec-despliegue")) {
+      var misma = prev.getAttribute("data-clave") === clave;
+      prev.remove();
+      if (misma) return;
+    }
+    var p = el("div", "lec-despliegue"); p.setAttribute("data-clave", clave);
+    var h = el("div", "lec-modal-h"); h.appendChild(el("div", "t", titulo));
+    var x = el("button", "lec-x", "×"); x.type = "button"; x.setAttribute("aria-label", T.cerrar);
+    x.addEventListener("click", function () { p.remove(); });
+    h.appendChild(x); p.appendChild(h); p.appendChild(cuerpo);
+    ancla.insertAdjacentElement("afterend", p);
+    if (p.scrollIntoView) p.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
   function modal(titulo, cuerpo) {
     var d = document.createElement("dialog"); d.className = "lec-modal";
     var h = el("div", "lec-modal-h"); h.appendChild(el("div", "t", titulo));
@@ -1317,7 +1339,7 @@ auto_idioma: true
       if (it[2]) n.appendChild(flama());
       d.appendChild(n); d.appendChild(el("div", "l", it[1])); b.appendChild(d);
     });
-    if (a) b.addEventListener("click", function () { abrirAnio(c); }); else b.style.cursor = "default";
+    if (a) b.addEventListener("click", function () { abrirAnio(c, b); }); else b.style.cursor = "default";
     return b;
   }
   function pintaLibro(padre, l, grande) {
@@ -1417,12 +1439,12 @@ auto_idioma: true
     if (a.momento && T.momento(a.momento)) ctx.push(T.momento(a.momento));
     if (ctx.length) { var t = ctx.join(" · "); k.appendChild(el("div", "lec-ctx", t.charAt(0).toUpperCase() + t.slice(1))); }
     var mas = el("button", "lec-mas", T.verAnio + " →"); mas.type = "button";
-    mas.addEventListener("click", function () { abrirAnio(c); });
+    mas.addEventListener("click", function () { abrirAnio(c, k); });
     k.appendChild(mas);
     d.appendChild(k);
     return d;
   }
-  function abrirAnio(c) {
+  function abrirAnio(c, ancla) {
     var a = c.anio; if (!a) return;
     var b = el("div", "lec-modal-b"), mn = el("div", "lec-minis"), r = rachaVigente(c);
     (r ? [[String(r), T.diasSeguidos(r)]] : [])
@@ -1467,9 +1489,9 @@ auto_idioma: true
       });
       b.appendChild(ls);
     }
-    modal(T.anioT + " " + a.anio, b);
+    desplegar(ancla, "anio", T.anioT + " " + a.anio, b);
   }
-  function abrirDestacado(l) {
+  function abrirDestacado(l, ancla) {
     var b = el("div", "lec-modal-b");
     if (l.autor) b.appendChild(el("div", "o", l.autor));
     if (l.horas >= 0.1) b.appendChild(el("div", "o", T.horasLeyendo(Math.round(l.horas * 10) / 10)));
@@ -1480,7 +1502,7 @@ auto_idioma: true
       b.appendChild(el("div", "k", T.destacoEste));
       l.citas.forEach(function (x) { var q = el("div", "lec-cita"); q.appendChild(el("div", "q", "“" + x + "”")); b.appendChild(q); });
     }
-    modal(l.titulo, b);
+    desplegar(ancla, "dest:" + l.titulo, l.titulo, b);
   }
   var ICONOS = { "book.closed.fill": "📕", "books.vertical.fill": "📚", "building.columns.fill": "🏛️", "character.book.closed.fill": "📖",
     "checkmark.seal.fill": "✅", "eye.fill": "👁️", "globe.americas.fill": "🌎", "lightbulb.fill": "💡", "link": "🔗", "moon.stars.fill": "🌙",
@@ -1534,7 +1556,7 @@ auto_idioma: true
           s.title = l.titulo + (l.autor ? " — " + l.autor : "");
           s.appendChild(el("span", null, l.titulo));
           if (tiene) { s.appendChild(el("i", "q", "“")); } else { s.disabled = true; }
-          s.addEventListener("click", function () { abrirDestacado(l); });
+          s.addEventListener("click", function () { abrirDestacado(l, g); });
           g.appendChild(s);
         });
         d.appendChild(g);
