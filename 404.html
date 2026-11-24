@@ -15,7 +15,7 @@ auto_idioma: true
     color:var(--paper);display:flex;align-items:center;justify-content:center;
     font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:34px;font-weight:700}
   .lec-name{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:clamp(28px,5vw,38px);font-weight:700;
-    letter-spacing:-.02em;line-height:1.08;text-wrap:balance}
+    letter-spacing:-.02em;line-height:1.08;text-wrap:balance;margin:0;max-width:none;text-align:left}
   .lec-alias{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:14px;color:var(--ink-soft);margin-top:4px}
   .lec-id{flex:1;min-width:0}
   .lec-racha{margin-left:auto;flex:none;display:flex;flex-direction:column;align-items:center;gap:1px;
@@ -23,10 +23,17 @@ auto_idioma: true
   .lec-racha svg{width:22px;height:22px;fill:var(--gold)}
   .lec-racha .n{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
   .lec-racha .d{font-size:11px;color:var(--ink-soft)}
-  .lec-bio{margin-top:20px;font-size:17px;color:var(--ink);text-wrap:pretty}
+  .lec-bio{margin-top:20px;font-size:17px;color:var(--ink);max-width:60ch;text-wrap:pretty}
   .lec-place{margin-top:6px;font-size:14px;color:var(--ink-faint)}
   .lec-now{margin-top:24px;padding:16px 18px;background:var(--surface);border:1px solid var(--hair);border-radius:16px}
-  .lec-now .t{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:20px;font-weight:600;margin-top:4px}
+  .lec-now .t{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:20px;font-weight:600;margin-top:4px;line-height:1.25;text-wrap:balance}
+  .lec-libro{display:flex;gap:14px;align-items:flex-start;margin-top:10px}
+  .lec-libro .lomo{flex:none;width:34px;aspect-ratio:.7;border-radius:3px;margin-top:3px;box-shadow:inset 3px 0 0 rgba(0,0,0,.18),0 4px 10px -5px rgba(0,0,0,.4)}
+  .lec-libro .x{flex:1;min-width:0}
+  .lec-libro .x>.t:first-child,.lec-libro .x>.r:first-child{margin-top:0}
+  .lec-also-list .lec-libro{margin-top:0}
+  .lec-also-list .lec-libro .lomo{width:22px;margin-top:2px}
+  .bg-mas .lec-libro .lomo{width:24px}
   .lec-now .a{font-size:14px;color:var(--rubric)}
   .lec-now .b{font-size:14px;color:var(--ink-soft);font-style:italic;margin-top:8px;text-wrap:pretty}
   button.lec-spine{border:0;padding:0;cursor:pointer;font:inherit;text-align:left;width:100%}
@@ -35,10 +42,10 @@ auto_idioma: true
   .lec-spine .q{position:absolute;top:4px;right:6px;color:#fff;font-size:12px;font-family:ui-serif,Georgia,serif;font-weight:700}
   .lec-hint{font-size:12px;color:var(--ink-faint);margin-top:8px}
   .lec-why{margin-top:12px}
-  .lec-cita{padding-left:12px;border-left:2px solid var(--acento,var(--rubric))}
-  .lec-cita + .lec-cita{margin-top:14px}
-  .lec-cita .q{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:17.5px;line-height:1.45;text-wrap:pretty}
-  .lec-cita .f{font-family:ui-monospace,monospace;font-size:11px;color:var(--ink-faint);margin-top:4px}
+  .lec-cita{padding-left:16px;border-left:2px solid var(--acento,var(--rubric))}
+  .lec-cita + .lec-cita{margin-top:24px}
+  .lec-cita .q{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:18.5px;line-height:1.5;text-wrap:pretty}
+  .lec-cita .f{font-family:ui-monospace,monospace;font-size:11px;color:var(--ink-faint);margin-top:8px}
   .lec-mas{margin-top:14px;background:none;border:0;padding:0;font:inherit;font-size:14px;font-weight:600;color:var(--acento,var(--rubric));cursor:pointer}
   body.en-blog nav.links a.nl{display:none}
   .lector .wrap.bg-ancho{max-width:1160px}
@@ -173,22 +180,25 @@ auto_idioma: true
   .md .md-thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .md .md-play{position:absolute;inset:0;margin:auto;width:56px;height:56px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px}
   .md .md-interna .md-card-s{font-family:ui-monospace,monospace;font-size:11px;margin:0 0 2px}
-  .lec-card .m{font-size:16px;font-weight:600;margin-top:8px;text-wrap:pretty}
-  .lec-block{margin-top:40px}
-  .lec-block h2{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:14px}
+  .lec-card .m,.lec-item .m{font-size:16px;font-weight:600;margin-top:8px;text-wrap:pretty}
+  .lec-block{margin-top:52px}
+  .lec-block h2{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:16px}
+  .lec-item{padding:18px 0;border-top:1px solid var(--hair)}
+  .lec-item:first-of-type{border-top:0;padding-top:2px}
+  .lec-item:last-child{padding-bottom:0}
   .lec-spines{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
   .lec-spine{position:relative;aspect-ratio:.7;max-width:100%;border-radius:6px;overflow:hidden;
     box-shadow:0 6px 14px -6px rgba(0,0,0,.35);display:flex;align-items:flex-end}
   .lec-spine::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:rgba(0,0,0,.18)}
   .lec-spine span{position:relative;padding:8px 8px 8px 10px;color:rgba(255,255,255,.96);
     font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:12.5px;font-weight:700;line-height:1.2;
-    display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+    display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word}
   .lec-card{background:var(--surface);border:1px solid var(--hair);border-radius:16px;padding:16px 18px}
   .lec-card + .lec-card{margin-top:12px}
   .lec-stats .lec-card,.lec-awards .lec-card{margin-top:0}
-  .lec-card .k{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
-  .lec-card .q{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:19px;line-height:1.42;margin-top:8px;text-wrap:pretty}
-  .lec-card .o{font-size:15px;color:var(--ink-soft);margin-top:10px;padding-left:12px;border-left:2px solid var(--acento,var(--rubric))}
+  .lec-card .k,.lec-item .k{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+  .lec-card .q,.lec-item .q{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:19px;line-height:1.45;margin-top:8px;text-wrap:pretty}
+  .lec-card .o,.lec-item .o{font-size:15px;color:var(--ink-soft);margin-top:10px;padding-left:12px;border-left:2px solid var(--acento,var(--rubric));text-wrap:pretty}
   .lec-interes .m{margin-top:0}
   .lec-interes .k{margin-top:6px;letter-spacing:.04em;text-transform:none}
   .lec-sub{font-size:14px;color:var(--ink-soft);margin-top:6px}
@@ -197,10 +207,16 @@ auto_idioma: true
   .lec-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   .lec-stat .n{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:28px;font-weight:700;color:var(--acento,var(--rubric))}
   .lec-stat .l{font-size:13.5px;color:var(--ink-soft)}
-  .lec-awards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-  .lec-award{text-align:center;font-size:14px;font-weight:600}
-  .lec-award::before{content:"✦";display:block;font-size:22px;color:var(--acento,var(--rubric));margin-bottom:4px}
-  .lec-shelf{display:grid;grid-template-columns:minmax(0,9rem) minmax(0,1fr) 2.6rem;align-items:center;gap:10px;margin-top:8px}
+  .lec-awards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:20px 24px}
+  .lec-award{display:flex;gap:12px;align-items:flex-start;min-width:0}
+  .lec-award .ic{flex:none;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:21px;line-height:1;
+    background:color-mix(in srgb,var(--acento,var(--rubric)) 13%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--acento,var(--rubric)) 30%,transparent)}
+  .lec-award .ic.sin::before{content:"✦";color:var(--acento,var(--rubric))}
+  .lec-award .x{min-width:0}
+  .lec-award .t{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:16.5px;font-weight:700;line-height:1.25;margin-top:3px;text-wrap:balance}
+  .lec-award .d{font-size:13.5px;line-height:1.4;color:var(--ink-soft);margin-top:3px;text-wrap:pretty}
+  .lec-estantes .q{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:19px;margin-bottom:6px}
+  .lec-shelf{display:grid;grid-template-columns:minmax(0,11rem) minmax(0,1fr) 2.6rem;align-items:center;gap:12px;margin-top:9px}
   .lec-shelf .nm{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .lec-shelf .bar{height:6px;border-radius:999px;background:var(--hair);overflow:hidden}
   .lec-shelf .bar i{display:block;height:100%;border-radius:999px;background:var(--acento,var(--rubric))}
@@ -211,21 +227,22 @@ auto_idioma: true
   .lec-link b{flex:none;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;
     align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:10.5px}
   .lec-link span{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-  .lec-linea{display:flex;gap:8px;margin-top:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-  .lec-linea::-webkit-scrollbar{display:none}
-  .lec-linea a{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:14px;color:var(--ink);text-decoration:none;
-    padding:4px 12px 4px 4px;background:var(--surface);border:1px solid var(--hair);border-radius:999px;white-space:nowrap}
-  .lec-linea b{width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;align-items:center;
+  .lec-linea{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .lec-linea a{display:inline-flex;align-items:center;gap:7px;max-width:100%;min-width:0;font-size:14px;color:var(--ink);text-decoration:none;
+    padding:4px 12px 4px 4px;background:var(--surface);border:1px solid var(--hair);border-radius:999px;white-space:nowrap;transition:border-color .2s}
+  .lec-linea a:hover{border-color:var(--ink-soft)}
+  .lec-linea span{overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .lec-linea b{flex:none;width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;align-items:center;
     justify-content:center;font-family:ui-monospace,monospace;font-size:9.5px}
   .lec-blogrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:inherit;text-decoration:none}
   .lec-blogrow .t{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:19px;font-weight:700}
   .lec-blogrow .x{font-size:13.5px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .lec-blogrow .n{margin-left:auto;font-family:ui-monospace,monospace;font-size:12px;color:var(--ink-soft)}
-  .lec-tabs2{display:flex;gap:20px;margin-bottom:6px}
+  .lec-tabs2{display:flex;flex-wrap:wrap;gap:6px 22px;margin-bottom:6px}
   .lec-tabs2 button{background:none;border:0;padding:0 0 3px;font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:22px;
-    color:var(--ink-faint);cursor:pointer}
+    color:var(--ink-faint);cursor:pointer;white-space:nowrap}
   .lec-tabs2 button.on{color:var(--ink);font-weight:700;border-bottom:2px solid var(--acento,var(--rubric))}
-  .lec-sub2{font-size:13px;color:var(--ink-faint);margin-bottom:12px}
+  .lec-sub2{font-size:13px;color:var(--ink-faint);margin-bottom:18px}
   button.lec-tag{cursor:pointer;font-family:inherit}
   .lec-pct{font-size:14px;color:var(--ink-soft);margin-top:10px}
   .lec-cifras{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));margin-top:22px;padding:12px 0;
@@ -298,17 +315,21 @@ auto_idioma: true
   .lec-fila:first-of-type{border-top:0}
   .lec-fila .s{font-family:ui-monospace,monospace;font-size:12px;color:var(--ink-soft);white-space:nowrap}
   .lec-fila .f{color:var(--ink-faint)}
-  .lec-award .ic{display:block;font-size:24px;margin-bottom:4px}
-  .lec-award.con::before{content:none}
   .lec-cta{margin-top:52px;padding:26px;border-radius:20px;background:var(--surface);border:1px solid var(--hair);text-align:center}
   .lec-cta p{color:var(--ink-soft);font-size:16px;max-width:46ch;margin:0 auto 18px;text-wrap:pretty}
   .lec-cta .row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
   .lec-note{margin-top:28px;font-size:13px;color:var(--ink-faint);text-align:center}
   @media(max-width:560px){
     .lec-head{gap:16px}.lec-avatar{width:68px;height:68px;font-size:26px}
-    .lec-spines{gap:7px}.lec-spine span{font-size:10px;padding:6px 5px 6px 8px;-webkit-line-clamp:4}
+    .lec-block{margin-top:44px}
+    .lec-spines{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.lec-spine span{font-size:12px;padding:7px 7px 7px 10px}
     .lec-links{grid-template-columns:minmax(0,1fr)}
-    .lec-awards{gap:8px}.lec-award{font-size:12.5px;padding:12px 8px}
+    .lec-linea:has(a:nth-child(4)) a{padding:3px}
+    .lec-linea:has(a:nth-child(4)) b{width:30px;height:30px;font-size:10.5px}
+    .lec-linea:has(a:nth-child(4)) span{display:none}
+    .lec-tabs2 button{font-size:19px}
+    .lec-shelf{grid-template-columns:minmax(0,8.5rem) minmax(0,1fr) 2.2rem;gap:10px}
+    .lec-cita .q{font-size:17.5px}
   }
 </style>
 
@@ -342,7 +363,7 @@ auto_idioma: true
     sinTitulo: "(sin título)", verPerfil: "Ver su perfil completo", sigue: "Sigue leyendo", refEntrada: "Referencia a una entrada", vacioBlog: "Todavía no hay entradas publicadas.",
     ctaBlog: "Este blog se escribe en Aleph, la app de lectura para iPhone y iPad: subrayas, citas con su fuente y publicas lo que piensas de lo que lees.", notaBlog: "Este blog muestra solo lo que su autor decidió publicar.",
     titulo: "@" + alias + " en Aleph", leyendo: "Leyendo ahora", citas: "Lo que destaco de cada obra",
-    verTodas: function (n) { return "Ver las " + n; }, verMenos: "Ver menos", blog: "Mi blog",
+    verTodas: function (n) { return "Ver las " + n; }, verEstantes: function (n) { return "Ver los " + n; }, verMenos: "Ver menos", blog: "Mi blog",
     noEntrada: "Esta entrada ya no está.", noEntradaSub: "Su autor la despublicó o cambió de alias.", busco: "Lo que busco: ", tocaLibro: "Toca un libro para ver por qué está aquí.",
     destacados: "Destacados", llevo: "Lo que me llevo de mis obras leídas", ideas: "Mis ideas", conversacion: "Mi conversación",
     comprobada: "Mi año de lectura", logros: "Logros", enlaces: "Enlaces", estantes: "Mis estantes",
@@ -373,14 +394,14 @@ auto_idioma: true
     meses: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
     noHay: "No encontramos a @" + alias + ".", noHaySub: "Puede que haya cambiado de alias.",
     soloApp: "Este perfil se ve completo en la app.",
-    aC: " a. C.", tituloPagina: function (a) { return "@" + a + " en Aleph"; }, pag: "pág. "
+    aC: " a. C.", tituloPagina: function (a) { return "@" + a + " en Aleph"; }, pag: "pág. ", uH: "h", uMin: "min"
   }, en: {
     blogDe: function (n) { return n + "’s blog"; }, verVideo: "Play the video", compartir: "Share", copiado: "Link copied", todo: "All", tema: "Topic", temas: "Topics",
     minLectura: function (n) { return n + " min read"; }, citasMeta: function (n, l) { return n + (n === 1 ? " quote" : " quotes") + (l ? " from " + l + (l === 1 ? " book" : " books") : ""); },
     sinTitulo: "(untitled)", verPerfil: "See their full profile", sigue: "Keep reading", refEntrada: "Reference to a post", vacioBlog: "No posts published yet.",
     ctaBlog: "This blog is written in Aleph, the reading app for iPhone and iPad: highlight, quote with the source, and publish what you think about what you read.", notaBlog: "This blog shows only what its author chose to publish.",
     titulo: "@" + alias + " on Aleph", leyendo: "Reading now", citas: "What I highlight from each work",
-    verTodas: function (n) { return "See all " + n; }, verMenos: "See less", blog: "My blog",
+    verTodas: function (n) { return "See all " + n; }, verEstantes: function (n) { return "See all " + n; }, verMenos: "See less", blog: "My blog",
     noEntrada: "This post is no longer available.", noEntradaSub: "Its author unpublished it or changed their alias.", busco: "What I'm looking for: ", tocaLibro: "Tap a book to see why it's here.",
     destacados: "Featured", llevo: "What I take from the works I've read", ideas: "My ideas", conversacion: "My conversation",
     comprobada: "My year in reading", logros: "Achievements", enlaces: "Links", estantes: "My shelves",
@@ -412,14 +433,14 @@ auto_idioma: true
     meses: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     noHay: "We couldn't find @" + alias + ".", noHaySub: "They may have changed their alias.",
     soloApp: "The full profile is in the app.",
-    aC: " BC", tituloPagina: function (a) { return "@" + a + " on Aleph"; }, pag: "p. "
+    aC: " BC", tituloPagina: function (a) { return "@" + a + " on Aleph"; }, pag: "p. ", uH: "h", uMin: "min"
   }, fr: {
     blogDe: function (n) { return "Le blog de " + n; }, verVideo: "Lire la vidéo", compartir: "Partager", copiado: "Lien copié", todo: "Tout", tema: "Thème", temas: "Thèmes",
     minLectura: function (n) { return n + " min de lecture"; }, citasMeta: function (n, l) { return n + (n === 1 ? " citation" : " citations") + (l ? " de " + l + (l === 1 ? " livre" : " livres") : ""); },
     sinTitulo: "(sans titre)", verPerfil: "Voir son profil complet", sigue: "Continuer la lecture", refEntrada: "Référence à un article", vacioBlog: "Aucun article publié pour l’instant.",
     ctaBlog: "Ce blog est écrit dans Aleph, l’app de lecture pour iPhone et iPad : on surligne, on cite avec la source et on publie ce qu’on pense de ce qu’on lit.", notaBlog: "Ce blog ne montre que ce que son auteur a choisi de publier.",
     titulo: "@" + alias + " sur Aleph", leyendo: "En cours de lecture", citas: "Ce que je retiens de chaque œuvre",
-    verTodas: function (n) { return "Voir les " + n; }, verMenos: "Voir moins", blog: "Mon blog",
+    verTodas: function (n) { return "Voir les " + n; }, verEstantes: function (n) { return "Voir les " + n; }, verMenos: "Voir moins", blog: "Mon blog",
     noEntrada: "Cet article n’est plus disponible.", noEntradaSub: "Son auteur l’a dépublié ou a changé d’alias.", busco: "Ce que je cherche : ", tocaLibro: "Touchez un livre pour voir pourquoi il est ici.",
     destacados: "À la une", llevo: "Ce que je garde des œuvres lues", ideas: "Mes idées", conversacion: "Ma conversation",
     comprobada: "Mon année de lecture", logros: "Succès", enlaces: "Liens", estantes: "Mes étagères",
@@ -451,14 +472,14 @@ auto_idioma: true
     meses: ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
     noHay: "Impossible de trouver @" + alias + ".", noHaySub: "L’alias a peut-être changé.",
     soloApp: "Le profil complet est dans l’app.",
-    aC: " av. J.-C.", tituloPagina: function (a) { return "@" + a + " sur Aleph"; }, pag: "p. "
+    aC: " av. J.-C.", tituloPagina: function (a) { return "@" + a + " sur Aleph"; }, pag: "p. ", uH: "h", uMin: "min"
   }, pt: {
     blogDe: function (n) { return "O blog de " + n; }, verVideo: "Reproduzir o vídeo", compartir: "Compartilhar", copiado: "Link copiado", todo: "Tudo", tema: "Tema", temas: "Temas",
     minLectura: function (n) { return n + " min de leitura"; }, citasMeta: function (n, l) { return n + (n === 1 ? " citação" : " citações") + (l ? " de " + l + (l === 1 ? " livro" : " livros") : ""); },
     sinTitulo: "(sem título)", verPerfil: "Ver o perfil completo", sigue: "Continue lendo", refEntrada: "Referência a um post", vacioBlog: "Ainda não há posts publicados.",
     ctaBlog: "Este blog é escrito no Aleph, o app de leitura para iPhone e iPad: você destaca, cita com a fonte e publica o que pensa sobre o que lê.", notaBlog: "Este blog mostra só o que o autor decidiu publicar.",
     titulo: "@" + alias + " no Aleph", leyendo: "Lendo agora", citas: "O que destaco de cada obra",
-    verTodas: function (n) { return "Ver as " + n; }, verMenos: "Ver menos", blog: "Meu blog",
+    verTodas: function (n) { return "Ver as " + n; }, verEstantes: function (n) { return "Ver as " + n; }, verMenos: "Ver menos", blog: "Meu blog",
     noEntrada: "Este post não está mais disponível.", noEntradaSub: "O autor despublicou ou mudou de alias.", busco: "O que procuro: ", tocaLibro: "Toque num livro para ver por que ele está aqui.",
     destacados: "Destaques", llevo: "O que levo das obras que li", ideas: "Minhas ideias", conversacion: "Minha conversa",
     comprobada: "Meu ano de leitura", logros: "Conquistas", enlaces: "Links", estantes: "Minhas estantes",
@@ -490,14 +511,14 @@ auto_idioma: true
     meses: ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"],
     noHay: "Não encontramos @" + alias + ".", noHaySub: "Talvez o alias tenha mudado.",
     soloApp: "O perfil completo está no app.",
-    aC: " a.C.", tituloPagina: function (a) { return "@" + a + " no Aleph"; }, pag: "p. "
+    aC: " a.C.", tituloPagina: function (a) { return "@" + a + " no Aleph"; }, pag: "p. ", uH: "h", uMin: "min"
   }, ru: {
     blogDe: function (n) { return "Блог: " + n; }, verVideo: "Смотреть видео", compartir: "Поделиться", copiado: "Ссылка скопирована", todo: "Все", tema: "Тема", temas: "Темы",
     minLectura: function (n) { return n + " мин чтения"; }, citasMeta: function (n, l) { return n + " " + pl(n, ["цитата", "цитаты", "цитат"]) + (l ? " из " + l + " " + pl(l, ["книги", "книг", "книг"]) : ""); },
     sinTitulo: "(без названия)", verPerfil: "Открыть полный профиль", sigue: "Читать дальше", refEntrada: "Ссылка на запись", vacioBlog: "Пока нет опубликованных записей.",
     ctaBlog: "Этот блог ведётся в Aleph, приложении для чтения на iPhone и iPad: выделяйте, цитируйте с указанием источника и публикуйте мысли о прочитанном.", notaBlog: "В этом блоге только то, что автор решил опубликовать.",
     titulo: "@" + alias + " в Aleph", leyendo: "Сейчас читаю", citas: "Что я выделяю в каждом произведении",
-    verTodas: function (n) { return "Показать все " + n; }, verMenos: "Свернуть", blog: "Мой блог",
+    verTodas: function (n) { return "Показать все " + n; }, verEstantes: function (n) { return "Показать все " + n; }, verMenos: "Свернуть", blog: "Мой блог",
     noEntrada: "Этой записи больше нет.", noEntradaSub: "Автор снял её с публикации или сменил alias.", busco: "Что я ищу: ", tocaLibro: "Нажмите на книгу, чтобы узнать, почему она здесь.",
     destacados: "Избранное", llevo: "Что я вынес(ла) из прочитанного", ideas: "Мои идеи", conversacion: "Мой разговор",
     comprobada: "Мой год чтения", logros: "Достижения", enlaces: "Ссылки", estantes: "Мои полки",
@@ -529,7 +550,7 @@ auto_idioma: true
     meses: ["январь", "февраль", "март", "апрель", "май", "июнь", "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"],
     noHay: "Не удалось найти @" + alias + ".", noHaySub: "Возможно, alias изменился.",
     soloApp: "Полный профиль доступен в приложении.",
-    aC: " до н. э.", tituloPagina: function (a) { return "@" + a + " в Aleph"; }, pag: "с. "
+    aC: " до н. э.", tituloPagina: function (a) { return "@" + a + " в Aleph"; }, pag: "с. ", uH: "ч", uMin: "мин"
   } };
   var T = DICC[loc];
   if (loc !== "en") document.documentElement.lang = loc;
@@ -1265,9 +1286,10 @@ auto_idioma: true
 
   function horas(min) {
     min = Math.round(min || 0);
-    if (min >= 600) return Math.round(min / 60) + " h";
-    if (min >= 60) return min % 60 === 0 ? (min / 60) + " h" : Math.floor(min / 60) + " h " + (min % 60) + " min";
-    return min + " min";
+    var h = "\u00a0" + T.uH, m = "\u00a0" + T.uMin;
+    if (min >= 600) return Math.round(min / 60) + h;
+    if (min >= 60) return min % 60 === 0 ? (min / 60) + h : Math.floor(min / 60) + h + " " + (min % 60) + m;
+    return min + m;
   }
   function flama() {
     var ns = "http://www.w3.org/2000/svg";
@@ -1316,8 +1338,10 @@ auto_idioma: true
     var ln = el("div", "lec-linea");
     enl.forEach(function (e) {
       var a = el("a"); a.href = urlRed(e.plataforma, e.valor); a.rel = "me noopener nofollow"; a.target = "_blank";
-      a.appendChild(el("b", null, MONO[e.plataforma] || "·"));
-      a.appendChild(el("span", null, visible(e.plataforma, e.valor)));
+      a.title = visible(e.plataforma, e.valor); a.setAttribute("aria-label", a.title);
+      var mono = el("b", null, MONO[e.plataforma] || "·"); mono.setAttribute("aria-hidden", "true");
+      a.appendChild(mono);
+      a.appendChild(el("span", null, a.title));
       ln.appendChild(a);
     });
     raiz.appendChild(ln);
@@ -1343,14 +1367,17 @@ auto_idioma: true
     return b;
   }
   function pintaLibro(padre, l, grande) {
-    if (l.releyendo) padre.appendChild(el("div", "r", T.releyendo));
-    padre.appendChild(el("div", "t", l.titulo));
-    if (l.autor) padre.appendChild(el("div", "a", l.autor));
-    if (grande && l.busco) padre.appendChild(el("div", "b", T.busco + l.busco));
+    var fila = el("div", "lec-libro"), lomo = el("span", "lomo"), x = el("div", "x");
+    lomo.style.background = PALETA[l.color] || PALETA[5]; lomo.setAttribute("aria-hidden", "true");
+    fila.appendChild(lomo); fila.appendChild(x); padre.appendChild(fila);
+    if (l.releyendo) x.appendChild(el("div", "r", T.releyendo));
+    x.appendChild(el("div", "t", l.titulo));
+    if (l.autor) x.appendChild(el("div", "a", l.autor));
+    if (grande && l.busco) x.appendChild(el("div", "b", T.busco + l.busco));
     if (l.progreso > 0 && !l.releyendo) {
       var pr = el("div", "p"), sp = el("span"), i = el("i");
       i.style.width = Math.min(100, l.progreso) + "%"; sp.appendChild(i); pr.appendChild(sp);
-      pr.appendChild(document.createTextNode(l.progreso + " %")); padre.appendChild(pr);
+      pr.appendChild(document.createTextNode(l.progreso + " %")); x.appendChild(pr);
     }
   }
   function leyendoLista(lista) {
@@ -1378,7 +1405,7 @@ auto_idioma: true
       if (!(c.horasComprobadas > 0 || c.terminadosAnio > 0)) return null;
       d = caja(T.comprobada);
       var st = el("div", "lec-stats");
-      [[c.horasComprobadas + " h", T.horas], [String(c.terminadosAnio || 0), T.libros(c.terminadosAnio || 0)]].forEach(function (p) {
+      [[c.horasComprobadas + "\u00a0" + T.uH, T.horas], [String(c.terminadosAnio || 0), T.libros(c.terminadosAnio || 0)]].forEach(function (p) {
         var x = el("div", "lec-card lec-stat"); x.appendChild(el("div", "n", p[0])); x.appendChild(el("div", "l", p[1])); st.appendChild(x);
       });
       d.appendChild(st); return d;
@@ -1472,7 +1499,7 @@ auto_idioma: true
         var f = el("div", "lec-fila"), izq = el("div"), fecha = fechaSwift(t.fecha);
         izq.appendChild(el("div", null, t.titulo)); if (t.autor) izq.appendChild(el("div", "f", t.autor));
         f.appendChild(izq);
-        f.appendChild(el("div", "s", [fecha ? T.meses[fecha.getMonth()] : "", t.horas ? t.horas + " h" : ""].filter(Boolean).join(" · ")));
+        f.appendChild(el("div", "s", [fecha ? T.meses[fecha.getMonth()] : "", t.horas ? t.horas + "\u00a0" + T.uH : ""].filter(Boolean).join(" · ")));
         lt.appendChild(f);
       });
       b.appendChild(lt);
@@ -1484,7 +1511,7 @@ auto_idioma: true
         var f = el("div", "lec-fila"), fecha = fechaSwift(s.fecha);
         var txt = (fecha ? new Intl.DateTimeFormat(loc, { day: "numeric", month: "short" }).format(fecha) + " · " : "") + (s.titulo || T.otroLibro);
         f.appendChild(el("div", s.titulo ? null : "f", txt));
-        f.appendChild(el("div", "s", s.minutos + " min" + (s.comprobada ? " ✓" : "")));
+        f.appendChild(el("div", "s", s.minutos + "\u00a0" + T.uMin + (s.comprobada ? " ✓" : "")));
         ls.appendChild(f);
       });
       b.appendChild(ls);
@@ -1508,7 +1535,35 @@ auto_idioma: true
     "checkmark.seal.fill": "✅", "eye.fill": "👁️", "globe.americas.fill": "🌎", "lightbulb.fill": "💡", "link": "🔗", "moon.stars.fill": "🌙",
     "person.crop.circle.badge.checkmark": "🤝", "person.text.rectangle.fill": "🪪", "questionmark.diamond.fill": "❓", "signpost.right.fill": "🪧",
     "square.and.pencil": "✍️", "sun.max.fill": "☀️", "text.book.closed.fill": "📘", "network": "🕸️", "hourglass": "⏳", "highlighter": "🖍️",
-    "brain.head.profile": "🧠", "atom": "⚛️" };
+    "brain.head.profile": "🧠", "atom": "⚛️", "moon.haze.fill": "🌙", "cloud.rain.fill": "🌧️" };
+  var LOGROS = {
+    genesis: { ic: "📕", es: ["Génesis", "Añade tu primer libro"], en: ["Genesis", "Add your first book"], fr: ["Genèse", "Ajoutez votre premier livre"], pt: ["Gênesis", "Adicione seu primeiro livro"], ru: ["Бытие", "Добавьте первую книгу"] },
+    atomico: { ic: "🖍️", es: ["Atómico", "Tu primer subrayado"], en: ["Atomic", "Your first highlight"], fr: ["Atomique", "Votre premier surlignage"], pt: ["Atômico", "Seu primeiro destaque"], ru: ["Атомарный", "Ваше первое выделение"] },
+    escribano: { ic: "✍️", es: ["Escribano", "Tu primera nota"], en: ["Scribe", "Your first note"], fr: ["Scribe", "Votre première note"], pt: ["Escriba", "Sua primeira nota"], ru: ["Писарь", "Ваша первая заметка"] },
+    presento: { ic: "🔗", es: ["Nice to meet you", "Tu primera relación entre libros"], en: ["Nice to meet you", "Your first relation between books"], fr: ["Enchanté", "Votre première relation entre livres"], pt: ["Muito prazer", "Sua primeira relação entre livros"], ru: ["Приятно познакомиться", "Ваша первая связь между книгами"] },
+    dontknow: { ic: "❓", es: ["Solo sé que no sé nada", "Registra tu primera duda"], en: ["All I know is that I know nothing", "Log your first question"], fr: ["Je sais que je ne sais rien", "Notez votre première question"], pt: ["Só sei que nada sei", "Registre sua primeira dúvida"], ru: ["Я знаю, что ничего не знаю", "Запишите свой первый вопрос"] },
+    nativo: { ic: "📘", es: ["Nativo", "Termina un libro en tu lengua madre"], en: ["Native", "Finish a book in your mother tongue"], fr: ["Natif", "Terminez un livre dans votre langue maternelle"], pt: ["Nativo", "Termine um livro na sua língua materna"], ru: ["Носитель языка", "Дочитайте книгу на родном языке"] },
+    roadless: { ic: "🪧", es: ["The road less traveled", "Completa una sesión de estudio"], en: ["The road less traveled", "Complete a study session"], fr: ["Le chemin le moins fréquenté", "Terminez une séance d’étude"], pt: ["A estrada menos percorrida", "Conclua uma sessão de estudo"], ru: ["Нехоженая дорога", "Завершите учебную сессию"] },
+    verificado: { ic: "👁️", es: ["Lectura Verificada", "Sesión con atención monitoreada"], en: ["Verified reading", "A session with attention tracking"], fr: ["Lecture vérifiée", "Une séance avec suivi de l’attention"], pt: ["Leitura verificada", "Uma sessão com atenção monitorada"], ru: ["Чтение с проверкой", "Сессия с контролем внимания"] },
+    noche: { ic: "🌙", es: ["Una noche fría, oscura y solitaria", "Lee de noche, entre las 10\u00a0p.\u00a0m. y las 5\u00a0a.\u00a0m."], en: ["A cold, dark and lonely night", "Read at night, between 10\u00a0p.m. and 5\u00a0a.m."], fr: ["Une nuit froide, sombre et solitaire", "Lisez la nuit, entre 22\u00a0h et 5\u00a0h"], pt: ["Uma noite fria, escura e solitária", "Leia à noite, entre 22h e 5h"], ru: ["Холодная, тёмная, одинокая ночь", "Читайте ночью, с 22:00 до 5:00"] },
+    gatolluvia: { ic: "🌧️", es: ["El gato bajo la lluvia", "Lee una tarde de lluvia"], en: ["Cat in the Rain", "Read on a rainy afternoon"], fr: ["Le Chat sous la pluie", "Lisez un après-midi de pluie"], pt: ["Gato na chuva", "Leia numa tarde de chuva"], ru: ["Кошка под дождём", "Почитайте в дождливый день"] },
+    bibliotecario: { ic: "📚", es: ["Bibliotecario", "3 categorías con 3 libros cada una"], en: ["Librarian", "3 categories with 3 books each"], fr: ["Bibliothécaire", "3 catégories de 3 livres chacune"], pt: ["Bibliotecário", "3 categorias com 3 livros cada"], ru: ["Библиотекарь", "3 категории по 3 книги в каждой"] },
+    bilingue: { ic: "📖", es: ["Bilingüe", "Termina un libro en un 2.º idioma"], en: ["Bilingual", "Finish a book in a second language"], fr: ["Bilingue", "Terminez un livre dans une deuxième langue"], pt: ["Bilíngue", "Termine um livro num segundo idioma"], ru: ["Билингв", "Дочитайте книгу на втором языке"] },
+    coleccionista: { ic: "⏳", es: ["Coleccionista", "3 libros de más de 100 años"], en: ["Collector", "3 books over 100 years old"], fr: ["Collectionneur", "3 livres de plus de 100 ans"], pt: ["Colecionador", "3 livros com mais de 100 anos"], ru: ["Коллекционер", "3 книги старше 100 лет"] },
+    alrededorsol: { ic: "☀️", es: ["Alrededor del sol", "Agrega un autor contemporáneo"], en: ["Around the sun", "Add a contemporary author"], fr: ["Autour du soleil", "Ajoutez un auteur contemporain"], pt: ["Ao redor do sol", "Adicione um autor contemporâneo"], ru: ["Вокруг солнца", "Добавьте современного автора"] },
+    atardecer: { ic: "🌅", es: ["57 años, 7 meses…", "57 años, 7 meses y 11 días, con sus noches. Agrega a un autor que ya vio su último atardecer."], en: ["57 years, 7 months…", "57 years, 7 months and 11 days and nights. Add an author who has already seen their last sunset."], fr: ["57 ans, 7 mois…", "57 ans, 7 mois et 11 jours et nuits. Ajoutez un auteur qui a déjà vu son dernier coucher de soleil."], pt: ["57 anos, 7 meses…", "57 anos, 7 meses e 11 dias, com suas noites. Adicione um autor que já viu seu último pôr do sol."], ru: ["57 лет, 7 месяцев…", "57 лет, 7 месяцев и 11 дней и ночей. Добавьте автора, который уже видел свой последний закат."] },
+    lookinggood: { ic: "🪪", es: ["Looking good", "Completa la ficha de un autor"], en: ["Looking good", "Complete an author's profile"], fr: ["Fière allure", "Complétez la fiche d’un auteur"], pt: ["Caprichado", "Complete a ficha de um autor"], ru: ["Красота", "Заполните карточку автора"] },
+    perfil_full: { ic: "🪶", es: ["Confieso que he vivido", "Completa tu perfil de usuario"], en: ["I Confess That I Have Lived", "Complete your user profile"], fr: ["J’avoue que j’ai vécu", "Complétez votre profil"], pt: ["Confesso que vivi", "Complete seu perfil"], ru: ["Признаюсь: я жил", "Заполните свой профиль"] },
+    erudito: { ic: "💡", es: ["Erudito", "Resuelve 5 dudas"], en: ["Erudite", "Resolve 5 questions"], fr: ["Érudit", "Résolvez 5 questions"], pt: ["Erudito", "Resolva 5 dúvidas"], ru: ["Эрудит", "Решите 5 вопросов"] },
+    polimata: { ic: "🧠", es: ["Polímata", "Libros en 5 categorías distintas"], en: ["Polymath", "Books in 5 different categories"], fr: ["Polymathe", "Des livres dans 5 catégories différentes"], pt: ["Polímata", "Livros em 5 categorias diferentes"], ru: ["Энциклопедист", "Книги в 5 разных категориях"] },
+    poliglota: { ic: "🌎", es: ["Políglota", "Termina un libro en un 3.er idioma"], en: ["Polyglot", "Finish a book in a third language"], fr: ["Polyglotte", "Terminez un livre dans une troisième langue"], pt: ["Poliglota", "Termine um livro num terceiro idioma"], ru: ["Полиглот", "Дочитайте книгу на третьем языке"] },
+    menteatomica: { ic: "⚛️", es: ["Mente atómica", "50 subrayados · 20 notas · 5 relaciones"], en: ["Atomic mind", "50 highlights · 20 notes · 5 relations"], fr: ["Esprit atomique", "50 surlignages · 20 notes · 5 relations"], pt: ["Mente atômica", "50 destaques · 20 notas · 5 relações"], ru: ["Атомарный ум", "50 выделений · 20 заметок · 5 связей"] },
+    interconectado: { ic: "🕸️", es: ["Interconectado", "Crea 10 relaciones entre libros"], en: ["Interconnected", "Create 10 relations between books"], fr: ["Interconnecté", "Créez 10 relations entre livres"], pt: ["Interconectado", "Crie 10 relações entre livros"], ru: ["Всё связано", "Создайте 10 связей между книгами"] },
+    alexandria: { ic: "🏛️", es: ["¿La nueva Alejandría?", "Reúne 50 libros"], en: ["The new Alexandria?", "Gather 50 books"], fr: ["La nouvelle Alexandrie ?", "Rassemblez 50 livres"], pt: ["A nova Alexandria?", "Reúna 50 livros"], ru: ["Новая Александрия?", "Соберите 50 книг"] },
+    estantecompleto: { ic: "✅", es: ["Estante completo", "Termina todos los libros de una categoría (5 o más)"], en: ["Shelf complete", "Finish every book in a category (5 or more)"], fr: ["Étagère complète", "Terminez tous les livres d’une catégorie (5 ou plus)"], pt: ["Estante completa", "Termine todos os livros de uma categoria (5 ou mais)"], ru: ["Полка прочитана", "Дочитайте все книги одной категории (5 или больше)"] }
+  };
+  var LOGRO_POR_NOMBRE = { "Los presento": "presento", "Su último atardecer": "atardecer" };
+  Object.keys(LOGROS).forEach(function (k) { LOGRO_POR_NOMBRE[LOGROS[k].es[0]] = k; });
 
   function citasYLlevo(c) {
     var hayC = c.bloques.indexOf("citas") >= 0 && c.citas && c.citas.length;
@@ -1533,7 +1588,7 @@ auto_idioma: true
   }
   function caja(titulo) { var d = el("div", "lec-block"); d.appendChild(el("h2", null, titulo)); return d; }
   function cifrasInteres(i) {
-    return [[i.libros, T.intLibro], [i.horas, ["h", "h"]], [i.subrayados, T.intSub], [i.temas, T.intTema]]
+    return [[i.libros, T.intLibro], [i.horas, [T.uH, T.uH]], [i.subrayados, T.intSub], [i.temas, T.intTema]]
       .filter(function (p) { return p[0] > 0; })
       .map(function (p) { return p[0].toLocaleString(loc) + " " + (p[1].length === 3 ? pl(p[0], p[1]) : p[1][p[0] === 1 ? 0 : 1]); })
       .join(" · ");
@@ -1566,7 +1621,7 @@ auto_idioma: true
         if (!c.intereses || !c.intereses.length) return null;
         d = caja(T.intereses);
         c.intereses.forEach(function (i) {
-          var k = el("div", "lec-card lec-interes");
+          var k = el("div", "lec-item lec-interes");
           k.appendChild(el("div", "m", ((i.emoji || "") + " " + (i.nombre || "")).trim()));
           var cifras = cifrasInteres(i);
           if (cifras) k.appendChild(el("div", "k", cifras));
@@ -1578,7 +1633,7 @@ auto_idioma: true
         if (!c.frases || !c.frases.length) return null;
         d = caja(T.llevo);
         c.frases.forEach(function (f) {
-          var k = el("div", "lec-card");
+          var k = el("div", "lec-item");
           var fecha = fechaSwift(f.terminado);
           var meta = f.titulo + (fecha ? " · " + new Intl.DateTimeFormat(loc, { month: "short", year: "numeric" }).format(fecha) : "");
           k.appendChild(el("div", "k", meta));
@@ -1620,32 +1675,40 @@ auto_idioma: true
         if (!(c.horasComprobadas > 0 || c.terminadosAnio > 0)) return null;
         d = caja(T.comprobada);
         var st = el("div", "lec-stats");
-        [[c.horasComprobadas + " h", T.horas], [String(c.terminadosAnio || 0), T.libros(c.terminadosAnio || 0)]].forEach(function (p) {
+        [[c.horasComprobadas + "\u00a0" + T.uH, T.horas], [String(c.terminadosAnio || 0), T.libros(c.terminadosAnio || 0)]].forEach(function (p) {
           var k = el("div", "lec-card lec-stat"); k.appendChild(el("div", "n", p[0])); k.appendChild(el("div", "l", p[1])); st.appendChild(k);
         });
         d.appendChild(st); return d;
       case "estantes":
         if (!c.estantes || !c.estantes.length) return null;
         d = caja(T.estantes);
-        var ks = el("div", "lec-card");
-        if (typeof c.totalLibros === "number" && c.totalLibros > 0) {
-          var tq = el("div", "q", T.totalLibros(c.totalLibros)); tq.style.marginTop = "0"; ks.appendChild(tq);
-        }
+        var ks = el("div", "lec-estantes"), filasE = el("div"), todosE = false;
+        if (typeof c.totalLibros === "number" && c.totalLibros > 0) ks.appendChild(el("div", "q", T.totalLibros(c.totalLibros)));
         var mx = Math.max.apply(null, c.estantes.map(function (e) { return e.libros; }).concat([1]));
-        c.estantes.forEach(function (e) {
-          var row = el("div", "lec-shelf");
-          row.appendChild(el("span", "nm", e.nombre));
-          var bar = el("span", "bar"), fill = el("i");
-          fill.style.width = Math.max(3, 100 * e.libros / mx) + "%";
-          bar.appendChild(fill); row.appendChild(bar);
-          row.appendChild(el("span", "n", String(e.libros)));
-          ks.appendChild(row);
-        });
+        var pintarEstantes = function () {
+          filasE.textContent = "";
+          (todosE ? c.estantes : c.estantes.slice(0, 8)).forEach(function (e) {
+            var row = el("div", "lec-shelf");
+            row.appendChild(el("span", "nm", e.nombre)); row.title = e.nombre;
+            var bar = el("span", "bar"), fill = el("i");
+            fill.style.width = Math.max(3, 100 * e.libros / mx) + "%";
+            bar.appendChild(fill); row.appendChild(bar);
+            row.appendChild(el("span", "n", String(e.libros)));
+            filasE.appendChild(row);
+          });
+          if (c.estantes.length > 8) {
+            var b = el("button", "lec-mas", todosE ? T.verMenos : T.verEstantes(c.estantes.length)); b.type = "button";
+            b.addEventListener("click", function () { todosE = !todosE; pintarEstantes(); });
+            filasE.appendChild(b);
+          }
+        };
+        pintarEstantes();
+        ks.appendChild(filasE);
         d.appendChild(ks); return d;
       case "citas":
         if (!c.citas || !c.citas.length) return null;
         d = caja(T.citas);
-        var kc = el("div", "lec-card");
+        var kc = el("div", "lec-citas");
         var abiertas = false;
         function pintarCitas() {
           kc.textContent = "";
@@ -1678,9 +1741,12 @@ auto_idioma: true
         d = caja(T.logros);
         var lg = el("div", "lec-awards");
         c.logros.forEach(function (l) {
-          var ic = ICONOS[l.icono], x = el("div", "lec-card lec-award" + (ic ? " con" : ""));
-          if (ic) x.appendChild(el("span", "ic", ic));
-          x.appendChild(document.createTextNode(l.nombre)); lg.appendChild(x);
+          var def = LOGROS[l.id] || LOGROS[LOGRO_POR_NOMBRE[l.nombre]], tx = def ? def[loc] || def.en : null;
+          var ic = def ? def.ic : ICONOS[l.icono], x = el("div", "lec-award"), m = el("span", "ic" + (ic ? "" : " sin"), ic || ""), txt = el("div", "x");
+          m.setAttribute("aria-hidden", "true");
+          txt.appendChild(el("div", "t", tx ? tx[0] : l.nombre));
+          if (tx && tx[1]) txt.appendChild(el("div", "d", tx[1]));
+          x.appendChild(m); x.appendChild(txt); lg.appendChild(x);
         });
         d.appendChild(lg); return d;
       case "enlaces":

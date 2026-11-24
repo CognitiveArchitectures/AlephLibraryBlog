@@ -81,6 +81,26 @@ auto_idioma: true
   .cl-res .a{font-size:13px;color:var(--ink-soft)}
   .cl-estado{padding:14px 18px;font-size:14px;color:var(--ink-faint)}
   .cl-oculto{position:absolute;left:-9999px}
+  /* «Mis favoritos para…» (2026-11-24): tarjetas de 3 libros para un carrusel. */
+  .cl-modo{margin-bottom:24px}
+  .cl-tarjetas{display:grid;gap:14px}
+  .cl-tj{border:1px solid var(--hair);border-radius:16px;padding:14px;background:var(--surface);display:grid;gap:12px;cursor:pointer}
+  .cl-tj[aria-current="true"]{border-color:var(--rubric);box-shadow:0 0 0 1px var(--rubric)}
+  .cl-tj-cab{display:flex;align-items:center;gap:10px}
+  .cl-tj-cab .n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+  .cl-tj-cab button{margin-left:auto;font:inherit;font-size:13px;border:0;background:none;color:var(--ink-faint);cursor:pointer;padding:4px}
+  .cl-tj-cab button:hover{color:var(--rubric)}
+  .cl-para{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .cl-para span{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:17px;color:var(--ink-soft);white-space:nowrap}
+  .cl-para input{flex:1;min-width:160px}
+  .cl-tj .cl-grid{gap:10px}
+  .cl-mas{font:inherit;font-size:14px;font-weight:600;border:1.5px dashed var(--hair-strong);border-radius:14px;background:none;color:var(--ink-soft);padding:12px;cursor:pointer;width:100%}
+  .cl-mas:hover{border-color:var(--rubric);color:var(--rubric)}
+  .cl-mas:disabled{opacity:.45;cursor:default}
+  .cl-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 0 12px}
+  .cl-nav button{width:38px;height:38px;border-radius:19px;border:1px solid var(--hair-strong);background:var(--surface);color:var(--ink);font-size:16px;cursor:pointer}
+  .cl-nav button:disabled{opacity:.35;cursor:default}
+  .cl-nav span{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:13px;color:var(--ink-soft);min-width:52px;text-align:center}
 </style>
 
 <section class="compartir">
@@ -91,6 +111,7 @@ auto_idioma: true
 
     <div class="cl-layout">
       <div>
+        <div class="cl-seg cl-modo" id="cl-modo" role="group" aria-label="Mode"></div>
         <div class="cl-sec" data-t="secTu">You</div>
         <div class="cl-campos">
           <div class="cl-yo">
@@ -108,6 +129,7 @@ auto_idioma: true
           </div>
           <label><span data-t="lBio">A line about you (optional)</span><input class="cl-input" id="cl-bio" maxlength="80" autocomplete="off"></label>
         </div>
+        <div id="cl-modo-grid">
         <div class="cl-sec" data-t="secLista">Your list</div>
         <div class="cl-campos">
           <label><span data-t="lTitulo">Title</span><input class="cl-input" id="cl-titulo" maxlength="60" autocomplete="off"></label>
@@ -119,6 +141,13 @@ auto_idioma: true
           <label><span data-t="lFrase">A sentence from one of your books (optional)</span><textarea class="cl-input" id="cl-frase" maxlength="220" rows="3"></textarea></label>
           <label><span data-t="lFraseLibro">From</span><select class="cl-input" id="cl-frase-libro"></select></label>
         </div>
+        </div>
+        <div id="cl-modo-para" hidden>
+          <div class="cl-sec" data-t="secTarjetas">Your cards</div>
+          <div class="cl-tarjetas" id="cl-tarjetas"></div>
+          <button type="button" class="cl-mas" id="cl-otra" data-t="otraTarjeta">+ Another card</button>
+          <p class="cl-hint" data-t="hintPara">Each card: a title and up to 3 books. Post them together as a carousel.</p>
+        </div>
         <div class="cl-sec" data-t="secDiseno">Design</div>
         <div class="cl-diseno">
           <div class="cl-seg" id="cl-formato" role="group" aria-label="Format"></div>
@@ -126,11 +155,17 @@ auto_idioma: true
         </div>
       </div>
       <div class="cl-preview">
+        <div class="cl-nav" id="cl-nav" hidden>
+          <button type="button" id="cl-ant" aria-label="Previous card">←</button>
+          <span id="cl-pos">1 / 1</span>
+          <button type="button" id="cl-sig" aria-label="Next card">→</button>
+        </div>
         <canvas id="cl-canvas" width="1080" height="1350" role="img" aria-label="Preview of your image"></canvas>
         <div class="cl-acciones">
           <button type="button" class="btn btn-primary" id="cl-descargar" data-t="descargar">Download image</button>
           <button type="button" class="btn btn-ghost" id="cl-copiar" hidden data-t="copiar">Copy image</button>
           <button type="button" class="btn btn-ghost" id="cl-compartir" hidden data-t="compartir">Share</button>
+          <button type="button" class="btn btn-ghost" id="cl-todas" hidden>All cards</button>
           <button type="button" class="btn btn-ghost" id="cl-limpiar" data-t="limpiar">Start over</button>
         </div>
         <p class="cl-cta"><span data-t="cta">In Aleph, your favorite books carry the line that stayed with you and the hours you actually spent reading them.</span>
@@ -163,6 +198,7 @@ auto_idioma: true
     otroLibro: "Otro libro", post: "Publicación", historia: "Historia", papel: "Papel", noche: "Noche", rubrica: "Rúbrica",
     guardarFotos: "Guardar en Fotos", notaFotos: "En el menú, toca «Guardar imagen»: va a tu carrete.",
     lema: "Únete a la Gran Conversación",
+    modoGrid: "Cuadrícula", modoPara: "Mis favoritos para…", secTarjetas: "Tus tarjetas", lPara: "Mis favoritos para", eyebrowPara: "MIS FAVORITOS PARA", ejemplosPara: ["pensar con calma", "entender el poder", "un viaje largo", "leer en vacaciones"], otraTarjeta: "+ Otra tarjeta", quitarTarjeta: "Quitar", tarjeta: "Tarjeta", hintPara: "Cada tarjeta: un título y hasta 3 libros. Publícalas juntas como carrusel.", todas: function (n) { return "Todas (" + n + ")"; }, todasFotos: function (n) { return "Todas a Fotos (" + n + ")"; }, archivoPara: "favoritos-aleph", anterior: "Tarjeta anterior", siguiente: "Tarjeta siguiente",
     hint: "Toca un cuadro vacío para agregar un libro (hasta 9). Usa las flechas para ordenarlos.",
     descargar: "Descargar imagen", compartir: "Compartir", limpiar: "Empezar de nuevo", copiar: "Copiar imagen", copiada: "Copiada ✓", noCopio: "No se pudo copiar",
     cta: "En Aleph, tus libros favoritos llevan la frase que se te quedó y las horas que de verdad los leíste.",
@@ -183,6 +219,7 @@ auto_idioma: true
     otroLibro: "Another book", post: "Post", historia: "Story", papel: "Paper", noche: "Night", rubrica: "Rubric",
     guardarFotos: "Save to Photos", notaFotos: "In the menu, tap “Save Image”: it goes to your camera roll.",
     lema: "Join the Great Conversation",
+    modoGrid: "Grid", modoPara: "My favorites for…", secTarjetas: "Your cards", lPara: "My favorites for", eyebrowPara: "MY FAVORITES FOR", ejemplosPara: ["thinking slowly", "understanding power", "a long trip", "a summer off"], otraTarjeta: "+ Another card", quitarTarjeta: "Remove", tarjeta: "Card", hintPara: "Each card: a title and up to 3 books. Post them together as a carousel.", todas: function (n) { return "All cards (" + n + ")"; }, todasFotos: function (n) { return "All to Photos (" + n + ")"; }, archivoPara: "favorites-aleph", anterior: "Previous card", siguiente: "Next card",
     hint: "Tap an empty square to add a book (up to 9). Use the arrows to reorder.",
     descargar: "Download image", compartir: "Share", limpiar: "Start over", copiar: "Copy image", copiada: "Copied ✓", noCopio: "Couldn't copy",
     cta: "In Aleph, your favorite books carry the line that stayed with you and the hours you actually spent reading them.",
@@ -203,6 +240,7 @@ auto_idioma: true
     otroLibro: "Un autre livre", post: "Publication", historia: "Story", papel: "Papier", noche: "Nuit", rubrica: "Carmin",
     guardarFotos: "Enregistrer dans Photos", notaFotos: "Dans le menu, touchez « Enregistrer l’image » : elle va dans votre pellicule.",
     lema: "Rejoignez la Grande Conversation",
+    modoGrid: "Grille", modoPara: "Mes favoris pour…", secTarjetas: "Vos cartes", lPara: "Mes favoris pour", eyebrowPara: "MES FAVORIS POUR", ejemplosPara: ["penser lentement", "comprendre le pouvoir", "un long voyage", "les vacances"], otraTarjeta: "+ Une autre carte", quitarTarjeta: "Retirer", tarjeta: "Carte", hintPara: "Chaque carte : un titre et jusqu’à 3 livres. Publiez-les ensemble en carrousel.", todas: function (n) { return "Toutes (" + n + ")"; }, todasFotos: function (n) { return "Toutes dans Photos (" + n + ")"; }, archivoPara: "favoris-aleph", anterior: "Carte précédente", siguiente: "Carte suivante",
     hint: "Touchez une case vide pour ajouter un livre (jusqu’à 9). Utilisez les flèches pour changer l’ordre.",
     descargar: "Télécharger l’image", compartir: "Partager", limpiar: "Recommencer", copiar: "Copier l’image", copiada: "Copiée ✓", noCopio: "Impossible de copier",
     cta: "Dans Aleph, vos livres préférés gardent la phrase qui vous est restée et les heures que vous avez vraiment passées à les lire.",
@@ -223,6 +261,7 @@ auto_idioma: true
     otroLibro: "Outro livro", post: "Post", historia: "Story", papel: "Papel", noche: "Noite", rubrica: "Carmim",
     guardarFotos: "Salvar em Fotos", notaFotos: "No menu, toque em “Salvar Imagem”: ela vai para a sua fototeca.",
     lema: "Junte-se à Grande Conversa",
+    modoGrid: "Grade", modoPara: "Meus favoritos para…", secTarjetas: "Seus cartões", lPara: "Meus favoritos para", eyebrowPara: "MEUS FAVORITOS PARA", ejemplosPara: ["pensar com calma", "entender o poder", "uma viagem longa", "ler nas férias"], otraTarjeta: "+ Outro cartão", quitarTarjeta: "Remover", tarjeta: "Cartão", hintPara: "Cada cartão: um título e até 3 livros. Publique juntos como carrossel.", todas: function (n) { return "Todos (" + n + ")"; }, todasFotos: function (n) { return "Todos para Fotos (" + n + ")"; }, archivoPara: "favoritos-aleph", anterior: "Cartão anterior", siguiente: "Próximo cartão",
     hint: "Toque num quadro vazio para adicionar um livro (até 9). Use as setas para mudar a ordem.",
     descargar: "Baixar imagem", compartir: "Compartilhar", limpiar: "Começar de novo", copiar: "Copiar imagem", copiada: "Copiada ✓", noCopio: "Não foi possível copiar",
     cta: "No Aleph, seus livros favoritos guardam a frase que ficou com você e as horas que você realmente passou lendo cada um.",
@@ -243,6 +282,7 @@ auto_idioma: true
     otroLibro: "Другая книга", post: "Пост", historia: "Сторис", papel: "Бумага", noche: "Ночь", rubrica: "Кармин",
     guardarFotos: "Сохранить в Фото", notaFotos: "В меню нажмите «Сохранить изображение»: оно попадёт в вашу медиатеку.",
     lema: "Присоединяйтесь к Великому разговору",
+    modoGrid: "Сетка", modoPara: "Мои любимые для…", secTarjetas: "Ваши карточки", lPara: "Мои любимые для", eyebrowPara: "МОИ ЛЮБИМЫЕ ДЛЯ", ejemplosPara: ["неспешных размышлений", "понимания власти", "долгой дороги", "отпуска"], otraTarjeta: "+ Ещё карточка", quitarTarjeta: "Убрать", tarjeta: "Карточка", hintPara: "В каждой карточке — заголовок и до 3 книг. Публикуйте их вместе каруселью.", todas: function (n) { return "Все (" + n + ")"; }, todasFotos: function (n) { return "Все в Фото (" + n + ")"; }, archivoPara: "lyubimye-aleph", anterior: "Предыдущая карточка", siguiente: "Следующая карточка",
     hint: "Нажмите на пустую клетку, чтобы добавить книгу (до 9). Стрелками можно менять порядок.",
     descargar: "Скачать картинку", compartir: "Поделиться", limpiar: "Начать заново", copiar: "Копировать картинку", copiada: "Скопировано ✓", noCopio: "Не удалось скопировать",
     cta: "В Aleph ваши любимые книги хранят фразу, которая вам запомнилась, и часы, которые вы действительно провели за чтением.",
@@ -295,11 +335,21 @@ auto_idioma: true
   var PALETA = ["#7FA88B", "#6E8CB0", "#6FB0AE", "#9182B0", "#C08BA0", "#9A968F", "#CF9A6A"];
   var CLAVE = "aleph.compartirLibros";
   var vacios = function () { return [null, null, null, null, null, null, null, null, null]; };
-  var st = { libros: vacios(), titulo: "", red: "instagram", usuario: "", foto: "", bio: "", frase: "", fraseLibro: -1, formato: "post", tema: "papel" };
+  var tarjetaVacia = function () { return { titulo: "", libros: [null, null, null] }; };
+  var st = { libros: vacios(), titulo: "", red: "instagram", usuario: "", foto: "", bio: "", frase: "", fraseLibro: -1, formato: "post", tema: "papel",
+             modo: "grid", tarjetas: [tarjetaVacia()], actual: 0 };
   try {
     var g = JSON.parse(localStorage.getItem(CLAVE) || "null");
     if (g && Array.isArray(g.libros) && g.libros.length === 9) st = Object.assign(st, g);
   } catch (e) {}
+  if (!Array.isArray(st.tarjetas) || !st.tarjetas.length) st.tarjetas = [tarjetaVacia()];
+  st.tarjetas = st.tarjetas.slice(0, 8).map(function (c) {
+    var l = Array.isArray(c && c.libros) ? c.libros.slice(0, 3) : [];
+    while (l.length < 3) l.push(null);
+    return { titulo: (c && typeof c.titulo === "string") ? c.titulo : "", libros: l };
+  });
+  if (!(st.actual >= 0 && st.actual < st.tarjetas.length)) st.actual = 0;
+  if (st.modo !== "para") st.modo = "grid";
   function guardar() { try { localStorage.setItem(CLAVE, JSON.stringify(st)); } catch (e) {} }
 
   function el(tag, cls, texto) { var e = document.createElement(tag); if (cls) e.className = cls; if (texto != null) e.textContent = texto; return e; }
@@ -450,14 +500,19 @@ auto_idioma: true
   $q.placeholder = T.placeholder;
   document.getElementById("cl-cerrar").addEventListener("click", function () { $dlg.close(); });
   document.getElementById("cl-form").addEventListener("submit", function (e) { e.preventDefault(); buscar(); });
-  function abrirBusqueda(i) {
-    destino = i; $q.value = ""; $res.textContent = ""; $estado.textContent = "";
+  var alElegir = null;
+  function abrirBusqueda(i, cb) {
+    destino = i; alElegir = cb || null; $q.value = ""; $res.textContent = ""; $estado.textContent = "";
     if ($dlg.showModal) $dlg.showModal(); else $dlg.setAttribute("open", "");
     setTimeout(function () { $q.focus(); }, 30);
   }
   var espera = null, turno = 0;
   $q.addEventListener("input", function () { clearTimeout(espera); espera = setTimeout(buscar, 350); });
-  function elegir(libro) { st.libros[destino] = libro; $dlg.close(); cambio(); }
+  function elegir(libro) {
+    $dlg.close();
+    if (alElegir) { alElegir(libro); alElegir = null; return; }
+    st.libros[destino] = libro; cambio();
+  }
   function buscar() {
     var q = $q.value.trim();
     $res.textContent = "";
@@ -534,7 +589,8 @@ auto_idioma: true
     ctx.restore();
   }
 
-  function dibujar() {
+  function dibujar() { if (st.modo === "para") dibujarPara(st.tarjetas[st.actual] || tarjetaVacia(), st.actual); else dibujarCuadricula(); }
+  function dibujarCuadricula() {
     var historia = st.formato === "historia";
     var H = historia ? 1920 : 1350;
     if ($canvas.height !== H) $canvas.height = H;
@@ -643,6 +699,204 @@ auto_idioma: true
     ctx.textAlign = "left";
   }
 
+  // ---- «Mis favoritos para…» (2026-11-24): una tarjeta = un título y hasta 3 portadas, sobre papel.
+  function portadaEn(l, x, y, w, h, ang, sombra) {
+    ctx.save();
+    ctx.translate(x + w / 2, y + h / 2); ctx.rotate(ang); ctx.translate(-w / 2, -h / 2);
+    ctx.shadowColor = sombra; ctx.shadowBlur = 30; ctx.shadowOffsetY = 14;
+    redondo(0, 0, w, h, 10); ctx.fillStyle = colorDe(l.title); ctx.fill();
+    ctx.shadowColor = "transparent";
+    var im = imagen(l.cover);
+    redondo(0, 0, w, h, 10); ctx.clip();
+    if (im && im.complete && im.naturalWidth && !im.fallo) {
+      var r = Math.max(w / im.naturalWidth, h / im.naturalHeight), iw = im.naturalWidth * r, ih = im.naturalHeight * r;
+      ctx.drawImage(im, (w - iw) / 2, (h - ih) / 2, iw, ih);
+    } else {
+      ctx.fillStyle = "#F7F2E8"; ctx.font = "600 " + Math.round(w * 0.105) + "px " + SERIF;
+      var lt = lineas(l.title, w - 36, 5), ly = h - 26 - (lt.length - 1) * w * 0.125;
+      lt.forEach(function (s) { ctx.fillText(s, 18, ly); ly += w * 0.125; });
+      if (l.author) { ctx.font = "400 " + Math.round(w * 0.07) + "px " + SANS; ctx.fillText(lineas(l.author, w - 36, 1)[0], 18, 40); }
+    }
+    // Un filo apenas visible: una portada blanca no se pierde en el papel.
+    redondo(1, 1, w - 2, h - 2, 9); ctx.strokeStyle = "rgba(0,0,0,.10)"; ctx.lineWidth = 2; ctx.stroke();
+    ctx.restore();
+  }
+  function dibujarPara(c, indice) {
+    var historia = st.formato === "historia";
+    var H = historia ? 1920 : 1350;
+    if ($canvas.height !== H) $canvas.height = H;
+    var t = TEMAS[st.tema] || TEMAS.papel;
+    var arriba = historia ? 230 : 70, abajo = historia ? 250 : 0;
+    ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = t.fondo; ctx.fillRect(0, 0, W, H);
+    var lg = logoDe(t.tinta);
+    if (lg) { var lh = 36, lw = lg.width * lh / lg.height; ctx.drawImage(lg, M, arriba, lw, lh); }
+    var total = st.tarjetas.length;
+    if (total > 1) {
+      ctx.font = "600 22px " + SANS; ctx.fillStyle = t.suave; ctx.textAlign = "right";
+      ctx.fillText((indice + 1) + " / " + total, W - M, arriba + 28); ctx.textAlign = "left";
+    }
+    // El título: «MIS FAVORITOS PARA» chico y el tuyo grande.
+    var y = arriba + (historia ? 170 : 130);
+    ctx.font = "700 26px " + SANS; ctx.fillStyle = t.acento;
+    if ("letterSpacing" in ctx) ctx.letterSpacing = "6px";
+    ctx.fillText(T.eyebrowPara, M, y);
+    if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+    var titulo = (c.titulo || "").trim() || T.ejemplosPara[indice % T.ejemplosPara.length];
+    ctx.font = "700 " + (historia ? 88 : 80) + "px " + SERIF; ctx.fillStyle = t.tinta;
+    var ls = lineas(titulo, W - 2 * M, 3), paso = historia ? 96 : 88;
+    ls.forEach(function (l) { y += paso; ctx.fillText(l, M, y); });
+    // Las portadas: la del centro al frente, las de los lados un poco giradas detrás.
+    var libros = c.libros.filter(Boolean);
+    var lineaPie = H - abajo - 96, pieY = H - abajo - 52;
+    var listaAlto = libros.length ? libros.length * 40 + 30 : 0;
+    var zonaArriba = y + (historia ? 90 : 60), zonaAbajo = lineaPie - listaAlto - (historia ? 70 : 40);
+    var dispo = zonaAbajo - zonaArriba;
+    var sombra = st.tema === "papel" ? "rgba(32,29,24,.28)" : "rgba(0,0,0,.5)";
+    if (!libros.length) {
+      ctx.font = "italic 400 34px " + SERIF; ctx.fillStyle = t.suave; ctx.textAlign = "center";
+      ctx.fillText(T.vacio, W / 2, zonaArriba + dispo / 2); ctx.textAlign = "left";
+    } else {
+      var ch = Math.min(dispo, historia ? 760 : 620), cw = ch / 1.5;
+      var cx = W / 2, cy = zonaArriba + dispo / 2;
+      var lados = libros.length === 3 ? [libros[0], libros[2]] : libros.length === 2 ? [libros[0], libros[1]] : [];
+      var centro = libros.length === 3 ? libros[1] : libros.length === 1 ? libros[0] : null;
+      var sw = cw * 0.84, sh = ch * 0.84, sep = cw * 0.72;
+      if (libros.length === 2) {
+        portadaEn(lados[0], cx - sep * 0.62 - sw / 2, cy - sh / 2, sw, sh, -0.06, sombra);
+        portadaEn(lados[1], cx + sep * 0.62 - sw / 2, cy - sh / 2, sw, sh, 0.06, sombra);
+      } else {
+        if (lados.length) {
+          portadaEn(lados[0], cx - sep - sw / 2, cy - sh / 2 + 18, sw, sh, -0.09, sombra);
+          portadaEn(lados[1], cx + sep - sw / 2, cy - sh / 2 + 18, sw, sh, 0.09, sombra);
+        }
+        portadaEn(centro, cx - cw / 2, cy - ch / 2, cw, ch, 0, sombra);
+      }
+      // Debajo, la lista: así se lee aunque una portada no cargue.
+      var ly = zonaAbajo + (historia ? 70 : 52);
+      libros.forEach(function (l, i) {
+        ctx.font = "600 26px " + SANS; ctx.fillStyle = t.tinta;
+        var linea = (i + 1) + "  " + l.title + (l.author ? " — " + l.author : "");
+        ctx.fillText(lineas(linea, W - 2 * M, 1)[0], M, ly); ly += 40;
+      });
+    }
+    ctx.fillStyle = t.linea; ctx.fillRect(M, lineaPie, W - 2 * M, 1);
+    if (st.usuario) {
+      iconoRed(st.red, M, pieY - 25, 30, t.suave, t.fondo);
+      ctx.fillStyle = t.suave; ctx.font = "600 26px " + SANS; ctx.fillText("@" + st.usuario, M + 42, pieY);
+    } else {
+      ctx.font = "italic 400 25px " + SERIF; ctx.fillStyle = t.suave; ctx.fillText("Aleph · " + T.lema, M, pieY);
+    }
+    ctx.font = "600 22px " + SANS; ctx.fillStyle = t.acento; ctx.textAlign = "right";
+    ctx.fillText("alephlibrary.com", W - M, pieY); ctx.textAlign = "left";
+  }
+
+  var $modo = document.getElementById("cl-modo"), $modoGrid = document.getElementById("cl-modo-grid");
+  var $modoPara = document.getElementById("cl-modo-para"), $tarjetas = document.getElementById("cl-tarjetas");
+  var $otra = document.getElementById("cl-otra"), $nav = document.getElementById("cl-nav"), $pos = document.getElementById("cl-pos");
+  var $ant = document.getElementById("cl-ant"), $sig = document.getElementById("cl-sig"), $todas = document.getElementById("cl-todas");
+  $ant.setAttribute("aria-label", T.anterior); $sig.setAttribute("aria-label", T.siguiente);
+  function pintarModo() {
+    $modo.textContent = "";
+    [["grid", T.modoGrid], ["para", T.modoPara]].forEach(function (m) {
+      var b = el("button", null, m[1]); b.type = "button"; b.setAttribute("aria-pressed", String(st.modo === m[0]));
+      b.addEventListener("click", function () { st.modo = m[0]; guardar(); pintarModo(); dibujar(); });
+      $modo.appendChild(b);
+    });
+    var para = st.modo === "para";
+    $modoGrid.hidden = para; $modoPara.hidden = !para;
+    $nav.hidden = !para || st.tarjetas.length < 2;
+    $pos.textContent = (st.actual + 1) + " / " + st.tarjetas.length;
+    $ant.disabled = st.actual === 0; $sig.disabled = st.actual >= st.tarjetas.length - 1;
+    $todas.hidden = !(para && puedeArchivos && st.tarjetas.length > 1);
+    $todas.textContent = (aFotos ? T.todasFotos : T.todas)(st.tarjetas.length);
+    if (para) pintarTarjetas();
+  }
+  function elegirTarjeta(i) { if (i < 0 || i >= st.tarjetas.length || i === st.actual) return; st.actual = i; guardar(); pintarModo(); dibujar(); }
+  $ant.addEventListener("click", function () { elegirTarjeta(st.actual - 1); });
+  $sig.addEventListener("click", function () { elegirTarjeta(st.actual + 1); });
+  $otra.addEventListener("click", function () {
+    if (st.tarjetas.length >= 8) return;
+    st.tarjetas.push(tarjetaVacia()); st.actual = st.tarjetas.length - 1; guardar(); pintarModo(); dibujar();
+  });
+  function pintarTarjetas() {
+    $tarjetas.textContent = "";
+    $otra.disabled = st.tarjetas.length >= 8;
+    st.tarjetas.forEach(function (c, k) {
+      var caja = el("div", "cl-tj"); caja.setAttribute("aria-current", String(k === st.actual));
+      caja.addEventListener("click", function (e) { if (e.target === caja || e.target.classList.contains("cl-tj-cab")) elegirTarjeta(k); });
+      caja.addEventListener("focusin", function () { elegirTarjeta(k); });
+      var cab = el("div", "cl-tj-cab"); cab.appendChild(el("span", "n", T.tarjeta + " " + (k + 1)));
+      if (st.tarjetas.length > 1) {
+        var q = el("button", null, T.quitarTarjeta); q.type = "button";
+        q.addEventListener("click", function (e) {
+          e.stopPropagation(); st.tarjetas.splice(k, 1); st.actual = Math.min(st.actual, st.tarjetas.length - 1);
+          guardar(); pintarModo(); dibujar();
+        });
+        cab.appendChild(q);
+      }
+      caja.appendChild(cab);
+      var fila = el("label", "cl-para"); fila.appendChild(el("span", null, T.lPara));
+      var inp = el("input", "cl-input"); inp.maxLength = 48; inp.autocomplete = "off"; inp.value = c.titulo;
+      inp.placeholder = T.ejemplosPara[k % T.ejemplosPara.length];
+      inp.addEventListener("input", function () { c.titulo = inp.value; guardar(); if (k === st.actual) dibujar(); });
+      fila.appendChild(inp); caja.appendChild(fila);
+      var g3 = el("div", "cl-grid");
+      c.libros.forEach(function (l, i) {
+        if (!l) {
+          var b = el("button", "cl-slot", "+"); b.type = "button"; b.setAttribute("aria-label", T.agregar + " " + (i + 1));
+          b.addEventListener("click", function () {
+            st.actual = k;
+            abrirBusqueda(i, function (libro) { c.libros[i] = libro; guardar(); pintarModo(); dibujar(); });
+          });
+          g3.appendChild(b); return;
+        }
+        var d = el("div", "cl-slot lleno");
+        if (l.cover) { var im = el("img"); im.src = portadaURL(l.cover, "M"); im.alt = l.title; im.loading = "lazy"; d.appendChild(im); }
+        else { var s = el("div", "sin", l.title); s.style.background = colorDe(l.title); d.appendChild(s); }
+        var ctl = el("div", "cl-ctl");
+        var iz = el("button", null, "←"); iz.type = "button"; iz.disabled = i === 0; iz.setAttribute("aria-label", T.mover + " ←");
+        var x = el("button", null, "✕"); x.type = "button"; x.setAttribute("aria-label", T.quitar + ": " + l.title);
+        var de = el("button", null, "→"); de.type = "button"; de.disabled = i === 2; de.setAttribute("aria-label", T.mover + " →");
+        iz.addEventListener("click", function () { var tmp = c.libros[i - 1]; c.libros[i - 1] = c.libros[i]; c.libros[i] = tmp; st.actual = k; guardar(); pintarModo(); dibujar(); });
+        de.addEventListener("click", function () { var tmp = c.libros[i + 1]; c.libros[i + 1] = c.libros[i]; c.libros[i] = tmp; st.actual = k; guardar(); pintarModo(); dibujar(); });
+        x.addEventListener("click", function () { c.libros[i] = null; st.actual = k; guardar(); pintarModo(); dibujar(); });
+        ctl.appendChild(iz); ctl.appendChild(x); ctl.appendChild(de); d.appendChild(ctl);
+        d.title = l.title + (l.author ? " — " + l.author : "");
+        g3.appendChild(d);
+      });
+      caja.appendChild(g3);
+      $tarjetas.appendChild(caja);
+    });
+  }
+  // Todas las tarjetas como archivos (carrusel): espera las portadas y dibuja cada una.
+  function esperarPortadas(listo) {
+    var ids = []; st.tarjetas.forEach(function (c) { c.libros.forEach(function (l) { if (l && l.cover) ids.push(l.cover); }); });
+    ids.forEach(imagen);
+    var intentos = 0;
+    (function revisar() {
+      var faltan = ids.some(function (id) { var im = imgs[id]; return im && !im.complete && !im.fallo; });
+      if (faltan && intentos++ < 40) setTimeout(revisar, 100); else listo();
+    })();
+  }
+  function archivosTodas(cb) {
+    esperarPortadas(function () {
+      var guardada = st.actual, archivos = [], k = 0;
+      (function siguiente() {
+        if (k >= st.tarjetas.length) { st.actual = guardada; dibujar(); cb(archivos); return; }
+        dibujarPara(st.tarjetas[k], k);
+        var n = k;
+        $canvas.toBlob(function (b) {
+          if (b) archivos.push(new File([b], T.archivoPara + "-" + (n + 1) + ".png", { type: "image/png" }));
+          k++; siguiente();
+        }, "image/png");
+      })();
+    });
+  }
+  $todas.addEventListener("click", function () {
+    archivosTodas(function (fs) { if (fs.length) navigator.share({ files: fs }).catch(function () {}); });
+  });
+
   function archivo(cb) { $canvas.toBlob(function (b) { cb(b); }, "image/png"); }
   var puedeArchivos = false;
   try {
@@ -651,6 +905,7 @@ auto_idioma: true
   } catch (e) {}
   var esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   var $descargar = document.getElementById("cl-descargar"), $comp = document.getElementById("cl-compartir");
+  function nombreArchivo() { return st.modo === "para" ? T.archivoPara + "-" + (st.actual + 1) + ".png" : T.archivo; }
   var aFotos = esIOS && puedeArchivos;
   if (aFotos) {
     $descargar.textContent = T.guardarFotos;
@@ -662,11 +917,11 @@ auto_idioma: true
     archivo(function (b) {
       if (!b) return;
       if (aFotos) {
-        navigator.share({ files: [new File([b], T.archivo, { type: "image/png" })] }).catch(function () {});
+        navigator.share({ files: [new File([b], nombreArchivo(), { type: "image/png" })] }).catch(function () {});
         return;
       }
       var u = URL.createObjectURL(b), a = document.createElement("a");
-      a.href = u; a.download = T.archivo; document.body.appendChild(a); a.click(); a.remove();
+      a.href = u; a.download = nombreArchivo(); document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(u); }, 2000);
     });
   });
@@ -682,16 +937,18 @@ auto_idioma: true
   $comp.addEventListener("click", function () {
     archivo(function (b) {
       if (!b) return;
-      var f = new File([b], T.archivo, { type: "image/png" });
+      var f = new File([b], nombreArchivo(), { type: "image/png" });
       navigator.share({ files: [f], title: (st.titulo || T.tituloDefault), text: T.pie }).catch(function () {});
     });
   });
   document.getElementById("cl-limpiar").addEventListener("click", function () {
-    st = { libros: vacios(), titulo: "", red: st.red, usuario: "", foto: "", bio: "", frase: "", fraseLibro: -1, formato: st.formato, tema: st.tema };
-    $titulo.value = ""; $usuario.value = ""; $bio.value = ""; $frase.value = ""; cargarFoto(); cambio();
+    st = { libros: vacios(), titulo: "", red: st.red, usuario: "", foto: "", bio: "", frase: "", fraseLibro: -1, formato: st.formato, tema: st.tema,
+           modo: st.modo, tarjetas: [tarjetaVacia()], actual: 0 };
+    $titulo.value = ""; $usuario.value = ""; $bio.value = ""; $frase.value = ""; cargarFoto(); pintarModo(); cambio();
   });
 
   pintarRedes();
+  pintarModo();
   pintarDiseno();
   pintarCasillas();
   pintarFraseLibro();
