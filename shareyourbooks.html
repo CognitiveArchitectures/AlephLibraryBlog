@@ -64,6 +64,8 @@ auto_idioma: true
   .cl-diseno{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
   textarea.cl-input{resize:vertical;min-height:72px;line-height:1.4}
   .cl-acciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  /* .btn pone display:flex y le gana al atributo hidden: sin esto salían Compartir, Copiar y Todas aunque no aplicaran. */
+  .cl-acciones [hidden]{display:none}
   .cl-cta{margin-top:16px;font-size:15px;color:var(--ink-soft)}
   .cl-cta a{color:var(--rubric);font-weight:600}
   dialog.cl-dlg{border:1px solid var(--hair-strong);border-radius:18px;background:var(--surface);color:var(--ink);
@@ -81,8 +83,14 @@ auto_idioma: true
   .cl-res .a{font-size:13px;color:var(--ink-soft)}
   .cl-estado{padding:14px 18px;font-size:14px;color:var(--ink-faint)}
   .cl-oculto{position:absolute;left:-9999px}
-  /* «Mis favoritos para…» (2026-11-24): tarjetas de 3 libros para un carrusel. */
-  .cl-modo{margin-bottom:24px}
+  /* Tarjetas (2026-11-24): cada quien escribe encabezado y título, con hasta 3 libros, para un carrusel. */
+  .cl-modo{margin-bottom:16px}
+  .cl-ejemplo{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 22px;padding:12px 14px;border-radius:14px;
+    background:color-mix(in srgb,var(--rubric) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--rubric) 25%,var(--hair))}
+  .cl-ejemplo span{flex:1;min-width:200px;font-size:14px;color:var(--ink-soft)}
+  .cl-ejemplo button{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 14px;cursor:pointer;
+    background:var(--ink);color:var(--paper)}
+  .cl-ejemplo[hidden]{display:none}
   .cl-tarjetas{display:grid;gap:14px}
   .cl-tj{border:1px solid var(--hair);border-radius:16px;padding:14px;background:var(--surface);display:grid;gap:12px;cursor:pointer}
   .cl-tj[aria-current="true"]{border-color:var(--rubric);box-shadow:0 0 0 1px var(--rubric)}
@@ -100,6 +108,7 @@ auto_idioma: true
   .cl-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 0 12px}
   .cl-nav button{width:38px;height:38px;border-radius:19px;border:1px solid var(--hair-strong);background:var(--surface);color:var(--ink);font-size:16px;cursor:pointer}
   .cl-nav button:disabled{opacity:.35;cursor:default}
+  .cl-nav[hidden]{display:none}
   .cl-nav span{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:13px;color:var(--ink-soft);min-width:52px;text-align:center}
 </style>
 
@@ -112,6 +121,10 @@ auto_idioma: true
     <div class="cl-layout">
       <div>
         <div class="cl-seg cl-modo" id="cl-modo" role="group" aria-label="Mode"></div>
+        <div class="cl-ejemplo" id="cl-ejemplo" hidden>
+          <span data-t="ejemploAviso">This is an example so you can see what you can make. Change the books and titles, or start yours from scratch.</span>
+          <button type="button" id="cl-mio" data-t="empezarMio">Start mine</button>
+        </div>
         <div class="cl-sec" data-t="secTu">You</div>
         <div class="cl-campos">
           <div class="cl-yo">
@@ -144,9 +157,12 @@ auto_idioma: true
         </div>
         <div id="cl-modo-para" hidden>
           <div class="cl-sec" data-t="secTarjetas">Your cards</div>
+          <div class="cl-campos">
+            <label><span data-t="lSerie">Series title (on every card)</span><input class="cl-input" id="cl-serie" maxlength="40" autocomplete="off"></label>
+          </div>
           <div class="cl-tarjetas" id="cl-tarjetas"></div>
           <button type="button" class="cl-mas" id="cl-otra" data-t="otraTarjeta">+ Another card</button>
-          <p class="cl-hint" data-t="hintPara">Each card: a title and up to 3 books. Post them together as a carousel.</p>
+          <p class="cl-hint" data-t="hintPara">A series for a carousel, or in Story format for your stories and reels: the series title goes on every card and each card has its own, with up to 3 books.</p>
         </div>
         <div class="cl-sec" data-t="secDiseno">Design</div>
         <div class="cl-diseno">
@@ -198,7 +214,8 @@ auto_idioma: true
     otroLibro: "Otro libro", post: "Publicación", historia: "Historia", papel: "Papel", noche: "Noche", rubrica: "Rúbrica",
     guardarFotos: "Guardar en Fotos", notaFotos: "En el menú, toca «Guardar imagen»: va a tu carrete.",
     lema: "Únete a la Gran Conversación",
-    modoGrid: "Cuadrícula", modoPara: "Mis favoritos para…", secTarjetas: "Tus tarjetas", lPara: "Mis favoritos para", eyebrowPara: "MIS FAVORITOS PARA", ejemplosPara: ["pensar con calma", "entender el poder", "un viaje largo", "leer en vacaciones"], otraTarjeta: "+ Otra tarjeta", quitarTarjeta: "Quitar", tarjeta: "Tarjeta", hintPara: "Cada tarjeta: un título y hasta 3 libros. Publícalas juntas como carrusel.", todas: function (n) { return "Todas (" + n + ")"; }, todasFotos: function (n) { return "Todas a Fotos (" + n + ")"; }, archivoPara: "favoritos-aleph", anterior: "Tarjeta anterior", siguiente: "Tarjeta siguiente",
+    modoGrid: "Cuadrícula", modoPara: "Tarjetas", secTarjetas: "Tus tarjetas", lPara: "Mis favoritos para", eyebrowPara: "MIS FAVORITOS PARA", ejemplosPara: ["pensar con calma", "entender el poder", "un viaje largo", "leer en vacaciones"], otraTarjeta: "+ Otra tarjeta", quitarTarjeta: "Quitar", tarjeta: "Tarjeta", hintPara: "Una serie para un carrusel, o en formato Historia para tus historias y reels: el título de la serie va en todas y cada tarjeta lleva el suyo con hasta 3 libros.", lEncabezado: "Encabezado (opcional)", lTituloTarjeta: "Título", todas: function (n) { return "Todas (" + n + ")"; }, todasFotos: function (n) { return "Todas a Fotos (" + n + ")"; }, archivoPara: "tarjeta-aleph", anterior: "Tarjeta anterior", siguiente: "Tarjeta siguiente",
+    lSerie: "Título de la serie (va en todas)", ejemploAviso: "Es un ejemplo para que veas lo que se puede hacer. Cambia los libros y los títulos, o empieza el tuyo de cero.", empezarMio: "Empezar el mío",
     hint: "Toca un cuadro vacío para agregar un libro (hasta 9). Usa las flechas para ordenarlos.",
     descargar: "Descargar imagen", compartir: "Compartir", limpiar: "Empezar de nuevo", copiar: "Copiar imagen", copiada: "Copiada ✓", noCopio: "No se pudo copiar",
     cta: "En Aleph, tus libros favoritos llevan la frase que se te quedó y las horas que de verdad los leíste.",
@@ -219,7 +236,8 @@ auto_idioma: true
     otroLibro: "Another book", post: "Post", historia: "Story", papel: "Paper", noche: "Night", rubrica: "Rubric",
     guardarFotos: "Save to Photos", notaFotos: "In the menu, tap “Save Image”: it goes to your camera roll.",
     lema: "Join the Great Conversation",
-    modoGrid: "Grid", modoPara: "My favorites for…", secTarjetas: "Your cards", lPara: "My favorites for", eyebrowPara: "MY FAVORITES FOR", ejemplosPara: ["thinking slowly", "understanding power", "a long trip", "a summer off"], otraTarjeta: "+ Another card", quitarTarjeta: "Remove", tarjeta: "Card", hintPara: "Each card: a title and up to 3 books. Post them together as a carousel.", todas: function (n) { return "All cards (" + n + ")"; }, todasFotos: function (n) { return "All to Photos (" + n + ")"; }, archivoPara: "favorites-aleph", anterior: "Previous card", siguiente: "Next card",
+    modoGrid: "Grid", modoPara: "Cards", secTarjetas: "Your cards", lPara: "My favorites for", eyebrowPara: "MY FAVORITES FOR", ejemplosPara: ["thinking slowly", "understanding power", "a long trip", "a summer off"], otraTarjeta: "+ Another card", quitarTarjeta: "Remove", tarjeta: "Card", hintPara: "A series for a carousel, or in Story format for your stories and reels: the series title goes on every card and each card has its own, with up to 3 books.", lEncabezado: "Heading (optional)", lTituloTarjeta: "Title", todas: function (n) { return "All cards (" + n + ")"; }, todasFotos: function (n) { return "All to Photos (" + n + ")"; }, archivoPara: "card-aleph", anterior: "Previous card", siguiente: "Next card",
+    lSerie: "Series title (on every card)", ejemploAviso: "This is an example so you can see what you can make. Change the books and titles, or start yours from scratch.", empezarMio: "Start mine",
     hint: "Tap an empty square to add a book (up to 9). Use the arrows to reorder.",
     descargar: "Download image", compartir: "Share", limpiar: "Start over", copiar: "Copy image", copiada: "Copied ✓", noCopio: "Couldn't copy",
     cta: "In Aleph, your favorite books carry the line that stayed with you and the hours you actually spent reading them.",
@@ -240,7 +258,8 @@ auto_idioma: true
     otroLibro: "Un autre livre", post: "Publication", historia: "Story", papel: "Papier", noche: "Nuit", rubrica: "Carmin",
     guardarFotos: "Enregistrer dans Photos", notaFotos: "Dans le menu, touchez « Enregistrer l’image » : elle va dans votre pellicule.",
     lema: "Rejoignez la Grande Conversation",
-    modoGrid: "Grille", modoPara: "Mes favoris pour…", secTarjetas: "Vos cartes", lPara: "Mes favoris pour", eyebrowPara: "MES FAVORIS POUR", ejemplosPara: ["penser lentement", "comprendre le pouvoir", "un long voyage", "les vacances"], otraTarjeta: "+ Une autre carte", quitarTarjeta: "Retirer", tarjeta: "Carte", hintPara: "Chaque carte : un titre et jusqu’à 3 livres. Publiez-les ensemble en carrousel.", todas: function (n) { return "Toutes (" + n + ")"; }, todasFotos: function (n) { return "Toutes dans Photos (" + n + ")"; }, archivoPara: "favoris-aleph", anterior: "Carte précédente", siguiente: "Carte suivante",
+    modoGrid: "Grille", modoPara: "Cartes", secTarjetas: "Vos cartes", lPara: "Mes favoris pour", eyebrowPara: "MES FAVORIS POUR", ejemplosPara: ["penser lentement", "comprendre le pouvoir", "un long voyage", "les vacances"], otraTarjeta: "+ Une autre carte", quitarTarjeta: "Retirer", tarjeta: "Carte", hintPara: "Une série pour un carrousel, ou au format Story pour vos stories et reels : le titre de la série va sur toutes les cartes et chacune a le sien, avec jusqu’à 3 livres.", lEncabezado: "En-tête (facultatif)", lTituloTarjeta: "Titre", todas: function (n) { return "Toutes (" + n + ")"; }, todasFotos: function (n) { return "Toutes dans Photos (" + n + ")"; }, archivoPara: "carte-aleph", anterior: "Carte précédente", siguiente: "Carte suivante",
+    lSerie: "Titre de la série (sur toutes les cartes)", ejemploAviso: "C’est un exemple pour voir ce qu’on peut faire. Changez les livres et les titres, ou partez de zéro.", empezarMio: "Commencer le mien",
     hint: "Touchez une case vide pour ajouter un livre (jusqu’à 9). Utilisez les flèches pour changer l’ordre.",
     descargar: "Télécharger l’image", compartir: "Partager", limpiar: "Recommencer", copiar: "Copier l’image", copiada: "Copiée ✓", noCopio: "Impossible de copier",
     cta: "Dans Aleph, vos livres préférés gardent la phrase qui vous est restée et les heures que vous avez vraiment passées à les lire.",
@@ -261,7 +280,8 @@ auto_idioma: true
     otroLibro: "Outro livro", post: "Post", historia: "Story", papel: "Papel", noche: "Noite", rubrica: "Carmim",
     guardarFotos: "Salvar em Fotos", notaFotos: "No menu, toque em “Salvar Imagem”: ela vai para a sua fototeca.",
     lema: "Junte-se à Grande Conversa",
-    modoGrid: "Grade", modoPara: "Meus favoritos para…", secTarjetas: "Seus cartões", lPara: "Meus favoritos para", eyebrowPara: "MEUS FAVORITOS PARA", ejemplosPara: ["pensar com calma", "entender o poder", "uma viagem longa", "ler nas férias"], otraTarjeta: "+ Outro cartão", quitarTarjeta: "Remover", tarjeta: "Cartão", hintPara: "Cada cartão: um título e até 3 livros. Publique juntos como carrossel.", todas: function (n) { return "Todos (" + n + ")"; }, todasFotos: function (n) { return "Todos para Fotos (" + n + ")"; }, archivoPara: "favoritos-aleph", anterior: "Cartão anterior", siguiente: "Próximo cartão",
+    modoGrid: "Grade", modoPara: "Cartões", secTarjetas: "Seus cartões", lPara: "Meus favoritos para", eyebrowPara: "MEUS FAVORITOS PARA", ejemplosPara: ["pensar com calma", "entender o poder", "uma viagem longa", "ler nas férias"], otraTarjeta: "+ Outro cartão", quitarTarjeta: "Remover", tarjeta: "Cartão", hintPara: "Uma série para um carrossel, ou no formato Story para seus stories e reels: o título da série vai em todos e cada cartão tem o seu, com até 3 livros.", lEncabezado: "Cabeçalho (opcional)", lTituloTarjeta: "Título", todas: function (n) { return "Todos (" + n + ")"; }, todasFotos: function (n) { return "Todos para Fotos (" + n + ")"; }, archivoPara: "cartao-aleph", anterior: "Cartão anterior", siguiente: "Próximo cartão",
+    lSerie: "Título da série (vai em todos)", ejemploAviso: "É um exemplo para você ver o que dá para fazer. Troque os livros e os títulos, ou comece o seu do zero.", empezarMio: "Começar o meu",
     hint: "Toque num quadro vazio para adicionar um livro (até 9). Use as setas para mudar a ordem.",
     descargar: "Baixar imagem", compartir: "Compartilhar", limpiar: "Começar de novo", copiar: "Copiar imagem", copiada: "Copiada ✓", noCopio: "Não foi possível copiar",
     cta: "No Aleph, seus livros favoritos guardam a frase que ficou com você e as horas que você realmente passou lendo cada um.",
@@ -282,7 +302,8 @@ auto_idioma: true
     otroLibro: "Другая книга", post: "Пост", historia: "Сторис", papel: "Бумага", noche: "Ночь", rubrica: "Кармин",
     guardarFotos: "Сохранить в Фото", notaFotos: "В меню нажмите «Сохранить изображение»: оно попадёт в вашу медиатеку.",
     lema: "Присоединяйтесь к Великому разговору",
-    modoGrid: "Сетка", modoPara: "Мои любимые для…", secTarjetas: "Ваши карточки", lPara: "Мои любимые для", eyebrowPara: "МОИ ЛЮБИМЫЕ ДЛЯ", ejemplosPara: ["неспешных размышлений", "понимания власти", "долгой дороги", "отпуска"], otraTarjeta: "+ Ещё карточка", quitarTarjeta: "Убрать", tarjeta: "Карточка", hintPara: "В каждой карточке — заголовок и до 3 книг. Публикуйте их вместе каруселью.", todas: function (n) { return "Все (" + n + ")"; }, todasFotos: function (n) { return "Все в Фото (" + n + ")"; }, archivoPara: "lyubimye-aleph", anterior: "Предыдущая карточка", siguiente: "Следующая карточка",
+    modoGrid: "Сетка", modoPara: "Карточки", secTarjetas: "Ваши карточки", lPara: "Мои любимые для", eyebrowPara: "МОИ ЛЮБИМЫЕ ДЛЯ", ejemplosPara: ["неспешных размышлений", "понимания власти", "долгой дороги", "отпуска"], otraTarjeta: "+ Ещё карточка", quitarTarjeta: "Убрать", tarjeta: "Карточка", hintPara: "Серия для карусели или в формате Story для историй и reels: название серии стоит на всех карточках, а у каждой — свой заголовок и до 3 книг.", lEncabezado: "Надзаголовок (необязательно)", lTituloTarjeta: "Заголовок", todas: function (n) { return "Все (" + n + ")"; }, todasFotos: function (n) { return "Все в Фото (" + n + ")"; }, archivoPara: "kartochka-aleph", anterior: "Предыдущая карточка", siguiente: "Следующая карточка",
+    lSerie: "Название серии (на всех карточках)", ejemploAviso: "Это пример, чтобы вы увидели, что можно сделать. Замените книги и заголовки или начните своё с нуля.", empezarMio: "Начать своё",
     hint: "Нажмите на пустую клетку, чтобы добавить книгу (до 9). Стрелками можно менять порядок.",
     descargar: "Скачать картинку", compartir: "Поделиться", limpiar: "Начать заново", copiar: "Копировать картинку", copiada: "Скопировано ✓", noCopio: "Не удалось скопировать",
     cta: "В Aleph ваши любимые книги хранят фразу, которая вам запомнилась, и часы, которые вы действительно провели за чтением.",
@@ -337,11 +358,63 @@ auto_idioma: true
   var vacios = function () { return [null, null, null, null, null, null, null, null, null]; };
   var tarjetaVacia = function () { return { titulo: "", libros: [null, null, null] }; };
   var st = { libros: vacios(), titulo: "", red: "instagram", usuario: "", foto: "", bio: "", frase: "", fraseLibro: -1, formato: "post", tema: "papel",
-             modo: "grid", tarjetas: [tarjetaVacia()], actual: 0 };
+             modo: "grid", serie: "", tarjetas: [tarjetaVacia()], actual: 0, esEjemplo: false };
+  // El ejemplo de cada modo, en el idioma de la página (2026-11-25, Diego: «un ejemplo de prueba en cada
+  // modo para cada idioma, para que vean lo que se puede hacer y ya editan ellos el suyo»). Clásicos con
+  // portada en Open Library. Solo sale la primera vez (sin nada guardado) y se va al tocar «Empezar el mío».
+  var LIBROS_EJ = {
+    quijote: [14428305, { es: "Don Quijote de la Mancha", en: "Don Quixote", fr: "Don Quichotte", pt: "Dom Quixote", ru: "Дон Кихот" }, { def: "Miguel de Cervantes", ru: "Мигель де Сервантес" }],
+    cien: [12627383, { es: "Cien años de soledad", en: "One Hundred Years of Solitude", fr: "Cent ans de solitude", pt: "Cem anos de solidão", ru: "Сто лет одиночества" }, { def: "Gabriel García Márquez", ru: "Габриэль Гарсиа Маркес" }],
+    paramo: [15154618, { def: "Pedro Páramo", ru: "Педро Парамо" }, { def: "Juan Rulfo", ru: "Хуан Рульфо" }],
+    principito: [10708272, { es: "El principito", en: "The Little Prince", fr: "Le Petit Prince", pt: "O Pequeno Príncipe", ru: "Маленький принц" }, { def: "Antoine de Saint-Exupéry", ru: "Антуан де Сент-Экзюпери" }],
+    crimen: [9411873, { es: "Crimen y castigo", en: "Crime and Punishment", fr: "Crime et Châtiment", pt: "Crime e Castigo", ru: "Преступление и наказание" }, { def: "Fyodor Dostoevsky", es: "Fiódor Dostoievski", fr: "Fiodor Dostoïevski", pt: "Fiódor Dostoiévski", ru: "Фёдор Достоевский" }],
+    orgullo: [14348537, { es: "Orgullo y prejuicio", en: "Pride and Prejudice", fr: "Orgueil et Préjugés", pt: "Orgulho e Preconceito", ru: "Гордость и предубеждение" }, { def: "Jane Austen", ru: "Джейн Остин" }],
+    meta: [12820198, { es: "La metamorfosis", en: "The Metamorphosis", fr: "La Métamorphose", pt: "A Metamorfose", ru: "Превращение" }, { def: "Franz Kafka", ru: "Франц Кафка" }],
+    ficciones: [13854343, { es: "Ficciones", en: "Ficciones", fr: "Fictions", pt: "Ficções", ru: "Вымыслы" }, { def: "Jorge Luis Borges", ru: "Хорхе Луис Борхес" }],
+    viejo: [463307, { es: "El viejo y el mar", en: "The Old Man and the Sea", fr: "Le Vieil Homme et la Mer", pt: "O Velho e o Mar", ru: "Старик и море" }, { def: "Ernest Hemingway", ru: "Эрнест Хемингуэй" }],
+    med: [211529, { es: "Meditaciones", en: "Meditations", fr: "Pensées pour moi-même", pt: "Meditações", ru: "Наедине с собой" }, { def: "Marcus Aurelius", es: "Marco Aurelio", fr: "Marc Aurèle", pt: "Marco Aurélio", ru: "Марк Аврелий" }],
+    walden: [11248037, { def: "Walden", ru: "Уолден" }, { def: "Henry David Thoreau", ru: "Генри Дэвид Торо" }],
+    sidd: [6562535, { def: "Siddhartha", ru: "Сиддхартха" }, { def: "Hermann Hesse", ru: "Герман Гессе" }],
+    principe: [6603635, { es: "El príncipe", en: "The Prince", fr: "Le Prince", pt: "O Príncipe", ru: "Государь" }, { def: "Niccolò Machiavelli", es: "Nicolás Maquiavelo", fr: "Nicolas Machiavel", pt: "Nicolau Maquiavel", ru: "Никколо Макиавелли" }],
+    n1984: [9267242, { def: "1984" }, { def: "George Orwell", ru: "Джордж Оруэлл" }],
+    granja: [11261770, { es: "Rebelión en la granja", en: "Animal Farm", fr: "La Ferme des animaux", pt: "A Revolução dos Bichos", ru: "Скотный двор" }, { def: "George Orwell", ru: "Джордж Оруэлл" }],
+    odisea: [9045853, { es: "La Odisea", en: "The Odyssey", fr: "L’Odyssée", pt: "A Odisseia", ru: "Одиссея" }, { def: "Homer", es: "Homero", fr: "Homère", pt: "Homero", ru: "Гомер" }],
+    moby: [10544254, { def: "Moby Dick", ru: "Моби Дик" }, { def: "Herman Melville", ru: "Герман Мелвилл" }]
+  };
+  var TEXTOS_EJ = {
+    es: { titulo: "Los que me formaron", frase: "El que lee mucho y anda mucho, ve mucho y sabe mucho.", serie: "Mis favoritos para" },
+    en: { titulo: "The books that shaped me", frase: "He who reads much and walks much, sees much and knows much.", serie: "My favorites for" },
+    fr: { titulo: "Ceux qui m’ont formé", frase: "Qui lit beaucoup et marche beaucoup voit beaucoup et sait beaucoup.", serie: "Mes favoris pour" },
+    pt: { titulo: "Os que me formaram", frase: "Quem lê muito e anda muito vê muito e sabe muito.", serie: "Meus favoritos para" },
+    ru: { titulo: "Книги, которые меня сформировали", frase: "Кто много читает и много ходит, тот много видит и много знает.", serie: "Мои любимые книги для" }
+  };
+  function libroEj(k) {
+    var d = LIBROS_EJ[k];
+    return { title: d[1][idioma] || d[1].def, author: d[2][idioma] || d[2].def, cover: d[0] };
+  }
+  function ejemplo() {
+    var tx = TEXTOS_EJ[idioma] || TEXTOS_EJ.en;
+    return {
+      libros: ["quijote", "cien", "paramo", "principito", "crimen", "orgullo", "meta", "ficciones", "viejo"].map(libroEj),
+      titulo: tx.titulo, frase: tx.frase, fraseLibro: 0, serie: tx.serie,
+      tarjetas: [["med", "walden", "sidd"], ["principe", "n1984", "granja"], ["odisea", "quijote", "moby"]].map(function (ks, i) {
+        return { titulo: T.ejemplosPara[i], libros: ks.map(libroEj) };
+      }),
+      actual: 0, esEjemplo: true
+    };
+  }
+  var habiaGuardado = false;
   try {
     var g = JSON.parse(localStorage.getItem(CLAVE) || "null");
-    if (g && Array.isArray(g.libros) && g.libros.length === 9) st = Object.assign(st, g);
+    if (g && Array.isArray(g.libros) && g.libros.length === 9) { st = Object.assign(st, g); habiaGuardado = true; }
   } catch (e) {}
+  if (!habiaGuardado) st = Object.assign(st, ejemplo());
+  // Antes (24-nov) cada tarjeta tenía su encabezado: el primero que haya pasa a ser el de la serie.
+  if (typeof st.serie !== "string") st.serie = "";
+  if (!st.serie && Array.isArray(st.tarjetas)) {
+    var conEnc = st.tarjetas.filter(function (c) { return c && typeof c.encabezado === "string" && c.encabezado.trim(); })[0];
+    if (conEnc) st.serie = conEnc.encabezado;
+  }
   if (!Array.isArray(st.tarjetas) || !st.tarjetas.length) st.tarjetas = [tarjetaVacia()];
   st.tarjetas = st.tarjetas.slice(0, 8).map(function (c) {
     var l = Array.isArray(c && c.libros) ? c.libros.slice(0, 3) : [];
@@ -351,6 +424,10 @@ auto_idioma: true
   if (!(st.actual >= 0 && st.actual < st.tarjetas.length)) st.actual = 0;
   if (st.modo !== "para") st.modo = "grid";
   function guardar() { try { localStorage.setItem(CLAVE, JSON.stringify(st)); } catch (e) {} }
+  // Cambiar libros o títulos vuelve tuyo el ejemplo: el aviso se va.
+  function tocar() { if (st.esEjemplo) { st.esEjemplo = false; pintarAviso(); } }
+  var $aviso = document.getElementById("cl-ejemplo");
+  function pintarAviso() { $aviso.hidden = !st.esEjemplo; }
 
   function el(tag, cls, texto) { var e = document.createElement(tag); if (cls) e.className = cls; if (texto != null) e.textContent = texto; return e; }
   function portadaURL(id, tam) { return "https://covers.openlibrary.org/b/id/" + encodeURIComponent(id) + "-" + tam + ".jpg"; }
@@ -358,7 +435,7 @@ auto_idioma: true
 
   var $titulo = document.getElementById("cl-titulo");
   $titulo.placeholder = T.tituloDefault; $titulo.value = st.titulo;
-  $titulo.addEventListener("input", function () { st.titulo = $titulo.value; guardar(); dibujar(); });
+  $titulo.addEventListener("input", function () { st.titulo = $titulo.value; tocar(); guardar(); dibujar(); });
 
   var $redes = document.getElementById("cl-redes"), $usuario = document.getElementById("cl-usuario");
   $usuario.value = st.usuario;
@@ -382,7 +459,7 @@ auto_idioma: true
   var $fraseLibro = document.getElementById("cl-frase-libro");
   $bio.value = st.bio || ""; $frase.value = st.frase || "";
   $bio.addEventListener("input", function () { st.bio = $bio.value; guardar(); dibujar(); });
-  $frase.addEventListener("input", function () { st.frase = $frase.value; guardar(); dibujar(); });
+  $frase.addEventListener("input", function () { st.frase = $frase.value; tocar(); guardar(); dibujar(); });
   $fraseLibro.addEventListener("change", function () { st.fraseLibro = Number($fraseLibro.value); guardar(); dibujar(); });
   function pintarFraseLibro() {
     $fraseLibro.textContent = "";
@@ -493,7 +570,7 @@ auto_idioma: true
     });
   }
   function mover(a, b) { if (b < 0 || b > 8) return; var t = st.libros[a]; st.libros[a] = st.libros[b]; st.libros[b] = t; cambio(); }
-  function cambio() { guardar(); pintarCasillas(); pintarFraseLibro(); dibujar(); }
+  function cambio() { tocar(); guardar(); pintarCasillas(); pintarFraseLibro(); dibujar(); }
 
   var $dlg = document.getElementById("cl-dlg"), $q = document.getElementById("cl-q");
   var $res = document.getElementById("cl-res"), $estado = document.getElementById("cl-estado");
@@ -699,7 +776,7 @@ auto_idioma: true
     ctx.textAlign = "left";
   }
 
-  // ---- «Mis favoritos para…» (2026-11-24): una tarjeta = un título y hasta 3 portadas, sobre papel.
+  // ---- Tarjetas (2026-11-24): encabezado y título tuyos (vacíos = no se dibujan) y hasta 3 portadas, sobre papel.
   function portadaEn(l, x, y, w, h, ang, sombra) {
     ctx.save();
     ctx.translate(x + w / 2, y + h / 2); ctx.rotate(ang); ctx.translate(-w / 2, -h / 2);
@@ -731,21 +808,21 @@ auto_idioma: true
     ctx.fillStyle = t.fondo; ctx.fillRect(0, 0, W, H);
     var lg = logoDe(t.tinta);
     if (lg) { var lh = 36, lw = lg.width * lh / lg.height; ctx.drawImage(lg, M, arriba, lw, lh); }
-    var total = st.tarjetas.length;
-    if (total > 1) {
-      ctx.font = "600 22px " + SANS; ctx.fillStyle = t.suave; ctx.textAlign = "right";
-      ctx.fillText((indice + 1) + " / " + total, W - M, arriba + 28); ctx.textAlign = "left";
+    // Encabezado (chico, en mayúsculas) y título (grande): los escribe cada quien; vacío = no se dibuja.
+    var y = arriba + (historia ? 120 : 80);
+    var encabezado = (st.serie || "").trim(), titulo = (c.titulo || "").trim();
+    if (encabezado) {
+      y += 50;
+      ctx.font = "700 26px " + SANS; ctx.fillStyle = t.acento;
+      if ("letterSpacing" in ctx) ctx.letterSpacing = "6px";
+      ctx.fillText(lineas(encabezado.toLocaleUpperCase(idioma), W - 2 * M, 1)[0], M, y);
+      if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
     }
-    // El título: «MIS FAVORITOS PARA» chico y el tuyo grande.
-    var y = arriba + (historia ? 170 : 130);
-    ctx.font = "700 26px " + SANS; ctx.fillStyle = t.acento;
-    if ("letterSpacing" in ctx) ctx.letterSpacing = "6px";
-    ctx.fillText(T.eyebrowPara, M, y);
-    if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
-    var titulo = (c.titulo || "").trim() || T.ejemplosPara[indice % T.ejemplosPara.length];
-    ctx.font = "700 " + (historia ? 88 : 80) + "px " + SERIF; ctx.fillStyle = t.tinta;
-    var ls = lineas(titulo, W - 2 * M, 3), paso = historia ? 96 : 88;
-    ls.forEach(function (l) { y += paso; ctx.fillText(l, M, y); });
+    if (titulo) {
+      ctx.font = "700 " + (historia ? 88 : 80) + "px " + SERIF; ctx.fillStyle = t.tinta;
+      var ls = lineas(titulo, W - 2 * M, 3), paso = historia ? 96 : 88;
+      ls.forEach(function (l) { y += paso; ctx.fillText(l, M, y); });
+    }
     // Las portadas: la del centro al frente, las de los lados un poco giradas detrás.
     var libros = c.libros.filter(Boolean);
     var lineaPie = H - abajo - 96, pieY = H - abajo - 52;
@@ -808,10 +885,17 @@ auto_idioma: true
     $nav.hidden = !para || st.tarjetas.length < 2;
     $pos.textContent = (st.actual + 1) + " / " + st.tarjetas.length;
     $ant.disabled = st.actual === 0; $sig.disabled = st.actual >= st.tarjetas.length - 1;
-    $todas.hidden = !(para && puedeArchivos && st.tarjetas.length > 1);
-    $todas.textContent = (aFotos ? T.todasFotos : T.todas)(st.tarjetas.length);
+    var llenas = conContenido().length;
+    $todas.hidden = !(para && llenas > 1);
+    $todas.textContent = (aFotos ? T.todasFotos : T.todas)(llenas);
     if (para) pintarTarjetas();
   }
+  function conContenido() {
+    return st.tarjetas.filter(function (c) { return (c.titulo || "").trim() || c.libros.some(Boolean); });
+  }
+  var $serie = document.getElementById("cl-serie");
+  $serie.value = st.serie; $serie.placeholder = T.lPara;
+  $serie.addEventListener("input", function () { st.serie = $serie.value; tocar(); guardar(); dibujar(); });
   function elegirTarjeta(i) { if (i < 0 || i >= st.tarjetas.length || i === st.actual) return; st.actual = i; guardar(); pintarModo(); dibujar(); }
   $ant.addEventListener("click", function () { elegirTarjeta(st.actual - 1); });
   $sig.addEventListener("click", function () { elegirTarjeta(st.actual + 1); });
@@ -819,6 +903,11 @@ auto_idioma: true
     if (st.tarjetas.length >= 8) return;
     st.tarjetas.push(tarjetaVacia()); st.actual = st.tarjetas.length - 1; guardar(); pintarModo(); dibujar();
   });
+  function actualizarTodas() {
+    var llenas = conContenido().length;
+    $todas.hidden = !(st.modo === "para" && llenas > 1);
+    $todas.textContent = (aFotos ? T.todasFotos : T.todas)(llenas);
+  }
   function pintarTarjetas() {
     $tarjetas.textContent = "";
     $otra.disabled = st.tarjetas.length >= 8;
@@ -836,18 +925,20 @@ auto_idioma: true
         cab.appendChild(q);
       }
       caja.appendChild(cab);
-      var fila = el("label", "cl-para"); fila.appendChild(el("span", null, T.lPara));
-      var inp = el("input", "cl-input"); inp.maxLength = 48; inp.autocomplete = "off"; inp.value = c.titulo;
+      var campos = el("div", "cl-campos");
+      var lTit = el("label"); lTit.appendChild(el("span", null, T.lTituloTarjeta));
+      var inp = el("input", "cl-input"); inp.maxLength = 60; inp.autocomplete = "off"; inp.value = c.titulo;
       inp.placeholder = T.ejemplosPara[k % T.ejemplosPara.length];
-      inp.addEventListener("input", function () { c.titulo = inp.value; guardar(); if (k === st.actual) dibujar(); });
-      fila.appendChild(inp); caja.appendChild(fila);
+      inp.addEventListener("input", function () { c.titulo = inp.value; tocar(); guardar(); actualizarTodas(); if (k === st.actual) dibujar(); });
+      lTit.appendChild(inp); campos.appendChild(lTit);
+      caja.appendChild(campos);
       var g3 = el("div", "cl-grid");
       c.libros.forEach(function (l, i) {
         if (!l) {
           var b = el("button", "cl-slot", "+"); b.type = "button"; b.setAttribute("aria-label", T.agregar + " " + (i + 1));
           b.addEventListener("click", function () {
             st.actual = k;
-            abrirBusqueda(i, function (libro) { c.libros[i] = libro; guardar(); pintarModo(); dibujar(); });
+            abrirBusqueda(i, function (libro) { c.libros[i] = libro; tocar(); guardar(); pintarModo(); dibujar(); });
           });
           g3.appendChild(b); return;
         }
@@ -858,9 +949,9 @@ auto_idioma: true
         var iz = el("button", null, "←"); iz.type = "button"; iz.disabled = i === 0; iz.setAttribute("aria-label", T.mover + " ←");
         var x = el("button", null, "✕"); x.type = "button"; x.setAttribute("aria-label", T.quitar + ": " + l.title);
         var de = el("button", null, "→"); de.type = "button"; de.disabled = i === 2; de.setAttribute("aria-label", T.mover + " →");
-        iz.addEventListener("click", function () { var tmp = c.libros[i - 1]; c.libros[i - 1] = c.libros[i]; c.libros[i] = tmp; st.actual = k; guardar(); pintarModo(); dibujar(); });
-        de.addEventListener("click", function () { var tmp = c.libros[i + 1]; c.libros[i + 1] = c.libros[i]; c.libros[i] = tmp; st.actual = k; guardar(); pintarModo(); dibujar(); });
-        x.addEventListener("click", function () { c.libros[i] = null; st.actual = k; guardar(); pintarModo(); dibujar(); });
+        iz.addEventListener("click", function () { var tmp = c.libros[i - 1]; c.libros[i - 1] = c.libros[i]; c.libros[i] = tmp; st.actual = k; tocar(); guardar(); pintarModo(); dibujar(); });
+        de.addEventListener("click", function () { var tmp = c.libros[i + 1]; c.libros[i + 1] = c.libros[i]; c.libros[i] = tmp; st.actual = k; tocar(); guardar(); pintarModo(); dibujar(); });
+        x.addEventListener("click", function () { c.libros[i] = null; st.actual = k; tocar(); guardar(); pintarModo(); dibujar(); });
         ctl.appendChild(iz); ctl.appendChild(x); ctl.appendChild(de); d.appendChild(ctl);
         d.title = l.title + (l.author ? " — " + l.author : "");
         g3.appendChild(d);
@@ -881,10 +972,10 @@ auto_idioma: true
   }
   function archivosTodas(cb) {
     esperarPortadas(function () {
-      var guardada = st.actual, archivos = [], k = 0;
+      var guardada = st.actual, archivos = [], k = 0, llenas = conContenido();
       (function siguiente() {
-        if (k >= st.tarjetas.length) { st.actual = guardada; dibujar(); cb(archivos); return; }
-        dibujarPara(st.tarjetas[k], k);
+        if (k >= llenas.length) { st.actual = guardada; dibujar(); cb(archivos); return; }
+        dibujarPara(llenas[k], k);
         var n = k;
         $canvas.toBlob(function (b) {
           if (b) archivos.push(new File([b], T.archivoPara + "-" + (n + 1) + ".png", { type: "image/png" }));
@@ -894,7 +985,18 @@ auto_idioma: true
     });
   }
   $todas.addEventListener("click", function () {
-    archivosTodas(function (fs) { if (fs.length) navigator.share({ files: fs }).catch(function () {}); });
+    archivosTodas(function (fs) {
+      if (!fs.length) return;
+      if (puedeArchivos) { navigator.share({ files: fs }).catch(function () {}); return; }
+      // Sin compartir archivos (computadora): se descargan una tras otra.
+      fs.forEach(function (f, i) {
+        setTimeout(function () {
+          var u = URL.createObjectURL(f), a = document.createElement("a");
+          a.href = u; a.download = f.name; document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(function () { URL.revokeObjectURL(u); }, 2000);
+        }, i * 350);
+      });
+    });
   });
 
   function archivo(cb) { $canvas.toBlob(function (b) { cb(b); }, "image/png"); }
@@ -941,12 +1043,18 @@ auto_idioma: true
       navigator.share({ files: [f], title: (st.titulo || T.tituloDefault), text: T.pie }).catch(function () {});
     });
   });
+  function empezarDeCero() {
+    st = { libros: vacios(), titulo: "", red: st.red, usuario: st.usuario, foto: st.foto, bio: st.bio, frase: "", fraseLibro: -1, formato: st.formato, tema: st.tema,
+           modo: st.modo, serie: "", tarjetas: [tarjetaVacia()], actual: 0, esEjemplo: false };
+    $titulo.value = ""; $frase.value = ""; $serie.value = ""; pintarAviso(); pintarModo(); cambio();
+  }
+  document.getElementById("cl-mio").addEventListener("click", empezarDeCero);
   document.getElementById("cl-limpiar").addEventListener("click", function () {
-    st = { libros: vacios(), titulo: "", red: st.red, usuario: "", foto: "", bio: "", frase: "", fraseLibro: -1, formato: st.formato, tema: st.tema,
-           modo: st.modo, tarjetas: [tarjetaVacia()], actual: 0 };
-    $titulo.value = ""; $usuario.value = ""; $bio.value = ""; $frase.value = ""; cargarFoto(); pintarModo(); cambio();
+    empezarDeCero();
+    st.usuario = ""; st.foto = ""; st.bio = ""; $usuario.value = ""; $bio.value = ""; cargarFoto(); guardar(); dibujar();
   });
 
+  pintarAviso();
   pintarRedes();
   pintarModo();
   pintarDiseno();
