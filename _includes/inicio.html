@@ -1,0 +1,300 @@
+{%- assign idioma = page.lang | default: 'en' -%}
+{%- assign x = site.data.inicio[idioma] -%}
+{%- assign t = site.data.i18n[idioma] -%}
+{%- if idioma == 'en' -%}{%- assign pre = '' -%}{%- assign q_idioma = '' -%}{%- assign sep = '?' -%}{%- else -%}{%- capture pre -%}/{{ idioma }}{%- endcapture -%}{%- capture q_idioma -%}?idioma={{ idioma }}{%- endcapture -%}{%- assign sep = '&amp;' -%}{%- endif -%}
+{%- capture url_compartir -%}/shareyourbooks/{{ q_idioma }}{%- endcapture -%}
+{%- assign hay_app_store = false -%}{%- if site.app_store_url and site.app_store_url != '' -%}{%- assign hay_app_store = true -%}{%- endif -%}
+{%- assign hay_perfil = false -%}{%- if site.perfil_ejemplo and site.perfil_ejemplo != '' -%}{%- assign hay_perfil = true -%}{%- endif -%}
+<script>(function(){var h=location.hash.slice(1);if(/^(idea|graph|pillars|loop|craft|conversation|philosophy)$/.test(h))location.replace('{{ pre }}/about/#'+h);})();</script>
+<style>
+  .hub-hero{position:relative;z-index:2;overflow:hidden;padding:clamp(28px,3vw,40px) 0 clamp(40px,4vw,52px)}
+  .hub-hero .const{position:absolute;top:-6%;left:50%;transform:translateX(-50%);width:min(1180px,150%);z-index:0;opacity:.3;pointer-events:none;
+    -webkit-mask-image:radial-gradient(110% 70% at 50% 25%,#000 30%,transparent 80%);mask-image:radial-gradient(110% 70% at 50% 25%,#000 30%,transparent 80%)}
+  .hub-hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(40px,6vw,64px);align-items:center}
+  @media(min-width:900px){.hub-hero-grid{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr)}}
+  .hub-hero .eyebrow{display:block;font-size:11.5px;letter-spacing:.16em;line-height:1.7}
+  .hub-hero h1{font-size:clamp(36px,4.6vw,56px);line-height:1.04;max-width:14ch;margin:14px 0 0;text-align:left}
+  .hub-sub{margin-top:20px;max-width:44ch;color:var(--ink-soft);font-size:clamp(17px,1.9vw,20px);line-height:1.55;text-wrap:pretty}
+  .hub-promesas{list-style:none;display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:20px;padding:0}
+  .hub-promesas li{display:inline-flex;align-items:center;gap:9px;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12.5px;letter-spacing:.03em;color:var(--ink-soft)}
+  .hub-promesas li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--rubric);flex:none}
+  .hub-acciones{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+  .hub-acciones .btn{font-size:15.5px;padding:12px 22px;white-space:normal;text-align:center}
+  .hub-lanza{margin-top:20px;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--rubric);font-weight:600}
+  .hub-hero-img .phone{width:min(244px,68vw)}
+  @media(max-width:899px){
+    .hub-hero-img{max-height:380px;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+    .hub-hero-img .phone{transform:rotate(-2deg);margin-top:8px} .hub-hero-img .stage:hover .phone{transform:rotate(-1deg)}
+  }
+
+  .hub-util{position:relative;z-index:2;padding:clamp(40px,4vw,52px) 0 clamp(36px,5vw,64px);border-top:1px solid var(--hair)}
+  .hub-cab{margin-bottom:clamp(24px,4vw,38px)}
+  .hub-cab h2{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-.02em;line-height:1.08;margin-top:12px;text-wrap:balance}
+  .hub-tool{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(26px,4vw,48px);align-items:center;background:var(--surface);border:1px solid var(--hair);
+    border-radius:24px;padding:clamp(22px,4vw,44px);box-shadow:var(--shadow)}
+  .hub-tool + .hub-tool{margin-top:20px}
+  @media(min-width:900px){.hub-tool{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)}}
+  .hub-tool h3{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:clamp(25px,3vw,33px);font-weight:700;letter-spacing:-.015em;line-height:1.12;text-wrap:balance}
+  .hub-tool-txt p{margin-top:12px;color:var(--ink-soft);font-size:17px;line-height:1.55;max-width:44ch;text-wrap:pretty}
+  .hub-tool-txt p.hub-nota{font-size:14.5px;line-height:1.5}
+  .hub-tool-txt p.hub-url{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:14px;color:var(--rubric);overflow-wrap:anywhere}
+  .hub-tool-txt .btn{margin-top:22px}
+  .hub-tool-txt .btn svg{width:15px;height:15px}
+
+  .hub-minis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(14px,2.6vw,26px)}
+  .hub-mini{display:flex;flex-direction:column;text-decoration:none;color:inherit;border-radius:18px;padding:10px;margin:-10px;transition:background .25s var(--ease)}
+  .hub-mini:hover{background:var(--surface-2)}
+  .hub-mini-tit{display:flex;align-items:center;gap:6px;margin-top:16px;font-weight:600;font-size:16px;color:var(--ink)}
+  .hub-mini-tit::after{content:"→";color:var(--rubric);transition:transform .25s var(--ease)}
+  .hub-mini:hover .hub-mini-tit::after{transform:translateX(3px)}
+  .hub-mini-p{margin-top:4px;font-size:14px;line-height:1.45;color:var(--ink-soft);text-wrap:pretty}
+
+  .mini{position:relative;z-index:1;display:flex;flex-direction:column;aspect-ratio:4/5;border-radius:10px;background:var(--paper);border:1px solid var(--hair-strong);
+    box-shadow:var(--shadow);padding:8% 8% 6%;overflow:hidden;container-type:inline-size}
+  .mini-logo{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-weight:700;font-size:9px;font-size:7cqw;line-height:1;color:var(--ink)}
+  .mini-tit{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-weight:700;font-size:13px;font-size:7.6cqw;line-height:1.12;letter-spacing:-.01em;color:var(--ink);
+    margin-top:5%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .mini-libros{display:grid;grid-template-columns:repeat(3,1fr);gap:4%;width:52%;margin:5% auto 0}
+  .mini-libros i,.mini-abanico i{position:relative;display:block;aspect-ratio:2/3;border-radius:2px;box-shadow:0 1px 3px rgba(32,29,24,.25)}
+  .mini-libros i::before,.mini-abanico i::before{content:"";position:absolute;left:20%;right:20%;top:18%;height:6%;background:rgba(255,255,255,.6);border-radius:1px}
+  .mini-libros i::after,.mini-abanico i::after{content:"";position:absolute;left:30%;right:30%;top:29%;height:4%;background:rgba(255,255,255,.45);border-radius:1px}
+  .mini-libros i:nth-child(1){background:#C8402F}.mini-libros i:nth-child(2){background:#2F5D50}.mini-libros i:nth-child(3){background:#C9A43A}
+  .mini-libros i:nth-child(4){background:#E4D9BF}.mini-libros i:nth-child(5){background:#2B2724}.mini-libros i:nth-child(6){background:#B54A2E}
+  .mini-libros i:nth-child(7){background:#A88C6A}.mini-libros i:nth-child(8){background:#4C5566}.mini-libros i:nth-child(9){background:#8DB3CC}
+  .mini-libros i:nth-child(4)::before,.mini-libros i:nth-child(4)::after{background:rgba(60,45,20,.35)}
+  .mini-frase{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-style:italic;font-size:8px;font-size:4.3cqw;line-height:1.3;color:var(--ink);
+    border-left:2px solid var(--rubric);padding-left:5%;margin-top:7%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .mini-pie{margin-top:auto;display:flex;justify-content:space-between;gap:4px;padding-top:4%;border-top:1px solid var(--hair);
+    font-size:6px;font-size:3.4cqw;color:var(--ink-soft);white-space:nowrap}
+  .mini-pie b{font-weight:600;color:var(--rubric)}
+  .mini-pila{position:relative;display:block}
+  .mini-pila::before,.mini-pila::after{content:"";position:absolute;inset:0;border-radius:10px;background:var(--surface-2);border:1px solid var(--hair-strong)}
+  .mini-pila::before{transform:translate(6%,3%) rotate(4deg)}
+  .mini-pila::after{transform:translate(3%,1.5%) rotate(2deg)}
+  .mini-serie{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:6px;font-size:3.3cqw;letter-spacing:.14em;text-transform:uppercase;color:var(--rubric);margin-top:6%;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mini-para .mini-tit{margin-top:2%}
+  .mini-abanico{position:relative;height:36%;margin:6% 0 5%}
+  .mini-abanico i{position:absolute;bottom:0;left:50%;width:30%;margin-left:-15%}
+  .mini-abanico i:nth-child(1){transform:translateX(-58%) rotate(-11deg);background:#9C8F6B}
+  .mini-abanico i:nth-child(3){transform:translateX(58%) rotate(11deg);background:#2B2724}
+  .mini-abanico i:nth-child(2){z-index:2;background:#5E7F8F;box-shadow:0 0 0 1.5px var(--paper),0 3px 8px rgba(32,29,24,.3)}
+  .mini-lista{display:grid;gap:3%;font-size:7px;font-size:3.9cqw;line-height:1.25;color:var(--ink)}
+  .mini-lista span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mini-lista b{color:var(--rubric);font-weight:700;margin-right:5px}
+
+  .hub-ejemplos{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
+  @media(min-width:600px){.hub-ejemplos{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .ej{position:relative;display:flex;flex-direction:column;gap:12px;background:var(--paper);border:1px solid var(--hair-strong);border-radius:16px;padding:16px 16px 18px;box-shadow:var(--shadow)}
+  .ej-badge{position:absolute;top:12px;right:12px;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-soft);border:1px solid var(--hair-strong);border-radius:999px;padding:3px 8px;background:var(--surface)}
+  .ej-cab{display:flex;align-items:center;gap:11px;padding-right:64px}
+  .ej-av{width:44px;height:44px;border-radius:50%;flex:none;background:var(--rubric);color:var(--paper);display:flex;align-items:center;justify-content:center;
+    font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:19px;font-weight:700}
+  .ej-id{display:grid;min-width:0}
+  .ej-id b{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:19px;line-height:1.1}
+  .ej-id span{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;color:var(--ink-soft)}
+  .ej-cifras{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:9px 0;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);text-align:center}
+  .ej-cifras span{display:grid;gap:1px;align-content:start}
+  .ej-cifras b{font-size:16px;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;justify-content:center;gap:2px}
+  .ej-cifras b svg{width:11px;height:11px;fill:var(--gold)}
+  .ej-cifras small{font-size:10.5px;line-height:1.25;color:var(--ink-soft)}
+  .ej-leyendo{background:var(--surface);border:1px solid var(--hair);border-radius:12px;padding:10px 12px}
+  .ej-lab{display:block;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--rubric);font-weight:600}
+  .ej-libro{display:flex;gap:10px;align-items:flex-start;margin-top:7px}
+  .ej-lomo{width:20px;height:30px;flex:none;border-radius:2px 3px 3px 2px;background:#6E8CB0;box-shadow:inset 3px 0 0 rgba(0,0,0,.18)}
+  .ej-libro > span{display:grid;gap:1px;flex:1;min-width:0}
+  .ej-libro b{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:15px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ej-autor{font-size:12px;color:#5E7896}
+  .ej-barra{display:block;height:4px;border-radius:2px;background:var(--hair);margin-top:6px;overflow:hidden}
+  .ej-barra i{display:block;height:100%;width:62%;background:#6FB0AE;border-radius:2px}
+  .ej-sec{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:15px;font-weight:700}
+  .ej-destacados{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:-4px}
+  .ej-destacados i{display:flex;align-items:flex-end;aspect-ratio:3/4;border-radius:4px 6px 6px 4px;padding:6px;font-style:normal;box-shadow:inset 3px 0 0 rgba(0,0,0,.16)}
+  .ej-destacados i:nth-child(1){background:#7FA88B}.ej-destacados i:nth-child(2){background:#C08BA0}.ej-destacados i:nth-child(3){background:#9182B0}
+  .ej-destacados span{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:10.5px;font-weight:700;line-height:1.15;color:#fff;hyphens:auto;-webkit-hyphens:auto}
+  .ej-blog-tit{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:21px;line-height:1.15;padding-right:64px;text-wrap:balance}
+  .ej-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .ej-chips i{font-style:normal;font-size:11.5px;border:1px solid var(--hair-strong);border-radius:999px;padding:3px 10px;color:var(--ink-soft)}
+  .ej-chips i.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .ej-entrada{display:grid;gap:5px;padding-top:11px;border-top:1px solid var(--hair)}
+  .ej-entrada b{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:16px;line-height:1.22}
+  .ej-cita{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-style:italic;font-size:13.5px;line-height:1.4;color:var(--ink-soft);padding-left:10px;border-left:2px solid var(--rubric)}
+  .ej-meta{font-size:12px;color:var(--ink-soft)}
+
+  .hub-mas{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-top:20px}
+  @media(min-width:760px){.hub-mas{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  .hub-link{display:flex;flex-direction:column;gap:9px;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--hair);border-radius:20px;
+    padding:22px 22px 20px;transition:border-color .25s var(--ease),transform .25s var(--ease)}
+  .hub-link:hover{border-color:var(--hair-strong);transform:translateY(-2px)}
+  .hub-link .eyebrow{font-size:11px;letter-spacing:.18em}
+  .hub-link-tit{font-family:ui-serif,"New York",Palatino,Georgia,serif;font-size:21px;font-weight:700;line-height:1.2;letter-spacing:-.01em;color:var(--ink);text-wrap:balance}
+  .hub-link-meta{font-size:14px;color:var(--ink-soft)}
+  .hub-link-mas{margin-top:auto;padding-top:4px;font-size:14.5px;font-weight:600;color:var(--rubric)}
+  .hub-home .cta{padding-top:clamp(36px,5vw,64px)}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ej-autor{color:#8FA9C7}}
+  :root[data-theme="dark"] .ej-autor{color:#8FA9C7}
+  @media (prefers-reduced-motion:reduce){.hub-link:hover{transform:none}}
+</style>
+<main id="home" class="hub-home">
+  <section class="hub-hero" id="hero">
+    <svg class="const" viewBox="0 0 1180 520" aria-hidden="true">
+      <g stroke="var(--edge)" stroke-width="1.1" fill="none" opacity=".85">
+        <path d="M120 360 L300 190"/><path d="M300 190 L520 300"/><path d="M520 300 L760 150"/>
+        <path d="M760 150 L980 260"/><path d="M520 300 L640 430"/><path d="M300 190 L180 120"/>
+        <path d="M640 430 L860 400"/><path d="M980 260 L1060 400"/><path d="M120 360 L360 440"/>
+        <path d="M360 440 L640 430"/><path d="M760 150 L900 90"/><path d="M180 120 L360 60"/>
+      </g>
+      <g fill="var(--gold)">
+        <circle cx="120" cy="360" r="4.5"/><circle cx="520" cy="300" r="5.5"/><circle cx="980" cy="260" r="4.5"/>
+        <circle cx="360" cy="440" r="4"/><circle cx="900" cy="90" r="4"/><circle cx="180" cy="120" r="4"/>
+      </g>
+      <g fill="var(--rubric)">
+        <circle cx="300" cy="190" r="5.5"/><circle cx="760" cy="150" r="6"/><circle cx="640" cy="430" r="5"/>
+        <circle cx="860" cy="400" r="4.5"/><circle cx="1060" cy="400" r="4"/><circle cx="360" cy="60" r="3.6"/>
+      </g>
+    </svg>
+    <div class="wrap hub-hero-grid">
+      <div class="hub-hero-txt">
+        <span class="eyebrow">{{ x.eyebrow }}</span>
+        <h1 class="serif">{{ x.h1 }}</h1>
+        <p class="hub-sub">{{ x.sub }}</p>
+        <ul class="hub-promesas">
+          {%- for p in x.promesas %}
+          <li>{{ p }}</li>
+          {%- endfor %}
+        </ul>
+        <div class="hub-acciones">
+          {%- if hay_app_store %}
+          <a class="btn btn-primary" href="{{ site.app_store_url }}">{{ x.boton_app_store }}</a>
+          {%- else %}
+          <a class="btn btn-primary" href="#notify">{{ x.boton_lista }}</a>
+          {%- endif %}
+          <a class="btn btn-ghost" href="{{ url_compartir | relative_url }}">{{ t.share }}</a>
+        </div>
+        {%- if hay_app_store %}
+        <p class="hub-lanza">{{ x.disponible }} · iPhone · iPad</p>
+        {%- else %}
+        <p class="hub-lanza launch-label">{{ x.lanzamiento }}</p>
+        {%- endif %}
+      </div>
+      <div class="hub-hero-img">
+        {% include escena-app.html %}
+      </div>
+    </div>
+  </section>
+
+  <section class="hub-util" id="herramientas" aria-labelledby="util-titulo">
+    <div class="wrap">
+      <div class="hub-cab">
+        <span class="eyebrow">{{ x.util_eyebrow }}</span>
+        <h2 class="serif" id="util-titulo">{{ x.util_h2 }}</h2>
+      </div>
+
+      <article class="hub-tool" id="compartir" aria-labelledby="compartir-titulo">
+        <div class="hub-tool-txt">
+          <h3 id="compartir-titulo">{{ t.share }}</h3>
+          <p>{{ x.compartir_p }}</p>
+          <p class="hub-nota">{{ x.compartir_nota }}</p>
+          <a class="btn btn-primary" href="{{ url_compartir | relative_url }}">{{ x.compartir_boton }} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+        <div class="hub-minis">
+          <a class="hub-mini" href="{{ url_compartir | relative_url }}{{ sep }}modo=grid">
+            <span class="mini mini-grid" aria-hidden="true">
+              <span class="mini-logo">ℵ</span>
+              <span class="mini-tit">{{ x.mini_grid }}</span>
+              <span class="mini-libros"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="mini-frase">“{{ x.mini_frase }}”</span>
+              <span class="mini-pie"><span>Aleph</span><b>alephlibrary.com</b></span>
+            </span>
+            <span class="hub-mini-tit">{{ x.grid }}</span>
+            <span class="hub-mini-p">{{ x.grid_p }}</span>
+          </a>
+          <a class="hub-mini" href="{{ url_compartir | relative_url }}{{ sep }}modo=para">
+            <span class="mini-pila" aria-hidden="true">
+              <span class="mini mini-para">
+                <span class="mini-logo">ℵ</span>
+                <span class="mini-serie">{{ x.mini_serie }}</span>
+                <span class="mini-tit">{{ x.mini_para }}</span>
+                <span class="mini-abanico"><i></i><i></i><i></i></span>
+                <span class="mini-lista">
+                  {%- for l in x.mini_libros %}
+                  <span><b>{{ forloop.index }}</b>{{ l }}</span>
+                  {%- endfor %}
+                </span>
+                <span class="mini-pie"><span>Aleph</span><b>alephlibrary.com</b></span>
+              </span>
+            </span>
+            <span class="hub-mini-tit">{{ x.para }}</span>
+            <span class="hub-mini-p">{{ x.para_p }}</span>
+          </a>
+        </div>
+      </article>
+
+      <article class="hub-tool" id="perfiles" aria-labelledby="perfiles-titulo">
+        <div class="hub-tool-txt">
+          <h3 id="perfiles-titulo">{{ x.perfiles_h3 }}</h3>
+          <p>{{ x.perfiles_p }}</p>
+          <p class="hub-url">{{ x.perfiles_url }}</p>
+          <p class="hub-nota">{{ x.perfiles_nota }}</p>
+          {%- if hay_perfil %}
+          <a class="btn btn-ghost" href="/@{{ site.perfil_ejemplo }}{{ q_idioma }}">{{ x.perfiles_ver }} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          {%- endif %}
+        </div>
+        <div class="hub-ejemplos">
+          <div class="ej ej-perfil" role="img" aria-label="{{ x.ej_perfil_alt }}">
+            <span class="ej-badge">{{ x.ejemplo }}</span>
+            <span class="ej-cab"><span class="ej-av">{{ x.ej_nombre | slice: 0 }}</span><span class="ej-id"><b>{{ x.ej_nombre }}</b><span>{{ x.ej_alias }}</span></span></span>
+            <span class="ej-cifras">
+              <span><b>12<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.4-5.2.3 1.6 1 2.6 2.1 3.2C11 8 11 5 12 2z"/></svg></b><small>{{ x.ej_racha }}</small></span>
+              <span><b>8</b><small>{{ x.ej_leidos }}</small></span>
+              <span><b>{{ x.ej_horas_n }}</b><small>{{ x.ej_horas }}</small></span>
+            </span>
+            <span class="ej-leyendo">
+              <span class="ej-lab">{{ x.ej_leyendo }}</span>
+              <span class="ej-libro"><i class="ej-lomo"></i><span><b>{{ x.ej_libro }}</b><span class="ej-autor">{{ x.ej_autor }}</span><span class="ej-barra"><i></i></span></span></span>
+            </span>
+            <span class="ej-sec">{{ x.ej_destacados }}</span>
+            <span class="ej-destacados">
+              {%- for l in x.ej_destacados_libros %}
+              <i><span>{{ l }}</span></i>
+              {%- endfor %}
+            </span>
+          </div>
+          <div class="ej ej-blog" role="img" aria-label="{{ x.ej_blog_alt }}">
+            <span class="ej-badge">{{ x.ejemplo }}</span>
+            <b class="ej-blog-tit">{{ x.ej_blog }}</b>
+            <span class="ej-chips">
+              {%- for f in x.ej_filtros %}
+              <i{% if forloop.first %} class="on"{% endif %}>{{ f }}</i>
+              {%- endfor %}
+            </span>
+            <span class="ej-entrada"><b>{{ x.ej_entrada }}</b><span class="ej-cita">“{{ x.ej_cita }}”</span><span class="ej-meta">{{ x.ej_meta }}</span></span>
+            <span class="ej-entrada"><b>{{ x.ej_entrada2 }}</b><span class="ej-meta">{{ x.ej_meta2 }}</span></span>
+          </div>
+        </div>
+      </article>
+
+      <div class="hub-mas">
+        <a class="hub-link" href="{{ pre | append: '/announcements/' | relative_url }}">
+          <span class="eyebrow">{{ x.noticias }}</span>
+          <span class="hub-link-tit">{{ x.noticias_h3 }}</span>
+          <span class="hub-link-meta">{{ x.noticias_fecha }}</span>
+          <span class="hub-link-mas">{{ x.noticias_mas }} →</span>
+        </a>
+        <a class="hub-link" href="{{ pre | append: '/feedback/' | relative_url }}">
+          <span class="eyebrow">{{ x.comentarios }}</span>
+          <span class="hub-link-tit">{{ x.comentarios_h3 }}</span>
+          <span class="hub-link-mas">{{ x.comentarios_mas }} →</span>
+        </a>
+        <a class="hub-link" href="{{ pre | append: '/about/' | relative_url }}">
+          <span class="eyebrow">{{ x.acerca }}</span>
+          <span class="hub-link-tit">{{ x.acerca_h3 }}</span>
+          <span class="hub-link-mas">{{ x.acerca_mas }} →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {% include lista-cta.html %}
+</main>

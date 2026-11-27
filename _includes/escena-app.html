@@ -1,0 +1,60 @@
+{%- assign idioma_e = page.lang | default: 'en' -%}
+{%- assign e = site.data.inicio[idioma_e].escena -%}
+<div class="stage">
+  <div class="phone">
+    <div class="screen">
+      <div class="island" aria-hidden="true"></div>
+      <div class="scene" role="img" aria-label="{{ e.aria }}">
+        <div class="app-status" aria-hidden="true">
+          <span>9:41</span>
+          <span class="sig"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px;opacity:.4"></i></span>
+        </div>
+        <div class="app-body" aria-hidden="true">
+          <div class="app-titulo">{{ e.titulo }}</div>
+          <div class="app-seg">{% for s in e.seg %}<span{% if forloop.first %} class="on"{% endif %}>{{ s }}</span>{% endfor %}</div>
+          <div class="app-resurge">
+            <span class="app-resurge-lab">✦ {{ e.resurge }}</span>
+            <span class="app-resurge-q">“{{ e.cita }}”</span>
+            <span class="app-resurge-src">{{ e.fuente }}</span>
+            <span class="app-resurge-btn">{{ e.siguiente }}</span>
+          </div>
+          <div class="app-dia">{{ e.hoy }}</div>
+          <div class="app-card">
+            {%- for f in e.filas %}
+            <div class="app-row">
+              {%- if forloop.first %}
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M14.5 4.5l5 5L10 19H5v-5z"/></svg>
+              {%- else %}
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M9 10h7M9 14h7M9 18h4"/></svg>
+              {%- endif %}
+              <span class="tx"><span class="app-lab">{{ f[0] }}</span><span class="app-name">{{ f[1] }}</span></span>
+              <span class="app-chev">›</span>
+            </div>
+            {%- endfor %}
+          </div>
+          <div class="app-dia">{{ e.ayer }}</div>
+          <div class="app-card">
+            {%- for f in e.filas_ayer %}
+            <div class="app-row">
+              {%- if forloop.first %}
+              <svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.6 6C6.7 7.3 5 9.6 5 12.6V18h5.4v-5.4H7.9c0-1.9 1-3.4 2.9-4.4zM18.6 6c-2.9 1.3-4.6 3.6-4.6 6.6V18h5.4v-5.4h-2.5c0-1.9 1-3.4 2.9-4.4z"/></svg>
+              {%- else %}
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M14.5 4.5l5 5L10 19H5v-5z"/></svg>
+              {%- endif %}
+              <span class="tx"><span class="app-lab">{{ f[0] }}</span><span class="app-name">{{ f[1] }}</span></span>
+              <span class="app-chev">›</span>
+            </div>
+            {%- endfor %}
+          </div>
+        </div>
+        <div class="app-tabs" aria-hidden="true">
+          <span class="app-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>{{ e.tabs[0] }}</span></span>
+          <span class="app-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4v16H5zM10 4h4v16h-4z"/><path d="M15.5 5.2l3.8-1 3.6 15.4-3.8 1z"/></svg><span>{{ e.tabs[1] }}</span></span>
+          <span class="app-tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8.5 5.5-13.5 14-14-.5 8.5-5.5 14-14 14z"/><path d="M5 19l8-8"/></svg><span>{{ e.tabs[2] }}</span></span>
+          <span class="app-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5v14M3 5.5a10 10 0 0 1 9 1 10 10 0 0 1 9-1v13a10 10 0 0 0-9 1 10 10 0 0 0-9-1z"/></svg><span>{{ e.tabs[3] }}</span></span>
+          <span class="app-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.6 18.2a6.4 6.4 0 0 1 10.8 0"/></svg><span>{{ e.tabs[4] }}</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

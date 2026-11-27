@@ -1,0 +1,28 @@
+{%- assign idioma_c = page.lang | default: 'en' -%}
+{%- assign xc = site.data.inicio[idioma_c] -%}
+{%- if idioma_c == 'en' -%}{%- assign pre_c = '' -%}{%- else -%}{%- capture pre_c -%}/{{ idioma_c }}{%- endcapture -%}{%- endif -%}
+{%- assign hay_app_store_c = false -%}{%- if site.app_store_url and site.app_store_url != '' -%}{%- assign hay_app_store_c = true -%}{%- endif -%}
+<section class="cta" id="notify">
+  <div class="wrap">
+    <div class="card">
+      {%- if hay_app_store_c %}
+      <h2 class="serif">{{ xc.lista_h2_despues }}</h2>
+      <p>{{ xc.lista_p_despues }}</p>
+      <p class="cta-row"><a class="btn btn-primary" href="{{ site.app_store_url }}">{{ xc.boton_app_store }}</a></p>
+      {% include lista.html boton=xc.boton_novedades %}
+      {%- else %}
+      <h2 class="serif">{{ xc.lista_h2 }}</h2>
+      <div class="launch cta-cuenta">
+        <div class="countdown" data-launch="2026-12-01T00:00:00" role="timer" aria-label="{{ xc.cuenta_aria }}">
+          <div class="cd-unit"><span class="cd-num" data-cd="d" aria-hidden="true">––</span><span class="cd-lab">{{ xc.cuenta[0] }}</span></div>
+          <div class="cd-unit"><span class="cd-num" data-cd="h" aria-hidden="true">––</span><span class="cd-lab">{{ xc.cuenta[1] }}</span></div>
+          <div class="cd-unit"><span class="cd-num" data-cd="m" aria-hidden="true">––</span><span class="cd-lab">{{ xc.cuenta[2] }}</span></div>
+          <div class="cd-unit"><span class="cd-num" data-cd="s" aria-hidden="true">––</span><span class="cd-lab">{{ xc.cuenta[3] }}</span></div>
+        </div>
+      </div>
+      <p>{{ xc.lista_p }}<a class="cta-enlace" href="{{ pre_c | append: '/announcements/' | relative_url }}">{{ xc.lista_enlace }}</a></p>
+      {% include lista.html boton=xc.boton_lista %}
+      {%- endif %}
+    </div>
+  </div>
+</section>

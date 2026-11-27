@@ -1,7 +1,12 @@
 title: Aleph Personal Library
-description: "The goal is not to read books. It is to interconnect them. A living graph of ideas for iOS."
+description: "A personal library for iPhone and iPad that gives you back what you read: your books, your highlights, your language."
 author: Cognitive Architectures S.A.S.
 lang: en
+# Enlace de Aleph en la App Store. Vacío = el botón principal es la lista de espera; con el enlace, el sitio
+# entero (cabecera, portada y pie) pasa a «App Store» en los cinco idiomas.
+app_store_url: ""
+# Alias (sin @) de un perfil público real para enseñarlo en la portada. Vacío = solo el ejemplo dibujado.
+perfil_ejemplo: ""
 # Lista de espera: Worker propio (alephlibrary.com/api/lista) con Turnstile. La clave del sitio es pública.
 turnstile_sitekey: "0x4AAAAAAF8INclDTH43zm0L"
 url: "https://alephlibrary.com"
